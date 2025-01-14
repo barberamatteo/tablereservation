@@ -5,7 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tabledefinitions")
+@Table(name = "tabledefinition")
 public class TableDefinition {
     @Id
     private String categoryName;

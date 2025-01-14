@@ -1,6 +1,5 @@
 package it.matteobarbera.tablereservation.model.table.admin;
 
-import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +53,7 @@ public class TablesService {
     }
 
 
-    public Set<CustomTable> getAdequateTables(Reservation reservation) {
-        return tablesRepository.getAdequateTables(reservation.getNumberOfPeople());
+    public Set<CustomTable> getAdequateTables(Integer numberOfPeople) {
+        return tablesRepository.getAdequateTables(numberOfPeople);
     }
 }

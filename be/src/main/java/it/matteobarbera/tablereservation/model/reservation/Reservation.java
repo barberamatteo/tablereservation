@@ -5,43 +5,74 @@ import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "reservations")
+@Table
 public class Reservation {
 
     @Id
+    @SequenceGenerator(
+            name = "reservation_sequence",
+            sequenceName = "reservation_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "reservation_sequence"
+    )
     private Long id;
 
-    @OneToMany
+    @ManyToMany
     private List<CustomTable> jointTables;
 
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "start_date_time"),
-            @JoinColumn(name = "end_date_time")
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "startDateTime", column = @Column(name = "start_date_time")),
+            @AttributeOverride(name = "endDateTime", column = @Column(name = "end_date_time"))
     })
     private Interval interval;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
     private Integer numberOfPeople;
 
-    public Reservation() {}
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumns({
+            @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
+            @JoinColumn(name = "date", referencedColumnName = "date")
+    })
+    private Schedule schedule;
+
 
     public Reservation(
             List<CustomTable> jointTables,
-            Interval interval,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
             Customer customer,
             Integer numberOfPeople
     ) {
+        this(startDateTime, endDateTime, customer, numberOfPeople);
         this.jointTables = jointTables;
-        this.interval = interval;
+    }
+
+    public Reservation(
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
+            Customer customer,
+            Integer numberOfPeople
+    ) {
+        this.jointTables = new ArrayList<>();
+        this.interval = new Interval(startDateTime, endDateTime);
         this.customer = customer;
         this.numberOfPeople = numberOfPeople;
+    }
+
+    public Reservation() {
     }
 
     public Long getId() {
@@ -82,5 +113,24 @@ public class Reservation {
 
     public void setNumberOfPeople(Integer numberOfPeople) {
         this.numberOfPeople = numberOfPeople;
+    }
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", jointTables=" + jointTables +
+                ", interval=" + interval +
+                ", customer=" + customer +
+                ", numberOfPeople=" + numberOfPeople +
+                '}';
     }
 }

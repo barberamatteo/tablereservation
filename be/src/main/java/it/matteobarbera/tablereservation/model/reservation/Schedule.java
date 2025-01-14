@@ -3,15 +3,16 @@ package it.matteobarbera.tablereservation.model.reservation;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "schedules")
+@Table
 @IdClass(ScheduleIdRecord.class)
 public class Schedule {
 
     @Id
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "table_id", nullable = false)
     private CustomTable table;
 
@@ -20,18 +21,23 @@ public class Schedule {
     private String parsedDate;
 
 
-    @ManyToOne(optional = false)
-    private Reservation reservation;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "schedule")
+    private List<Reservation> reservation;
 
     public Schedule() {
     }
 
-    public Schedule(CustomTable table, String parsedDate, Reservation reservation) {
+    public Schedule(CustomTable table, String parsedDate, List<Reservation> reservation) {
         this.table = table;
         this.parsedDate = parsedDate;
         this.reservation = reservation;
     }
 
+    public Schedule(CustomTable table, String parsedDate) {
+        this.table = table;
+        this.parsedDate = parsedDate;
+        this.reservation = new ArrayList<>();
+    }
     public CustomTable getTable() {
         return table;
     }
@@ -48,11 +54,24 @@ public class Schedule {
         this.parsedDate = parsedDate;
     }
 
-    public Reservation getReservation() {
+    public List<Reservation> getReservation() {
         return reservation;
     }
 
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+    public void setReservation(List<Reservation> reservations) {
+        this.reservation = reservations;
+    }
+
+    public void addReservation(Reservation reservation) {
+        this.reservation.add(reservation);
+    }
+
+    @Override
+    public String toString() {
+        return "Schedule{" +
+                "table=" + table +
+                ", parsedDate='" + parsedDate + '\'' +
+                ", reservationsSize=" + reservation.size() +
+                '}';
     }
 }
