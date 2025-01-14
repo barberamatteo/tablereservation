@@ -1,22 +1,16 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 
 import java.time.LocalDateTime;
 
-@Entity
-@IdClass(IntervalIdRecord.class)
-
+@Embeddable
 public class Interval {
-    @Id
     private LocalDateTime startDateTime;
-    @Id
     private LocalDateTime endDateTime;
-
-    public Interval() {
-    }
 
     public Interval(LocalDateTime startDateTime, LocalDateTime endDateTime) {
         this.startDateTime = startDateTime;
@@ -25,6 +19,10 @@ public class Interval {
 
     public Interval(String startDateTime, String endDateTime) {
         this(LocalDateTime.parse(startDateTime), LocalDateTime.parse(endDateTime));
+    }
+
+    public Interval() {
+
     }
 
     public LocalDateTime getEndDateTime() {

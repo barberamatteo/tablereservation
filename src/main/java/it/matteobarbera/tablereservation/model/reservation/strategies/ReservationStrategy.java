@@ -5,5 +5,6 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 
 public interface ReservationStrategy {
 
+
     Manipulations postReservation(Reservation reservation);
 }

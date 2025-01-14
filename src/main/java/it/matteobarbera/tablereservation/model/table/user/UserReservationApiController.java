@@ -3,14 +3,14 @@ package it.matteobarbera.tablereservation.model.table.user;
 import it.matteobarbera.tablereservation.Constants;
 import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
-import it.matteobarbera.tablereservation.model.reservation.Interval;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
-import it.matteobarbera.tablereservation.model.reservation.strategies.FillLoungeFirst;
-import org.hibernate.internal.build.AllowNonPortable;
+import it.matteobarbera.tablereservation.model.reservation.strategies.ReservationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @RestController
@@ -19,17 +19,21 @@ public class UserReservationApiController {
 
     private final UserPreferences userPreferences;
     private final CustomerService customerService;
-    private final FillLoungeFirst fillLoungeFirst;
+    private final ReservationStrategy fillLoungeFirst;
 
     @Autowired
-    public UserReservationApiController(UserPreferences userPreferences, CustomerService customerService, FillLoungeFirst fillLoungeFirst) {
+    public UserReservationApiController(
+            UserPreferences userPreferences,
+            CustomerService customerService,
+            ReservationStrategy fillLoungeFirst
+    ) {
         this.userPreferences = userPreferences;
         this.customerService = customerService;
         this.fillLoungeFirst = fillLoungeFirst;
     }
 
     @PostMapping("/newreservation/")
-    public String newReservation(
+    public Set<Object> newReservation(
             @RequestParam(name = "customer") Long customerId,
             @RequestParam(name = "arrivalDateTime") String arrivalDateTime,
             @RequestParam(name = "leaveDateTime", required = false) String leaveDateTime,
@@ -45,14 +49,15 @@ public class UserReservationApiController {
 
 
         Reservation reservation = new Reservation(
-                null,
-                new Interval(startDateTime, endDateTime),
+                startDateTime,
+                endDateTime,
                 customerService.getCustomerById(customerId),
                 numberOfPeople
         );
 
-        fillLoungeFirst.postReservation(reservation).runAll();
+        Set<Object> toReturn = new HashSet<>();
+        fillLoungeFirst.postReservation(reservation).runAll(toReturn);
+        return toReturn;
 
-        return null;
     }
 }

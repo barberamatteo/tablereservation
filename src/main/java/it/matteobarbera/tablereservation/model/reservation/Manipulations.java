@@ -1,18 +1,16 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class Manipulations extends ArrayList<Supplier<?>> {
+public class Manipulations extends ArrayList<Function<?, ?>> {
 
-
-    /*
-     * TODO: Vedere se va con i supplier oppure riprogettare
-     */
-    public void runAll(){
-        for (Supplier<?> supplier : this) {
-            supplier.get();
-        }
+    public void runAll(Set<Object> objects) {
+        for (Function<?, ?> function : this)
+            objects.add(function.apply(null));
     }
 
 
