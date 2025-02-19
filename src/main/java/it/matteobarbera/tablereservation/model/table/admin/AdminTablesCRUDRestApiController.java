@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,6 +22,12 @@ public class AdminTablesCRUDRestApiController {
     public AdminTablesCRUDRestApiController(TablesService tablesService, TablesDefinitionService tablesDefinitionService) {
         this.tablesService = tablesService;
         this.tablesDefinitionService = tablesDefinitionService;
+    }
+
+    @GetMapping("/getall/")
+    public List<CustomTable> getAllTables() {
+        List<CustomTable> allTables = tablesService.getAllTables();
+        return allTables;
     }
 
     @GetMapping("/getbynum/{num}")
