@@ -1,10 +1,14 @@
 package it.matteobarbera.tablereservation.model.reservation.strategies;
 
-import it.matteobarbera.tablereservation.model.reservation.Manipulations;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import it.matteobarbera.tablereservation.model.table.CustomTable;
+
+import java.util.Set;
 
 public interface ReservationStrategy {
 
 
-    Manipulations postReservation(Reservation reservation);
+    Set<AbstractTable> postReservation(Reservation reservation);
+
 }

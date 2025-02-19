@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -33,7 +32,7 @@ public class UserReservationApiController {
     }
 
     @PostMapping("/newreservation/")
-    public Set<Object> newReservation(
+    public Set<?> newReservation(
             @RequestParam(name = "customer") Long customerId,
             @RequestParam(name = "arrivalDateTime") String arrivalDateTime,
             @RequestParam(name = "leaveDateTime", required = false) String leaveDateTime,
@@ -47,7 +46,7 @@ public class UserReservationApiController {
             endDateTime = LocalDateTime.parse(leaveDateTime);
         }
 
-
+        
         Reservation reservation = new Reservation(
                 startDateTime,
                 endDateTime,
@@ -55,9 +54,7 @@ public class UserReservationApiController {
                 numberOfPeople
         );
 
-        Set<Object> toReturn = new HashSet<>();
-        fillLoungeFirst.postReservation(reservation).runAll(toReturn);
-        return toReturn;
+        return fillLoungeFirst.postReservation(reservation);
 
     }
 }

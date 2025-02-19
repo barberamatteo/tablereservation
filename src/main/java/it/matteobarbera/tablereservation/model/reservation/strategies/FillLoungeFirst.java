@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.reservation.strategies;
 
 import it.matteobarbera.tablereservation.model.reservation.*;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 @Component
 @Primary
@@ -28,43 +28,39 @@ public class FillLoungeFirst implements ReservationStrategy{
 
 
     @Override
-    public synchronized Manipulations postReservation(Reservation reservation) {
-        return new Manipulations(){{
-            add(
-                    (Function<Void, Set<CustomTable>>) unused -> {
-                        List<Schedule> schedulesByDay = scheduleService.getSchedulesByDayAndAdequateTable(
-                                reservation.getInterval().getStartDateTime().toLocalDate(),
-                                reservation.getNumberOfPeople()
-                        );
-                        for (Schedule schedule : schedulesByDay) {
-                            System.out.println(schedule + "\n\n");
-                            if (schedule.getReservation().isEmpty()){
-                                scheduleService.addReservationToSchedule(
-                                        reservationsService.addReservation(
-                                                schedule,
-                                                reservation,
-                                                Set.of(schedule.getTable())),
-                                        schedule
-                                );
-                                return Set.of(schedule.getTable());
-                            }
-                            Boolean conflictualReservation = false;
-                            for (Reservation r : schedule.getReservation()) {
-                                conflictualReservation =
-                                        conflictualReservation || reservation.getInterval().clashes(r.getInterval());
-                            }
-                            if (!conflictualReservation) {
-                                reservationsService.addReservation(
-                                        schedule,
-                                        reservation,
-                                        Set.of(schedule.getTable()));
-                                return Set.of(schedule.getTable());
-                            }
-                        }
-                        return Set.of();
-                    }
-            );
-        }};
+    public Set<AbstractTable> postReservation(Reservation reservation) {
+        List<Schedule> schedulesByDay = scheduleService.getSchedulesByDayAndAdequateTable(
+                reservation.getInterval().getStartDateTime().toLocalDate(),
+                reservation.getNumberOfPeople()
+        );
+        for (Schedule schedule : schedulesByDay) {
+            if (schedule.getReservation().isEmpty()){
+                scheduleService.addReservationToSchedule(
+                        reservationsService.addReservation(
+                                schedule,
+                                reservation,
+                                Set.of(schedule.getTable())),
+                        schedule
+                );
+                return Set.of(schedule.getTable());
+            }
+            boolean conflictualReservation = false;
+            for (Reservation r : schedule.getReservation()) {
+                conflictualReservation =
+                        conflictualReservation || reservation.getInterval().clashes(r.getInterval());
+            }
+            if (!conflictualReservation) {
+                reservationsService.addReservation(
+                        schedule,
+                        reservation,
+                        Set.of(schedule.getTable())
+                );
+                return Set.of(schedule.getTable());
+            }
+        }
+        return Set.of();
 
     }
+
+
 }
