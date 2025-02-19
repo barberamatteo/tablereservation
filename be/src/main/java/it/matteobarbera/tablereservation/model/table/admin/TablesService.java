@@ -48,7 +48,7 @@ public class TablesService {
     }
 
 
-    List<CustomTable> getAllTables() {
+    public List<CustomTable> getAllTables() {
         return tablesRepository.findAll();
     }
 
