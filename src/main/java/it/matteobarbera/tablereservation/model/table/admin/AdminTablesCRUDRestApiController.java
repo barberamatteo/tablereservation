@@ -24,6 +24,7 @@ public class AdminTablesCRUDRestApiController {
         this.tablesDefinitionService = tablesDefinitionService;
     }
 
+    @CrossOrigin
     @GetMapping("/getall/")
     public List<CustomTable> getAllTables() {
         List<CustomTable> allTables = tablesService.getAllTables();

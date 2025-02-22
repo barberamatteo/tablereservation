@@ -13,15 +13,15 @@ public class DebugConfig {
     @Bean
     CommandLineRunner commandLineRunner(TablesDefinitionService tablesDefinitionService, TablesService tablesService) {
         return args -> {
-            tablesDefinitionService.createNewDef("tavoloda4", 4);
-            tablesDefinitionService.createNewDef("tavoloda6", 6);
+            tablesDefinitionService.createNewDef("Tavolo piccolo", 4);
+            tablesDefinitionService.createNewDef("Tavolo grande", 6);
 
-            tablesService.createTable("tavoloda4", 1);
-            tablesService.createTable("tavoloda4", 2);
-            tablesService.createTable("tavoloda4", 3);
-            tablesService.createTable("tavoloda6", 4);
-            tablesService.createTable("tavoloda6", 5);
-            tablesService.createTable("tavoloda6", 6);
+            tablesService.createTable("Tavolo piccolo", 1);
+            tablesService.createTable("Tavolo piccolo", 2);
+            tablesService.createTable("Tavolo piccolo", 3);
+            tablesService.createTable("Tavolo grande", 4);
+            tablesService.createTable("Tavolo grande", 5);
+            tablesService.createTable("Tavolo grande", 6);
 
 
         };
