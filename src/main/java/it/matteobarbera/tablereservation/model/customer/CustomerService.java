@@ -21,4 +21,8 @@ public class CustomerService {
     public Customer getCustomerById(Long customerId) {
         return customerRepository.findById(customerId).orElse(null);
     }
+
+    public Customer getCustomerByPhoneNumber(String phoneNumber) {
+        return customerRepository.findByPhoneNumber(phoneNumber);
+    }
 }
