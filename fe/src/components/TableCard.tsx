@@ -1,21 +1,21 @@
-// @ts-ignore
-
-import Table from "./Table.ts";
+import Table from "../model/Table.ts";
+import Reservation from "../model/Reservation.ts";
 import '@material/web/divider/divider.js';
 interface TableCardProps {
-    table?: Table
+    table?: Table,
+    reservations?: Reservation[]
 }
 
-function TableCard(table: TableCardProps) {
+function TableCard(props: TableCardProps) {
 
     return (
         <>
             <div className="card col shadow-sm" style={{width: "8rem", padding: 0}} >
                 <div className="card-body" style={{padding: 0}}>
-                    <h5 className="card-title" style={{padding: "2rem"}}>{table.table?.numberInLounge}</h5>
+                    <h5 className="card-title" style={{padding: "2rem"}}>{props.table?.numberInLounge}</h5>
                     <h6 className="card-subtitle mb-2 text-body-secondary">
                         {
-                            table
+                            props
                                 .table
                                 ?.tableDefinition
                                 .categoryName
@@ -23,11 +23,14 @@ function TableCard(table: TableCardProps) {
                     </h6>
                     <h6 className="card-subtitle mb-2 text-body-secondary">
                         {
-                            "Capacity: " + table.table?.tableDefinition.standaloneCapacity
+                            "Capacity: " + props.table?.tableDefinition.standaloneCapacity
                         }
                     </h6>
                     <md-divider />
-                    <p></p>
+                    {
+                        props.reservations.
+                    }
+                    <p>{props.reservations?.customer.name + "(x" + props.reservations?.numberOfPeople + ")"}</p>
                 </div>
             </div>
         </>
