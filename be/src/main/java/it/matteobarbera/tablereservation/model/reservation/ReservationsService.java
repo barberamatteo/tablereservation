@@ -23,6 +23,10 @@ public class ReservationsService {
         return reservationsRepository.save(reservation);
     }
 
+    public Set<Reservation> getAllReservations() {
+        return Set.copyOf(reservationsRepository.findAll());
+    }
+
 //    public Set<Reservation> getReservationsByDateAndJointTables(LocalDate date, Set<CustomTable> jointTables){
 //        return reservationsRepository.getReservationsByDateAndJointTables(date, jointTables);
 //    }

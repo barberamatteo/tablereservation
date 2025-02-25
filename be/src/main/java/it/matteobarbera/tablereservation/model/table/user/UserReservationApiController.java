@@ -4,11 +4,18 @@ import it.matteobarbera.tablereservation.Constants;
 import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
+import it.matteobarbera.tablereservation.model.reservation.ReservationsService;
 import it.matteobarbera.tablereservation.model.reservation.strategies.ReservationStrategy;
+import it.matteobarbera.tablereservation.model.table.CustomTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -16,21 +23,27 @@ import java.util.Set;
 @RequestMapping(Constants.USER_RESERVATION_API_ENDPOINT)
 public class UserReservationApiController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserReservationApiController.class);
     private final UserPreferences userPreferences;
     private final CustomerService customerService;
     private final ReservationStrategy fillLoungeFirst;
+    private final ReservationsService reservationsService;
 
     @Autowired
     public UserReservationApiController(
             UserPreferences userPreferences,
             CustomerService customerService,
-            ReservationStrategy fillLoungeFirst
-    ) {
+            ReservationStrategy fillLoungeFirst,
+            ReservationsService reservationsService) {
         this.userPreferences = userPreferences;
         this.customerService = customerService;
         this.fillLoungeFirst = fillLoungeFirst;
+        this.reservationsService = reservationsService;
     }
 
+
+
+    @CrossOrigin
     @PostMapping("/newreservation/")
     public Set<?> newReservation(
             @RequestParam(name = "customer") Long customerId,
@@ -57,4 +70,35 @@ public class UserReservationApiController {
         return fillLoungeFirst.postReservation(reservation);
 
     }
+
+    @CrossOrigin
+    @PostMapping("/newreservationpn/")
+    public Set<?> newReservation(@RequestBody Map<String, Object> reservation){
+
+        Long customerId = customerService.getCustomerByPhoneNumber(
+                (String) reservation.get("customerPhoneNumber")
+        ).getId();
+        return newReservation(
+                customerId,
+                (String) reservation.get("arrivalDateTime"),
+                (String) reservation.get("leaveDateTime"),
+                Integer.parseInt((String) reservation.get("numberOfPeople"))
+        );
+    }
+
+    @CrossOrigin
+    @GetMapping("/getall/")
+    public Map<Reservation, List<CustomTable>> getAllReservation(){
+        Set<Reservation> allReservations = reservationsService.getAllReservations();
+        Map<Reservation, List<CustomTable>> toRet = new HashMap<>(){{
+           for (Reservation reservation : allReservations) {
+               put(reservation, reservation.getJointTables());
+           }
+        }};
+        /*
+         * TODO: Change to a Map<CustomTable, Set<Reservation>> implementation
+         */
+        return toRet;
+    }
+
 }
