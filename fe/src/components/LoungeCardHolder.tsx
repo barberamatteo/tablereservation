@@ -2,20 +2,20 @@ import { useState, useEffect } from 'react';
 import Table from "../model/Table.ts"
 import Reservation from "../model/Reservation.ts"
 import TableCard from "./TableCard.tsx";
+import reservation from "../model/Reservation.ts";
 async function fetchTables(): Promise<Table[]> {
     const response = await fetch('http://localhost:8080/api/v1.0.0/admin/tables/getall/');
     return await response.json();
 }
 
-async function fetchReservations(): Promise<Reservation[]>{
-    const response = await fetch('http://localhost:8080/api/v1.0.0/reservation/getall/');
+async function fetchReservations(): Promise<Map<string, Reservation[]>>{
+    const response = await fetch('http://localhost:8080/api/v1.0.0/user/reservation/getall/');
     return await response.json();
 }
 
 function LoungeCardHolder() {
     const [tables, setTables] = useState<Table[]>([]);
-    const [reservations, setReservations] = useState<Reservation[]>([]);
-    let reservationsPerTable = new Map<Reservation, Table[]>();
+    const [reservations, setReservations] = useState<Map<string, Reservation[]>>(new Map());
 
 
     useEffect(() => {
@@ -27,7 +27,7 @@ function LoungeCardHolder() {
                 console.error('Error occurred loading tables:', error);
             }
         }
-        loadTables().then();
+        loadTables().then(() => console.log(tables));
 
         async function loadReservations(){
             try {
@@ -37,22 +37,20 @@ function LoungeCardHolder() {
                 console.error('Error occurred loading reservations:', error);
             }
         }
-        loadReservations().then(() => {
-            reservations.map((value: Reservation) => {
-                reservationsPerTable.set(value, value.jointTables);
-            });
-        });
-    }, [reservations, reservationsPerTable]);
+        loadReservations().then();
+
+    }, [tables]);
 
     return (
         <>
             <div className="container" style={{marginTop: "10rem"}}>
                 <div className="row gap-5">
-                    {tables.map(table => (
-                        <TableCard
-                            table={table}
-                            {/*TODO : Stick with the backend implementation of map*/}/>
-                    ))}
+                    {/*
+
+                        Array.from(reservations.entries()).map((row, index) => (
+                        <TableCard table={JSON.parse(row[0]) as Table} reservations={row[1]}/>
+                    ))
+                    */}
                 </div>
             </div>
         </>

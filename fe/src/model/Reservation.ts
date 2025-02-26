@@ -4,16 +4,16 @@ class Reservation {
     id: number;
     jointTables: Table[];
     interval: {
-        start: string;
-        end: string;
+        startDateTime: string;
+        endDateTime: string;
     };
     customer: Customer;
     numberOfPeople: number;
 
 
     public constructor(id: number, jointTables: Table[], interval: {
-        start: string;
-        end: string
+        startDateTime: string;
+        endDateTime: string
     }, customer: Customer, numberOfPeople: number) {
         this.id = id;
         this.jointTables = jointTables;

@@ -27,10 +27,13 @@ function TableCard(props: TableCardProps) {
                         }
                     </h6>
                     <md-divider />
-                    {
-                        props.reservations.
-                    }
-                    <p>{props.reservations?.customer.name + "(x" + props.reservations?.numberOfPeople + ")"}</p>
+                    <div>
+                        {
+                            props.reservations?.map((reservation: Reservation, index: number) => (
+                                <p>{reservation.customer.name + "(x" + reservation.numberOfPeople + ")"}</p>
+                            ))
+                        }
+                    </div>
                 </div>
             </div>
         </>
