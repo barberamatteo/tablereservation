@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @RestController
@@ -88,17 +85,15 @@ public class UserReservationApiController {
 
     @CrossOrigin
     @GetMapping("/getall/")
-    public Map<Reservation, List<CustomTable>> getAllReservation(){
+    public Map<CustomTable, Set<Reservation>> getAllReservation(){
         Set<Reservation> allReservations = reservationsService.getAllReservations();
-        Map<Reservation, List<CustomTable>> toRet = new HashMap<>(){{
-           for (Reservation reservation : allReservations) {
-               put(reservation, reservation.getJointTables());
-           }
+
+        log.atInfo().log("getAllReservation");
+        return new HashMap<>(){{
+           for (Reservation reservation : allReservations)
+               for (CustomTable jointTable : reservation.getJointTables())
+                   computeIfAbsent(jointTable, k -> new HashSet<>()).add(reservation);
         }};
-        /*
-         * TODO: Change to a Map<CustomTable, Set<Reservation>> implementation
-         */
-        return toRet;
     }
 
 }

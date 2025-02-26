@@ -64,7 +64,7 @@ public abstract class AbstractTable implements Serializable {
 
     @Override
     public String toString() {
-        return "AbstractTable{" +
+        return "{" +
                 "id=" + id +
                 ", numberInLounge=" + numberInLounge +
                 ", tableDefinition=" + tableDefinition.toString() +

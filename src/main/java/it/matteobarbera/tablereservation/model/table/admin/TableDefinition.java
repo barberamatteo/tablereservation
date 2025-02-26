@@ -36,7 +36,7 @@ public class TableDefinition {
 
     @Override
     public String toString() {
-        return "TableDefinition{" +
+        return "{" +
                 "categoryName='" + categoryName + '\'' +
                 ", standaloneCapacity=" + standaloneCapacity +
                 '}';
