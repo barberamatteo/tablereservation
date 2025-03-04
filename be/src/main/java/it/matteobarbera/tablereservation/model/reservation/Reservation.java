@@ -6,8 +6,8 @@ import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
@@ -26,7 +26,7 @@ public class Reservation {
     private Long id;
 
     @ManyToMany
-    private List<CustomTable> jointTables;
+    private Set<CustomTable> jointTables;
 
     @Embedded
     @AttributeOverrides({
@@ -48,16 +48,18 @@ public class Reservation {
     })
     private Schedule schedule;
 
-
     public Reservation(
-            List<CustomTable> jointTables,
-            LocalDateTime startDateTime,
-            LocalDateTime endDateTime,
+            Set<CustomTable> jointTables,
+            Interval interval,
             Customer customer,
-            Integer numberOfPeople
+            Integer numberOfPeople,
+            Schedule schedule
     ) {
-        this(startDateTime, endDateTime, customer, numberOfPeople);
         this.jointTables = jointTables;
+        this.interval = interval;
+        this.customer = customer;
+        this.numberOfPeople = numberOfPeople;
+        this.schedule = schedule;
     }
 
     public Reservation(
@@ -66,12 +68,21 @@ public class Reservation {
             Customer customer,
             Integer numberOfPeople
     ) {
-        this.jointTables = new ArrayList<>();
+        this.jointTables = new HashSet<>();
         this.interval = new Interval(startDateTime, endDateTime);
         this.customer = customer;
         this.numberOfPeople = numberOfPeople;
     }
 
+    public Reservation(Reservation reservation, Schedule schedule) {
+        this(
+                reservation.jointTables,
+                reservation.interval,
+                reservation.customer,
+                reservation.numberOfPeople,
+                schedule
+        );
+    }
     public Reservation() {
     }
 
@@ -83,11 +94,11 @@ public class Reservation {
         this.id = id;
     }
 
-    public List<CustomTable> getJointTables() {
+    public Set<CustomTable> getJointTables() {
         return jointTables;
     }
 
-    public void setJointTables(List<CustomTable> jointTables) {
+    public void setJointTables(Set<CustomTable> jointTables) {
         this.jointTables = jointTables;
     }
 

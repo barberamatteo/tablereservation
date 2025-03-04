@@ -3,75 +3,60 @@ package it.matteobarbera.tablereservation.model.reservation;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table
-@IdClass(ScheduleIdRecord.class)
 public class Schedule {
 
-    @Id
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "table_id", nullable = false)
-    private CustomTable table;
-
-    @Id
-    @Column(name = "date")
-    private String parsedDate;
+    @EmbeddedId
+    private ScheduleIdRecord id;
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "schedule")
-    private List<Reservation> reservation;
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
+    private Set<Reservation> reservation = new HashSet<>();
 
     public Schedule() {
     }
 
-    public Schedule(CustomTable table, String parsedDate, List<Reservation> reservation) {
-        this.table = table;
-        this.parsedDate = parsedDate;
-        this.reservation = reservation;
-    }
+
 
     public Schedule(CustomTable table, String parsedDate) {
-        this.table = table;
-        this.parsedDate = parsedDate;
-        this.reservation = new ArrayList<>();
-    }
-    public CustomTable getTable() {
-        return table;
+        this.id = new ScheduleIdRecord(table, parsedDate);
     }
 
-    public void setTable(CustomTable table) {
-        this.table = table;
+    public ScheduleIdRecord getId() {
+        return id;
     }
 
-    public String getParsedDate() {
-        return parsedDate;
+    public void setId(ScheduleIdRecord id) {
+        this.id = id;
     }
 
-    public void setParsedDate(String parsedDate) {
-        this.parsedDate = parsedDate;
-    }
-
-    public List<Reservation> getReservation() {
+    public Set<Reservation> getReservation() {
         return reservation;
     }
 
-    public void setReservation(List<Reservation> reservations) {
+    public void setReservation(Set<Reservation> reservations) {
         this.reservation = reservations;
     }
 
+
     public void addReservation(Reservation reservation) {
         this.reservation.add(reservation);
+        reservation.setSchedule(this);
     }
 
     @Override
     public String toString() {
-        return "Schedule{" +
-                "table=" + table +
-                ", parsedDate='" + parsedDate + '\'' +
-                ", reservationsSize=" + reservation.size() +
-                '}';
+        String toString = "{"
+                + "        \"id\":" + id
+                + ",         \"reservation\":" + reservation
+                + "}";
+        return toString.replaceAll("[\n\r]", "   ");
     }
 }

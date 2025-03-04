@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.table.admin.TableDefinition;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @MappedSuperclass
 public abstract class AbstractTable implements Serializable {
@@ -65,11 +66,20 @@ public abstract class AbstractTable implements Serializable {
     @Override
     public String toString() {
         return "{" +
-                "id=" + id +
-                ", numberInLounge=" + numberInLounge +
-                ", tableDefinition=" + tableDefinition.toString() +
+                "\"id\":" + id +
+                ", \"numberInLounge\":" + numberInLounge +
+                ", \"tableDefinition\":" + tableDefinition.toString() +
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AbstractTable that)) return false;
+        return Objects.equals(id, that.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
