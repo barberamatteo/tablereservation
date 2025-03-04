@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import java.util.Set;
 
 @Configuration
 public class CustomerConfig {
@@ -12,7 +12,7 @@ public class CustomerConfig {
     CommandLineRunner initCustomerTable(CustomerRepository customerRepository) {
         return args ->
                 customerRepository.saveAll(
-                        List.of(
+                        Set.of(
                                 new Customer(
                                         "3921318124",
                                         "Matteo Mb",

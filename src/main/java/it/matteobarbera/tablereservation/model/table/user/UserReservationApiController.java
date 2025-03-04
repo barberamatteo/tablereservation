@@ -5,8 +5,10 @@ import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.ReservationsService;
+import it.matteobarbera.tablereservation.model.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.reservation.strategies.ReservationStrategy;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
+import it.matteobarbera.tablereservation.model.table.admin.TablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +25,26 @@ public class UserReservationApiController {
     private static final Logger log = LoggerFactory.getLogger(UserReservationApiController.class);
     private final UserPreferences userPreferences;
     private final CustomerService customerService;
-    private final ReservationStrategy fillLoungeFirst;
+
+    //The Default strategy is FillLoungeFirst
+    private final ReservationStrategy reservationStrategy;
+
     private final ReservationsService reservationsService;
+    private final TablesService tablesService;
+    private final ScheduleService scheduleService;
 
     @Autowired
     public UserReservationApiController(
             UserPreferences userPreferences,
             CustomerService customerService,
-            ReservationStrategy fillLoungeFirst,
-            ReservationsService reservationsService) {
+            ReservationStrategy reservationStrategy,
+            ReservationsService reservationsService, TablesService tablesService, ScheduleService scheduleService) {
         this.userPreferences = userPreferences;
         this.customerService = customerService;
-        this.fillLoungeFirst = fillLoungeFirst;
+        this.reservationStrategy = reservationStrategy;
         this.reservationsService = reservationsService;
+        this.tablesService = tablesService;
+        this.scheduleService = scheduleService;
     }
 
 
@@ -48,6 +57,9 @@ public class UserReservationApiController {
             @RequestParam(name = "leaveDateTime", required = false) String leaveDateTime,
             @RequestParam(name = "numberOfPeople") Integer numberOfPeople
     ){
+
+        scheduleService.initScheduleIfAbsent(arrivalDateTime, leaveDateTime);
+
         LocalDateTime startDateTime = LocalDateTime.parse(arrivalDateTime);
         LocalDateTime endDateTime;
         if (leaveDateTime == null) {
@@ -64,7 +76,7 @@ public class UserReservationApiController {
                 numberOfPeople
         );
 
-        return fillLoungeFirst.postReservation(reservation);
+        return reservationStrategy.postReservation(reservation);
 
     }
 
@@ -85,14 +97,19 @@ public class UserReservationApiController {
 
     @CrossOrigin
     @GetMapping("/getall/")
-    public Map<CustomTable, Set<Reservation>> getAllReservation(){
-        Set<Reservation> allReservations = reservationsService.getAllReservations();
-
+    public Map<CustomTable, Set<Reservation>> getAllTodayReservation(){
+        Set<Reservation> allReservations = reservationsService.getAllTodayReservations();
+        Set<CustomTable> allTables = tablesService.getAllTables();
         log.atInfo().log("getAllReservation");
         return new HashMap<>(){{
            for (Reservation reservation : allReservations)
                for (CustomTable jointTable : reservation.getJointTables())
                    computeIfAbsent(jointTable, k -> new HashSet<>()).add(reservation);
+
+           for (CustomTable table : allTables){
+               if (!containsKey(table))
+                   put(table, new HashSet<>());
+           }
         }};
     }
 

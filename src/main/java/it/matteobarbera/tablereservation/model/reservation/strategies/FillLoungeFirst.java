@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -29,36 +29,32 @@ public class FillLoungeFirst implements ReservationStrategy{
 
     @Override
     public Set<AbstractTable> postReservation(Reservation reservation) {
-        List<Schedule> schedulesByDay = scheduleService.getSchedulesByDayAndAdequateTable(
+        Set<Schedule> adequateSchedules = scheduleService.getSchedulesByDayAndAdequateTable(
                 reservation.getInterval().getStartDateTime().toLocalDate(),
                 reservation.getNumberOfPeople()
         );
-        for (Schedule schedule : schedulesByDay) {
-            if (schedule.getReservation().isEmpty()){
-                scheduleService.addReservationToSchedule(
-                        reservationsService.addReservation(
-                                schedule,
-                                reservation,
-                                Set.of(schedule.getTable())),
-                        schedule
-                );
-                return Set.of(schedule.getTable());
-            }
+
+        Set<AbstractTable> jointTables = new HashSet<>();
+
+        for (Schedule schedule : adequateSchedules) {
             boolean conflictualReservation = false;
+
             for (Reservation r : schedule.getReservation()) {
                 conflictualReservation =
                         conflictualReservation || reservation.getInterval().clashes(r.getInterval());
+
             }
-            if (!conflictualReservation) {
-                reservationsService.addReservation(
-                        schedule,
-                        reservation,
-                        Set.of(schedule.getTable())
-                );
-                return Set.of(schedule.getTable());
+                if (!conflictualReservation) {
+
+                    jointTables.add(schedule.getId().getTable());
+                    schedule.addReservation(reservation);
+                    reservation.setSchedule(schedule);
+                    scheduleService.addReservationToSchedule(schedule);
+                    return jointTables;
+                }
             }
-        }
-        return Set.of();
+
+        return jointTables;
 
     }
 

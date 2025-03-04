@@ -3,7 +3,7 @@ package it.matteobarbera.tablereservation.model.customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 
 @Service
 public class CustomerService {
@@ -14,8 +14,8 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public List<Customer> getCustomers() {
-        return customerRepository.findAll();
+    public Set<Customer> getCustomers() {
+        return Set.copyOf(customerRepository.findAll());
     }
 
     public Customer getCustomerById(Long customerId) {

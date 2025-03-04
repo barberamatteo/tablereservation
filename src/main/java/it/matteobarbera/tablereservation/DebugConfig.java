@@ -2,7 +2,6 @@ package it.matteobarbera.tablereservation;
 
 import it.matteobarbera.tablereservation.model.table.admin.TablesDefinitionService;
 import it.matteobarbera.tablereservation.model.table.admin.TablesService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

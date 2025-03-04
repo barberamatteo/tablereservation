@@ -1,10 +1,10 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
-import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -17,17 +17,12 @@ public class ReservationsService {
         this.reservationsRepository = reservationsRepository;
     }
 
-    public Reservation addReservation(Schedule schedule, Reservation reservation, Set<CustomTable> tables) {
-        reservation.getJointTables().addAll(tables);
-        reservation.setSchedule(schedule);
-        return reservationsRepository.save(reservation);
+
+    public Set<Reservation> getAllTodayReservations() {
+        return Set.copyOf(reservationsRepository.getAllByDate(
+                        new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+                )
+        );
     }
 
-    public Set<Reservation> getAllReservations() {
-        return Set.copyOf(reservationsRepository.findAll());
-    }
-
-//    public Set<Reservation> getReservationsByDateAndJointTables(LocalDate date, Set<CustomTable> jointTables){
-//        return reservationsRepository.getReservationsByDateAndJointTables(date, jointTables);
-//    }
 }

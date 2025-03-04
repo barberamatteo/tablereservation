@@ -36,10 +36,11 @@ public class TableDefinition {
 
     @Override
     public String toString() {
-        return "{" +
-                "categoryName='" + categoryName + '\'' +
-                ", standaloneCapacity=" + standaloneCapacity +
-                '}';
+        String toString = "{"
+                + "        \"categoryName\":\"" + categoryName + "\""
+                + ",         \"standaloneCapacity\":\"" + standaloneCapacity + "\""
+                + "}";
+        return toString.replaceAll("[\n\r]", "   ");
     }
 
 }

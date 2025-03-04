@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping(Constants.ADMIN_TABLES_CRUD_API_ENDPOINT)
@@ -26,9 +26,8 @@ public class AdminTablesCRUDRestApiController {
 
     @CrossOrigin
     @GetMapping("/getall/")
-    public List<CustomTable> getAllTables() {
-        List<CustomTable> allTables = tablesService.getAllTables();
-        return allTables;
+    public Set<CustomTable> getAllTables() {
+        return tablesService.getAllTables();
     }
 
     @GetMapping("/getbynum/{num}")
