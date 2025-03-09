@@ -15,12 +15,12 @@ public class DebugConfig {
             tablesDefinitionService.createNewDef("Tavolo piccolo", 4);
             tablesDefinitionService.createNewDef("Tavolo grande", 6);
 
-            tablesService.createTable("Tavolo piccolo", 1);
-            tablesService.createTable("Tavolo piccolo", 2);
-            tablesService.createTable("Tavolo piccolo", 3);
-            tablesService.createTable("Tavolo grande", 4);
-            tablesService.createTable("Tavolo grande", 5);
-            tablesService.createTable("Tavolo grande", 6);
+            tablesService.createTable("Tavolo grande", 1);
+            tablesService.createTable("Tavolo grande", 2);
+            tablesService.createTable("Tavolo grande", 3);
+            tablesService.createTable("Tavolo piccolo", 4);
+            tablesService.createTable("Tavolo piccolo", 5);
+            tablesService.createTable("Tavolo piccolo", 6);
 
 
         };
