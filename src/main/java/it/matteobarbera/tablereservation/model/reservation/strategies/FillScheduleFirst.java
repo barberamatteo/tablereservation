@@ -2,7 +2,6 @@ package it.matteobarbera.tablereservation.model.reservation.strategies;
 
 import it.matteobarbera.tablereservation.model.reservation.*;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -12,23 +11,15 @@ import java.util.Set;
 
 @Component
 @Primary
-public class FillLoungeFirst implements ReservationStrategy{
+public class FillScheduleFirst implements ReservationStrategy{
 
-    private final ScheduleService scheduleService;
-    private final ReservationsService reservationsService;
 
-    @Autowired
-    public FillLoungeFirst(
-            ScheduleService scheduleService,
-            ReservationsService reservationsService
-    ) {
-        this.scheduleService = scheduleService;
-        this.reservationsService = reservationsService;
+    public FillScheduleFirst() {
     }
 
 
     @Override
-    public Set<AbstractTable> postReservation(Reservation reservation) {
+    public Set<AbstractTable> postReservation(ScheduleService scheduleService, Reservation reservation) {
         Set<Schedule> adequateSchedules = scheduleService.getSchedulesByDayAndAdequateTable(
                 reservation.getInterval().getStartDateTime().toLocalDate(),
                 reservation.getNumberOfPeople()
