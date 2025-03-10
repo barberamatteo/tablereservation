@@ -31,7 +31,7 @@ public class NewReservationUCTest {
     // Config
 
     @Test
-    public void newReservation() throws Exception {
+    public void newReservationMvcTest() throws Exception {
         mockMvc
                 .perform(
                         post(
@@ -49,4 +49,9 @@ public class NewReservationUCTest {
                 )
                 .andExpect(status().isOk());
     }
+
+
+
+
+
 }

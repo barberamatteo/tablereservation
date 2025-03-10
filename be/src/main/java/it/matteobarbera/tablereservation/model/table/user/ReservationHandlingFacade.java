@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.ReservationsService;
+import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
@@ -68,5 +69,14 @@ public class ReservationHandlingFacade {
 
     public Customer getCustomerByPhoneNumber(String phoneNumber){
         return customerService.getCustomerByPhoneNumber(phoneNumber);
+    }
+
+    public Boolean deleteReservation(Long reservationId) {
+        Reservation reservationById = reservationsService.getScheduleById(reservationId);
+        Schedule scheduleOfReservation = scheduleService.getScheduleByReservation(reservationById);
+        if (!scheduleOfReservation.getReservation().remove(reservationById))
+            return false;
+        reservationsService.deleteReservation(reservationById);
+        return scheduleService.updateSchedule(scheduleOfReservation);
     }
 }

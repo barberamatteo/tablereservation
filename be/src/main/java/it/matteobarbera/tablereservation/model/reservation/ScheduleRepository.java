@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -29,4 +30,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
             "FROM Schedule s WHERE s.id.parsedDate = :arrivalDate"
     )
     Set<Schedule> getSchedulesByParsedDate(String arrivalDate);
+
+    Optional<Schedule> getScheduleByReservationContaining(Reservation reservation);
 }

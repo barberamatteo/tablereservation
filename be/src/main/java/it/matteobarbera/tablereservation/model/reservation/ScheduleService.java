@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Service
 public class ScheduleService {
@@ -54,4 +51,15 @@ public class ScheduleService {
         }
     }
 
+    public Schedule getScheduleByReservation(Reservation reservation) {
+        return scheduleRepository
+                .getScheduleByReservationContaining(reservation)
+                .orElse(
+                        null
+                );
+    }
+
+    public Boolean updateSchedule(Schedule scheduleOfReservation) {
+        return !scheduleRepository.save(scheduleOfReservation).equals(scheduleOfReservation);
+    }
 }
