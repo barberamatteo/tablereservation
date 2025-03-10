@@ -59,7 +59,17 @@ public class ScheduleService {
                 );
     }
 
-    public Boolean updateSchedule(Schedule scheduleOfReservation) {
-        return !scheduleRepository.save(scheduleOfReservation).equals(scheduleOfReservation);
+    public void updateSchedule(Schedule scheduleOfReservation) {
+        scheduleRepository.save(scheduleOfReservation);
+    }
+
+    public Boolean removeReservationFromSchedule(Reservation reservation) {
+        Schedule scheduleOfReservation = getScheduleByReservation(reservation);
+        if (scheduleOfReservation == null)
+            return false;
+        if (!scheduleOfReservation.removeReservation(reservation))
+            return false;
+        updateSchedule(scheduleOfReservation);
+        return true;
     }
 }
