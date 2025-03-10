@@ -73,10 +73,8 @@ public class ReservationHandlingFacade {
 
     public Boolean deleteReservation(Long reservationId) {
         Reservation reservationById = reservationsService.getScheduleById(reservationId);
-        Schedule scheduleOfReservation = scheduleService.getScheduleByReservation(reservationById);
-        if (!scheduleOfReservation.getReservation().remove(reservationById))
+        if (reservationById == null)
             return false;
-        reservationsService.deleteReservation(reservationById);
-        return scheduleService.updateSchedule(scheduleOfReservation);
+        return scheduleService.removeReservationFromSchedule(reservationById);
     }
 }

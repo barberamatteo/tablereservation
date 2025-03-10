@@ -1,7 +1,7 @@
 package it.matteobarbera.tablereservation.model.table.user;
 
 import it.matteobarbera.tablereservation.Constants;
-import it.matteobarbera.tablereservation.http.response.CommonBodies;
+import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
@@ -48,7 +48,7 @@ public class UserReservationApiController {
                 response.isEmpty()
                 ? ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonBodies.fromStatusAndMsg(
+                        .body(CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.CONFLICT.value(),
                                 "No available tables for this reservation"
                         ))
@@ -81,13 +81,13 @@ public class UserReservationApiController {
         return (
                 reservationHandlingFacade.deleteReservation(reservationId)
                 ? ResponseEntity.ok(
-                        CommonBodies.fromStatusAndMsg(
+                        CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.OK.value(),
                                 "Reservation deleted successfully"
                         )
                 )
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        CommonBodies.fromStatusAndMsg(
+                        CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.BAD_REQUEST.value(),
                                 "No resevation with ID " + reservationId + " was found"
                         )
@@ -102,7 +102,7 @@ public class UserReservationApiController {
                 response.isEmpty()
                 ? ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonBodies.fromStatusAndMsg(
+                        .body(CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.CONFLICT.value(),
                                 "There are no reservations yet today."
                         ))

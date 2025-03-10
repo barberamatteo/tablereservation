@@ -1,7 +1,7 @@
 package it.matteobarbera.tablereservation.http.response;
 
-public final class CommonBodies {
-    private CommonBodies(){
+public final class CommonJSONBodies {
+    private CommonJSONBodies(){
 
     }
 
