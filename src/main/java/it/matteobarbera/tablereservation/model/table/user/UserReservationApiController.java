@@ -48,7 +48,7 @@ public class UserReservationApiController {
                 response.isEmpty()
                 ? ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonBodies.failure(
+                        .body(CommonBodies.fromStatusAndMsg(
                                 HttpStatus.CONFLICT.value(),
                                 "No available tables for this reservation"
                         ))
@@ -74,6 +74,26 @@ public class UserReservationApiController {
 
     }
 
+    @DeleteMapping("/deletereservation/")
+    public ResponseEntity<?> deleteReservation(
+            @RequestParam(name="reservation_id") Long reservationId
+    ){
+        return (
+                reservationHandlingFacade.deleteReservation(reservationId)
+                ? ResponseEntity.ok(
+                        CommonBodies.fromStatusAndMsg(
+                                HttpStatus.OK.value(),
+                                "Reservation deleted successfully"
+                        )
+                )
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        CommonBodies.fromStatusAndMsg(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "No resevation with ID " + reservationId + " was found"
+                        )
+                )
+        );
+    }
     @CrossOrigin
     @GetMapping("/getall/")
     public ResponseEntity<?> getAllTodayReservations(){
@@ -82,7 +102,7 @@ public class UserReservationApiController {
                 response.isEmpty()
                 ? ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonBodies.failure(
+                        .body(CommonBodies.fromStatusAndMsg(
                                 HttpStatus.CONFLICT.value(),
                                 "There are no reservations yet today."
                         ))

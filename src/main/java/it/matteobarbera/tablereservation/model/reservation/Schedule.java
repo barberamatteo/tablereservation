@@ -4,6 +4,7 @@ import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -51,6 +52,10 @@ public class Schedule {
         reservation.setSchedule(this);
     }
 
+    public boolean removeReservation(Reservation reservation) {
+        return this.reservation.remove(reservation);
+    }
+
     @Override
     public String toString() {
         String toString = "{"
@@ -58,5 +63,16 @@ public class Schedule {
                 + ",         \"reservation\":" + reservation
                 + "}";
         return toString.replaceAll("[\n\r]", "   ");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Schedule schedule)) return false;
+        return Objects.equals(id, schedule.id) && Objects.equals(reservation, schedule.reservation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, reservation);
     }
 }

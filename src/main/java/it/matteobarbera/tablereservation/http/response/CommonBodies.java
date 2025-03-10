@@ -5,7 +5,7 @@ public final class CommonBodies {
 
     }
 
-    public static String failure(int status, String message) {
+    public static String fromStatusAndMsg(int status, String message) {
         return "{\"status\":" + status + ", \"message\":\"" + message + "\"}";
     }
 
