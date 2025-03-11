@@ -6,6 +6,9 @@ public class ReservationDTO {
     private String endDateTime;
     private Integer numberOfPeople;
 
+    public ReservationDTO() {
+    }
+
     public ReservationDTO(Long customerId, String startDateTime, String endDateTime, Integer numberOfPeople) {
         this.customerId = customerId;
         this.startDateTime = startDateTime;
