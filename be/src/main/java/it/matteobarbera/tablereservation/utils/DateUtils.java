@@ -2,6 +2,9 @@ package it.matteobarbera.tablereservation.utils;
 
 public class DateUtils {
 
+    private DateUtils(){
+
+    }
     public static String estrapolateDate(String dateTime){
         if (dateTime.isEmpty())
             return "";

@@ -110,4 +110,12 @@ public class UserReservationApiController {
         );
     }
 
+    @PatchMapping
+    public ResponseEntity<?> editReservationNumberOfPeople(
+            @RequestParam Long reservationId,
+            @RequestParam Integer newNumberOfPeople
+    ){
+        reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
+    }
+
 }

@@ -5,12 +5,12 @@ import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.ReservationsService;
-import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.model.table.admin.TablesService;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ReflectionUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,9 +72,20 @@ public class ReservationHandlingFacade {
     }
 
     public Boolean deleteReservation(Long reservationId) {
-        Reservation reservationById = reservationsService.getScheduleById(reservationId);
+        Reservation reservationById = reservationsService.getReservationById(reservationId);
         if (reservationById == null)
             return false;
         return scheduleService.removeReservationFromSchedule(reservationById);
+    }
+
+    public Boolean editReservationNumberOfPeople(Long reservationId, Integer newNumberOfPeople) {
+        Reservation reservationById = reservationsService.getReservationById(reservationId);
+        if (reservationById == null)
+            return false;
+        return null;
+
+        /*
+         * TODO: Continue
+         */
     }
 }

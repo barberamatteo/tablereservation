@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -60,14 +59,11 @@ public class ReservationsService {
     }
 
 
-    public Reservation getScheduleById(Long reservationId) {
+    public Reservation getReservationById(Long reservationId) {
         return reservationsRepository
                 .findById(reservationId)
                 .orElse(null);
 
     }
 
-    public void deleteReservation(Reservation reservationById) {
-        reservationsRepository.delete(reservationById);
-    }
 }
