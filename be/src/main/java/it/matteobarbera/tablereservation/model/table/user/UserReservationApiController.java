@@ -115,7 +115,25 @@ public class UserReservationApiController {
             @RequestParam Long reservationId,
             @RequestParam Integer newNumberOfPeople
     ){
-        reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
+
+        return (
+                reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople)
+                ? ResponseEntity.ok(
+                        CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.OK.value(),
+                                "Reservation with ID " + reservationId +
+                                        " has been updated successfully with a new number of people of " +
+                                        newNumberOfPeople
+                        )
+                )
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.BAD_REQUEST.value(),
+                                "No reservation with ID " + reservationId + " was found"
+                        )
+                )
+        );
+
     }
 
 }

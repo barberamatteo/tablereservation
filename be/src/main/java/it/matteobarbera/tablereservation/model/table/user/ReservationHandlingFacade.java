@@ -82,10 +82,10 @@ public class ReservationHandlingFacade {
         Reservation reservationById = reservationsService.getReservationById(reservationId);
         if (reservationById == null)
             return false;
-        return null;
+        if (reservationsService.isNumberOfPeopleUpdatableWithoutRescheduling(reservationById, newNumberOfPeople)){
+            return scheduleService.editReservationNumberOfPeopleInSchedule(reservationById, newNumberOfPeople);
+        }
+        return false;
 
-        /*
-         * TODO: Continue
-         */
     }
 }

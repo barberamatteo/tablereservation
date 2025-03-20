@@ -6,13 +6,10 @@ public final class SuccessAdmin {
     }
 
     public static String getMessageForAction(String action) {
-        switch (action){
-            case "createTable":
-                return "Table successfully created";
-            case "createDefinitionTable":
-                return "Table definition created successfully";
-            default:
-                return "Action not recognized.";
-        }
+        return switch (action) {
+            case "createTable" -> "Table successfully created";
+            case "createDefinitionTable" -> "Table definition created successfully";
+            default -> "Action not recognized.";
+        };
     }
 }

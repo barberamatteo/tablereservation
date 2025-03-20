@@ -8,6 +8,6 @@ public class ValidatorUtils {
     }
 
     public static Boolean validateReservation(ReservationDTO reservationDTO){
-
+        return null;
     }
 }
