@@ -56,6 +56,11 @@ public class Schedule {
         return this.reservation.remove(reservation);
     }
 
+    public void editReservation(Reservation reservation) {
+        this.reservation.remove(reservation);
+        this.reservation.add(reservation);
+    }
+
     @Override
     public String toString() {
         String toString = "{"

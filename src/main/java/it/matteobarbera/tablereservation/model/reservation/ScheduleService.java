@@ -6,7 +6,6 @@ import it.matteobarbera.tablereservation.utils.DateUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.*;
 
@@ -51,7 +50,7 @@ public class ScheduleService {
         }
     }
 
-    public Schedule getScheduleByReservation(Reservation reservation) {
+    private Schedule getScheduleByReservation(Reservation reservation) {
         return scheduleRepository
                 .getScheduleByReservationContaining(reservation)
                 .orElse(
@@ -59,7 +58,7 @@ public class ScheduleService {
                 );
     }
 
-    public void updateSchedule(Schedule scheduleOfReservation) {
+    private void updateSchedule(Schedule scheduleOfReservation) {
         scheduleRepository.save(scheduleOfReservation);
     }
 
@@ -69,6 +68,16 @@ public class ScheduleService {
             return false;
         if (!scheduleOfReservation.removeReservation(reservation))
             return false;
+        updateSchedule(scheduleOfReservation);
+        return true;
+    }
+
+    public Boolean editReservationNumberOfPeopleInSchedule(Reservation reservation, Integer newNumberOfPeople) {
+        Schedule scheduleOfReservation = getScheduleByReservation(reservation);
+        if (scheduleOfReservation == null)
+            return false;
+        reservation.setNumberOfPeople(newNumberOfPeople);
+        scheduleOfReservation.editReservation(reservation);
         updateSchedule(scheduleOfReservation);
         return true;
     }

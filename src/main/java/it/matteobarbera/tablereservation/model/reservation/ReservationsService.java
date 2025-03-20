@@ -63,7 +63,13 @@ public class ReservationsService {
         return reservationsRepository
                 .findById(reservationId)
                 .orElse(null);
-
     }
 
+    public Boolean isNumberOfPeopleUpdatableWithoutRescheduling(Reservation reservation, Integer numberOfPeople) {
+        return
+                reservation.getJointTables().stream().mapToInt(customTable ->
+                        customTable.getTableDefinition().getStandaloneCapacity()
+                ).sum()
+                        >= numberOfPeople;
+    }
 }
