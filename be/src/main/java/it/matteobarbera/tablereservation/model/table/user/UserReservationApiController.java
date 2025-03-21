@@ -1,11 +1,9 @@
 package it.matteobarbera.tablereservation.model.table.user;
 
-import it.matteobarbera.tablereservation.Constants;
+import it.matteobarbera.tablereservation.CacheUtils;
+import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
-import it.matteobarbera.tablereservation.model.reservation.Reservation;
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +11,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+import static it.matteobarbera.tablereservation.Constants.TOKEN;
+import static it.matteobarbera.tablereservation.Constants.USER_RESERVATION_API_ENDPOINT;
+import static it.matteobarbera.tablereservation.http.ReservationAPIError.*;
+import static it.matteobarbera.tablereservation.http.ReservationAPIInfo.*;
+
 
 @RestController
-@RequestMapping(Constants.USER_RESERVATION_API_ENDPOINT)
+@RequestMapping(USER_RESERVATION_API_ENDPOINT)
 public class UserReservationApiController {
 
     private final ReservationHandlingFacade reservationHandlingFacade;
+    private final CacheUtils cacheUtils;
 
     @Autowired
-    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade) {
+    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade, CacheUtils cacheUtils) {
         this.reservationHandlingFacade = reservationHandlingFacade;
+        this.cacheUtils = cacheUtils;
     }
 
 
@@ -42,19 +47,29 @@ public class UserReservationApiController {
                 numberOfPeople
         );
 
-        Set<AbstractTable> response = reservationHandlingFacade.newReservation(reservationDTO);
+        ReservationAPIResult result = reservationHandlingFacade.newReservation(reservationDTO);
 
-        return (
-                response.isEmpty()
-                ? ResponseEntity
+        if (result.isSuccess()) {
+            if (result.getStatus() == RESERVATION_CREATED_OK) {
+                return ResponseEntity.ok(
+                        result.getSuccess().getResult()
+                );
+            }
+        } else {
+            if (result.getStatus() == NO_AVAILABLE_TABLES) {
+                return ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.CONFLICT.value(),
-                                "No available tables for this reservation"
-                        ))
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.CONFLICT.value(),
+                                        NO_AVAILABLE_TABLES.getMessage()
+                                )
+                        );
+            }
+        }
 
-                : ResponseEntity.ok(response)
-        );
+        return defaultError();
+
 
     }
 
@@ -78,62 +93,117 @@ public class UserReservationApiController {
     public ResponseEntity<?> deleteReservation(
             @RequestParam(name="reservation_id") Long reservationId
     ){
-        return (
-                reservationHandlingFacade.deleteReservation(reservationId)
-                ? ResponseEntity.ok(
-                        CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.OK.value(),
-                                "Reservation deleted successfully"
-                        )
-                )
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+
+        ReservationAPIResult result = reservationHandlingFacade.deleteReservation(reservationId);
+
+        if (result.isSuccess()){
+            return ResponseEntity.ok(
+                    CommonJSONBodies.fromStatusAndMsg(
+                            HttpStatus.OK.value(),
+                            RESERVATION_DELETED_OK.getMessage()
+                    )
+            );
+        } else {
+            if (result.getStatus() == NO_RESERVATION_WITH_ID) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                         CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.BAD_REQUEST.value(),
-                                "No resevation with ID " + reservationId + " was found"
+                                NO_RESERVATION_WITH_ID.getMessage(reservationId)
                         )
-                )
-        );
+                );
+            }
+            if (result.getStatus() == RESERVATION_DELETE_ERROR) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.BAD_REQUEST.value(),
+                                RESERVATION_DELETE_ERROR.getMessage()
+                        )
+                );
+            }
+        }
+
+        return defaultError();
     }
     @CrossOrigin
     @GetMapping("/getall/")
     public ResponseEntity<?> getAllTodayReservations(){
-        Map<CustomTable, Set<Reservation>> response = reservationHandlingFacade.getAllTodayReservations();
-        return (
-                response.isEmpty()
-                ? ResponseEntity
+        ReservationAPIResult result = reservationHandlingFacade.getAllTodayReservations();
+
+        if (result.isSuccess()){
+            return ResponseEntity.ok(result.getSuccess().getResult());
+        } else {
+            if (result.getStatus() == NO_RESERVATION_YET_TODAY){
+                return ResponseEntity
                         .status(HttpStatus.CONFLICT)
                         .body(CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.CONFLICT.value(),
-                                "There are no reservations yet today."
-                        ))
-                : ResponseEntity.ok(response)
-        );
+                                NO_RESERVATION_YET_TODAY.getMessage()
+                        ));
+            }
+        }
+        return defaultError();
     }
 
-    @PatchMapping
+    @PatchMapping("/editnumberofpeople/")
     public ResponseEntity<?> editReservationNumberOfPeople(
-            @RequestParam Long reservationId,
-            @RequestParam Integer newNumberOfPeople
+            @RequestParam(name = "reservation_id") Long reservationId,
+            @RequestParam(name = "numberOfPeople") Integer newNumberOfPeople
     ){
 
-        return (
-                reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople)
-                ? ResponseEntity.ok(
-                        CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.OK.value(),
-                                "Reservation with ID " + reservationId +
-                                        " has been updated successfully with a new number of people of " +
-                                        newNumberOfPeople
-                        )
-                )
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        CommonJSONBodies.fromStatusAndMsg(
+        ReservationAPIResult result =
+                reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
+        if (result.isSuccess() && result.getStatus() == RESERVATION_UPDATE_OK) {
+            return ResponseEntity.ok(
+                    CommonJSONBodies.fromStatusAndMsg(
+                            HttpStatus.OK.value(),
+                            RESERVATION_UPDATE_OK.getMessage(reservationId, newNumberOfPeople)
+                    )
+            );
+        } else {
+            if (result.getStatus() == NO_RESERVATION_WITH_ID) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.BAD_REQUEST.value(),
-                                "No reservation with ID " + reservationId + " was found"
-                        )
-                )
-        );
+                                NO_RESERVATION_WITH_ID.getMessage(reservationId)
+                        ));
+            }
+            if (result.getStatus() == NO_RESERVATION_WITH_ID_IN_SCHEDULE){
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.BAD_REQUEST.value(),
+                                NO_RESERVATION_WITH_ID_IN_SCHEDULE.getMessage(reservationId)
+                        ));
+            }
+            if (result.getStatus() == NEED_TO_RESCHEDULE){
+                String token = cacheUtils.createUpdateTokenBoundTo(reservationId);
+                return ResponseEntity
+                        .status(HttpStatus.SEE_OTHER.value())
+                        .body(CommonJSONBodies.fromStatusAndMsgAndX(
+                                HttpStatus.SEE_OTHER.value(),
+                                NEED_TO_RESCHEDULE.getMessage(),
+                                Map.of(TOKEN, token)
+                        ));
+            }
 
+        }
+
+
+
+        return defaultError();
+    }
+
+
+    private ResponseEntity<String> defaultError(){
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                        CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                GENERAL_ERROR.getMessage()
+                        )
+                );
     }
 
 }

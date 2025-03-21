@@ -1,5 +1,8 @@
 package it.matteobarbera.tablereservation.model.table.user;
 
+import it.matteobarbera.tablereservation.http.ReservationAPIError;
+import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
+import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -10,11 +13,9 @@ import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.model.table.admin.TablesService;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ReflectionUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -37,22 +38,41 @@ public class ReservationHandlingFacade {
         this.reservationsService = reservationsService;
     }
 
-    public Set<AbstractTable> newReservation(ReservationDTO reservationDTO) {
+    public ReservationAPIResult newReservation(ReservationDTO reservationDTO) {
         scheduleService.initScheduleIfAbsent(
                 tablesService,
                 reservationDTO.getStartDateTime(),
                 reservationDTO.getEndDateTime()
         );
 
-        return reservationsService.newReservation(
+        Set<AbstractTable> reservationOutcome =  reservationsService.newReservation(
                 customerService,
                 scheduleService,
                 reservationDTO
         );
+        if (!reservationOutcome.isEmpty()) {
+            return new ReservationAPIResult.Success(
+                    reservationOutcome,
+                    ReservationAPIInfo.RESERVATION_CREATED_OK
+            );
+        } else {
+            return new ReservationAPIResult.Failure(
+                    ReservationAPIError.NO_AVAILABLE_TABLES
+            );
+        }
     }
 
-    public Map<CustomTable, Set<Reservation>> getAllTodayReservations() {
+    public ReservationAPIResult getAllTodayReservations() {
         Set<Reservation> allReservations = reservationsService.getAllTodayReservations();
+        HashMap<CustomTable, Set<Reservation>> res = getAllReservationMap(allReservations);
+        return (
+                res.isEmpty()
+                ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_TODAY)
+                : new ReservationAPIResult.Success(res, ReservationAPIInfo.RESERVATION_FETCHED_OK)
+        );
+    }
+
+    private HashMap<CustomTable, Set<Reservation>> getAllReservationMap(Set<Reservation> allReservations) {
         Set<CustomTable> allTables = tablesService.getAllTables();
         return new HashMap<>(){{
             for (Reservation reservation : allReservations)
@@ -71,21 +91,30 @@ public class ReservationHandlingFacade {
         return customerService.getCustomerByPhoneNumber(phoneNumber);
     }
 
-    public Boolean deleteReservation(Long reservationId) {
+    public ReservationAPIResult deleteReservation(Long reservationId) {
         Reservation reservationById = reservationsService.getReservationById(reservationId);
         if (reservationById == null)
-            return false;
-        return scheduleService.removeReservationFromSchedule(reservationById);
+            return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
+        return (
+                scheduleService.removeReservationFromSchedule(reservationById)
+                ? new ReservationAPIResult.Success(ReservationAPIInfo.RESERVATION_DELETED_OK)
+                : new ReservationAPIResult.Failure(ReservationAPIError.RESERVATION_DELETE_ERROR)
+        );
     }
 
-    public Boolean editReservationNumberOfPeople(Long reservationId, Integer newNumberOfPeople) {
+    public ReservationAPIResult editReservationNumberOfPeople(Long reservationId, Integer newNumberOfPeople) {
         Reservation reservationById = reservationsService.getReservationById(reservationId);
         if (reservationById == null)
-            return false;
-        if (reservationsService.isNumberOfPeopleUpdatableWithoutRescheduling(reservationById, newNumberOfPeople)){
-            return scheduleService.editReservationNumberOfPeopleInSchedule(reservationById, newNumberOfPeople);
-        }
-        return false;
+            return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
 
+        if (reservationsService.isNumberOfPeopleUpdatableWithoutRescheduling(reservationById, newNumberOfPeople)){
+            return (
+                    scheduleService.editReservationNumberOfPeopleInSchedule(reservationById, newNumberOfPeople)
+                    ? new ReservationAPIResult.Success(ReservationAPIInfo.RESERVATION_UPDATE_OK)
+                    : new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID_IN_SCHEDULE)
+            );
+        } else {
+            return new ReservationAPIResult.Failure(ReservationAPIError.NEED_TO_RESCHEDULE);
+        }
     }
 }
