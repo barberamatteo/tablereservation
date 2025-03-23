@@ -1,5 +1,8 @@
 package it.matteobarbera.tablereservation.model.table.user;
 
+import it.matteobarbera.tablereservation.cache.CacheConstants;
+import it.matteobarbera.tablereservation.cache.CacheUtils;
+import it.matteobarbera.tablereservation.cache.model.ActionCacheEntry;
 import it.matteobarbera.tablereservation.http.ReservationAPIError;
 import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
@@ -13,10 +16,14 @@ import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.model.table.admin.TablesService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
 
 @Component
 public class ReservationHandlingFacade {
@@ -25,17 +32,19 @@ public class ReservationHandlingFacade {
     private final ScheduleService scheduleService;
     private final TablesService tablesService;
     private final ReservationsService reservationsService;
+    private final CacheUtils cacheUtils;
 
     public ReservationHandlingFacade(
             CustomerService customerService,
             ScheduleService scheduleService,
             TablesService tablesService,
-            ReservationsService reservationsService
-    ) {
+            ReservationsService reservationsService,
+            CacheUtils cacheUtils) {
         this.customerService = customerService;
         this.scheduleService = scheduleService;
         this.tablesService = tablesService;
         this.reservationsService = reservationsService;
+        this.cacheUtils = cacheUtils;
     }
 
     public ReservationAPIResult newReservation(ReservationDTO reservationDTO) {
@@ -93,10 +102,14 @@ public class ReservationHandlingFacade {
 
     public ReservationAPIResult deleteReservation(Long reservationId) {
         Reservation reservationById = reservationsService.getReservationById(reservationId);
-        if (reservationById == null)
+        return deleteReservation(reservationById);
+    }
+
+    public ReservationAPIResult deleteReservation(Reservation reservation) {
+        if (reservation == null)
             return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
         return (
-                scheduleService.removeReservationFromSchedule(reservationById)
+                scheduleService.removeReservationFromSchedule(reservation)
                 ? new ReservationAPIResult.Success(ReservationAPIInfo.RESERVATION_DELETED_OK)
                 : new ReservationAPIResult.Failure(ReservationAPIError.RESERVATION_DELETE_ERROR)
         );
@@ -117,4 +130,38 @@ public class ReservationHandlingFacade {
             return new ReservationAPIResult.Failure(ReservationAPIError.NEED_TO_RESCHEDULE);
         }
     }
+
+    @Transactional
+    public ReservationAPIResult performActionFromToken(String token) {
+        ActionCacheEntry<?> cacheQuery = cacheUtils.getActionCacheEntryBoundToToken(token);
+        if (Objects.equals(cacheQuery.getAction(), CacheConstants.CONFIRM_RESCHEDULE)){
+            Reservation reservation = (Reservation) cacheQuery.getObj();
+            if (reservation == null) {
+                return new ReservationAPIResult.Failure(ReservationAPIError.INVALID_TOKEN);
+            }
+            if (!deleteReservation(reservation).isSuccess()){
+                return new ReservationAPIResult.Failure(ReservationAPIError.GENERAL_ERROR);
+            }
+            ReservationAPIResult recreateResult = newReservation(ReservationDTO.from(reservation));
+            if (recreateResult.getStatus() == ReservationAPIError.NO_AVAILABLE_TABLES) {
+                TransactionInterceptor.currentTransactionStatus().setRollbackOnly();
+                return new ReservationAPIResult.Failure(ReservationAPIError.NO_AVAILABLE_TABLES_FOR_CHANGES_REQUIRED);
+            }
+            if (recreateResult.isSuccess()) {
+                return recreateResult;
+            }
+        }
+        else {
+            return new ReservationAPIResult.Failure(ReservationAPIError.GENERAL_ERROR);
+        }
+        return null;
+    }
+
+
+    public String createActionTokenBoundToReservation(String action, Long reservationId){
+        Reservation reservation = reservationsService.getReservationById(reservationId);
+        return cacheUtils.createActionTokenBoundToObj(action, reservation);
+    }
+
+
 }

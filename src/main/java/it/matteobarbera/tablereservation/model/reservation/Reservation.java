@@ -2,6 +2,7 @@ package it.matteobarbera.tablereservation.model.reservation;
 
 
 import it.matteobarbera.tablereservation.model.customer.Customer;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import jakarta.persistence.*;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table
@@ -99,8 +101,11 @@ public class Reservation {
         return jointTables;
     }
 
-    public void setJointTables(Set<CustomTable> jointTables) {
-        this.jointTables = jointTables;
+
+    public void setJointTables(Set<AbstractTable> jointTables) {
+        this.jointTables = jointTables.stream().map(
+                abstractTable -> (CustomTable) abstractTable
+        ).collect(Collectors.toSet());
     }
 
     public Interval getInterval() {

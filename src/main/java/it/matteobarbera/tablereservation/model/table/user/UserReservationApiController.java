@@ -1,6 +1,6 @@
 package it.matteobarbera.tablereservation.model.table.user;
 
-import it.matteobarbera.tablereservation.CacheUtils;
+import it.matteobarbera.tablereservation.cache.CacheConstants;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import static it.matteobarbera.tablereservation.Constants.TOKEN;
 import static it.matteobarbera.tablereservation.Constants.USER_RESERVATION_API_ENDPOINT;
 import static it.matteobarbera.tablereservation.http.ReservationAPIError.*;
 import static it.matteobarbera.tablereservation.http.ReservationAPIInfo.*;
@@ -22,12 +21,10 @@ import static it.matteobarbera.tablereservation.http.ReservationAPIInfo.*;
 public class UserReservationApiController {
 
     private final ReservationHandlingFacade reservationHandlingFacade;
-    private final CacheUtils cacheUtils;
 
     @Autowired
-    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade, CacheUtils cacheUtils) {
+    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade) {
         this.reservationHandlingFacade = reservationHandlingFacade;
-        this.cacheUtils = cacheUtils;
     }
 
 
@@ -177,13 +174,18 @@ public class UserReservationApiController {
                         ));
             }
             if (result.getStatus() == NEED_TO_RESCHEDULE){
-                String token = cacheUtils.createUpdateTokenBoundTo(reservationId);
+                String token = reservationHandlingFacade.createActionTokenBoundToReservation(
+                        CacheConstants.CONFIRM_RESCHEDULE,
+                        reservationId
+                );
+
+
                 return ResponseEntity
                         .status(HttpStatus.SEE_OTHER.value())
                         .body(CommonJSONBodies.fromStatusAndMsgAndX(
                                 HttpStatus.SEE_OTHER.value(),
                                 NEED_TO_RESCHEDULE.getMessage(),
-                                Map.of(TOKEN, token)
+                                Map.of(CacheConstants.TOKEN, token)
                         ));
             }
 
@@ -194,6 +196,26 @@ public class UserReservationApiController {
         return defaultError();
     }
 
+    @PatchMapping("/confirm/")
+    public ResponseEntity<?> performPatchByToken(
+            @RequestParam(name = "token") String token
+    ){
+        ReservationAPIResult res = reservationHandlingFacade.performActionFromToken(token);
+        if (res.isSuccess()){
+            return ResponseEntity.ok(
+                    res.getSuccess().getResult()
+            );
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.CONFLICT.value(),
+                                    res.getFailure().getError().getMessage()
+                            )
+                    );
+        }
+    }
 
     private ResponseEntity<String> defaultError(){
         return ResponseEntity

@@ -1,5 +1,7 @@
 package it.matteobarbera.tablereservation.model.dto;
 
+import it.matteobarbera.tablereservation.model.reservation.Reservation;
+
 public class ReservationDTO {
     private Long customerId;
     private String startDateTime;
@@ -16,6 +18,14 @@ public class ReservationDTO {
         this.numberOfPeople = numberOfPeople;
     }
 
+    private ReservationDTO(Reservation reservation) {
+        this(
+                reservation.getCustomer().getId(),
+                reservation.getInterval().getStartDateTime().toString(),
+                reservation.getInterval().getEndDateTime().toString(),
+                reservation.getNumberOfPeople()
+        );
+    }
     public Long getCustomerId() {
         return customerId;
     }
@@ -46,5 +56,9 @@ public class ReservationDTO {
 
     public void setNumberOfPeople(Integer numberOfPeople) {
         this.numberOfPeople = numberOfPeople;
+    }
+
+    public static ReservationDTO from(Reservation reservation) {
+        return new ReservationDTO(reservation);
     }
 }

@@ -11,8 +11,9 @@ public enum ReservationAPIInfo {
     RESERVATION_UPDATE_OK("Reservation with ID %d" +
             " has been updated successfully with a new number of people of " +
             "%d."
-    );
+    ),
 
+    TOKEN_VALIDATION_OK(null);
     private final String template;
     ReservationAPIInfo(String template) {
         this.template = template;
