@@ -2,11 +2,6 @@ package it.matteobarbera.tablereservation;
 
 public abstract class Constants {
 
-    public static final String TOKEN = "token";
-    public static final String UPDATE = "update";
-
-
-
 
     private static final String ADMIN_TABLES_CRUD_API_VERSION =
             "/api/v1.0.0";

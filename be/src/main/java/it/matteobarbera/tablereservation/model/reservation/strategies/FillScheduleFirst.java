@@ -36,8 +36,8 @@ public class FillScheduleFirst implements ReservationStrategy{
 
             }
                 if (!conflictualReservation) {
-
                     jointTables.add(schedule.getId().getTable());
+                    reservation.setJointTables(jointTables);
                     schedule.addReservation(reservation);
                     reservation.setSchedule(schedule);
                     scheduleService.addReservationToSchedule(schedule);
