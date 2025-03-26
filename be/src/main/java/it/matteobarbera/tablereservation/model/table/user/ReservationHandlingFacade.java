@@ -109,8 +109,7 @@ public class ReservationHandlingFacade {
         if (reservation == null)
             return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
         boolean isRemovedFromSchedule = scheduleService.removeReservationFromSchedule(reservation);
-        //TODO : FIX
-        // reservationsService.deleteReservation(reservation);
+        reservationsService.deleteReservation(reservation);
         return (
                 isRemovedFromSchedule
                 ? new ReservationAPIResult.Success(ReservationAPIInfo.RESERVATION_DELETED_OK)

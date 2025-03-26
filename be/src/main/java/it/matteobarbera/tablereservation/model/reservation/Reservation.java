@@ -38,7 +38,7 @@ public class Reservation {
     })
     private Interval interval;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
