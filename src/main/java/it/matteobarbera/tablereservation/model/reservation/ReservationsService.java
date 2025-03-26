@@ -72,4 +72,8 @@ public class ReservationsService {
                 ).sum()
                         >= numberOfPeople;
     }
+
+    public void deleteReservation(Reservation reservation) {
+        reservationsRepository.delete(reservation);
+    }
 }

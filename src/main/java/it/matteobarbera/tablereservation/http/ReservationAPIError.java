@@ -23,8 +23,9 @@ public enum ReservationAPIError {
     NO_AVAILABLE_TABLES_FOR_CHANGES_REQUIRED(
             "No available table for the change bound to the token provided." +
             " The former reservation was rolled back as it was before the change request."
-    );
+    ),
 
+    INVALID_DATA_FORMAT("Couldn't post the reservation due to errors in the request. Check the request parameters values.");
     private final String template;
     ReservationAPIError(String template) {
         this.template = template;

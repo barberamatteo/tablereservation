@@ -3,6 +3,7 @@ package it.matteobarbera.tablereservation.model.table.user;
 import it.matteobarbera.tablereservation.cache.CacheConstants;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
+import it.matteobarbera.tablereservation.model.dto.JSONConstructable;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,18 +73,28 @@ public class UserReservationApiController {
 
     @CrossOrigin
     @PostMapping("/newreservationpn/")
+    // TODO: Must be tested.
     public ResponseEntity<?> newReservation(@RequestBody Map<String, Object> reservation){
 
-        Long customerId = reservationHandlingFacade.getCustomerByPhoneNumber(
-                (String) reservation.get("customerPhoneNumber")
-        ).getId();
-        return newReservation(
-                customerId,
-                (String) reservation.get("arrivalDateTime"),
-                (String) reservation.get("leaveDateTime"),
-                Integer.parseInt((String) reservation.get("numberOfPeople"))
-        );
 
+        try {
+            ReservationDTO r = JSONConstructable.construct(reservation, ReservationDTO.class);
+            return newReservation(
+                    r.getCustomerId(),
+                    r.getStartDateTime(),
+                    r.getEndDateTime(),
+                    r.getNumberOfPeople()
+            );
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.BAD_REQUEST.value(),
+                                    INVALID_DATA_FORMAT.getMessage()
+                            )
+                    );
+        }
     }
 
     @DeleteMapping("/deletereservation/")
@@ -174,9 +185,9 @@ public class UserReservationApiController {
                         ));
             }
             if (result.getStatus() == NEED_TO_RESCHEDULE){
-                String token = reservationHandlingFacade.createActionTokenBoundToReservation(
-                        CacheConstants.CONFIRM_RESCHEDULE,
-                        reservationId
+                String token = reservationHandlingFacade.triggerUpdateNumberOfPeopleTokenCreation(
+                        reservationId,
+                        newNumberOfPeople
                 );
 
 
