@@ -61,4 +61,5 @@ public class ReservationDTO {
     public static ReservationDTO from(Reservation reservation) {
         return new ReservationDTO(reservation);
     }
+
 }

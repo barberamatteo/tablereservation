@@ -1,9 +1,11 @@
 package it.matteobarbera.tablereservation.cache;
 
 import it.matteobarbera.tablereservation.cache.model.ActionCacheEntry;
+import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -23,6 +25,7 @@ public class CacheUtils {
 
 
 
+
     private Cache getTokenCache(){
         return cacheManager.getCache(CacheConstants.TOKEN_CACHE);
     }
@@ -35,9 +38,9 @@ public class CacheUtils {
     }
 
     public ActionCacheEntry<?> getActionCacheEntryBoundToToken(String token){
-        Cache a = getTokenCache();
-        var b = (ActionCacheEntry<?>) a.get(token).get();
-        return b;
+        Cache cache = getTokenCache();
+        UUID tokenUUID = UUID.fromString(token);
+        return cache.get(tokenUUID, ActionCacheEntry.class);
 
         /*
          * TODO: Understand why CacheWrapper.get() is null

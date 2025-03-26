@@ -73,7 +73,7 @@ public class ReservationHandlingFacade {
 
     public ReservationAPIResult getAllTodayReservations() {
         Set<Reservation> allReservations = reservationsService.getAllTodayReservations();
-        HashMap<CustomTable, Set<Reservation>> res = getAllReservationMap(allReservations);
+        HashMap<CustomTable, Set<Reservation>> res = getAllReservationsMap(allReservations);
         return (
                 res.isEmpty()
                 ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_TODAY)
@@ -81,7 +81,7 @@ public class ReservationHandlingFacade {
         );
     }
 
-    private HashMap<CustomTable, Set<Reservation>> getAllReservationMap(Set<Reservation> allReservations) {
+    private HashMap<CustomTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
         Set<CustomTable> allTables = tablesService.getAllTables();
         return new HashMap<>(){{
             for (Reservation reservation : allReservations)
@@ -108,8 +108,11 @@ public class ReservationHandlingFacade {
     public ReservationAPIResult deleteReservation(Reservation reservation) {
         if (reservation == null)
             return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
+        boolean isRemovedFromSchedule = scheduleService.removeReservationFromSchedule(reservation);
+        //TODO : FIX
+        // reservationsService.deleteReservation(reservation);
         return (
-                scheduleService.removeReservationFromSchedule(reservation)
+                isRemovedFromSchedule
                 ? new ReservationAPIResult.Success(ReservationAPIInfo.RESERVATION_DELETED_OK)
                 : new ReservationAPIResult.Failure(ReservationAPIError.RESERVATION_DELETE_ERROR)
         );
@@ -157,9 +160,13 @@ public class ReservationHandlingFacade {
         return null;
     }
 
-
-    public String createActionTokenBoundToReservation(String action, Long reservationId){
+    public String triggerUpdateNumberOfPeopleTokenCreation(Long reservationId, Integer newNumberOfPeople) {
         Reservation reservation = reservationsService.getReservationById(reservationId);
+        reservation.setNumberOfPeople(newNumberOfPeople);
+        return createActionTokenBoundToReservation(CacheConstants.CONFIRM_RESCHEDULE, reservation);
+    }
+
+    private String createActionTokenBoundToReservation(String action, Reservation reservation) {
         return cacheUtils.createActionTokenBoundToObj(action, reservation);
     }
 
