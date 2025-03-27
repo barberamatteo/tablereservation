@@ -1,17 +1,26 @@
 package it.matteobarbera.tablereservation.model.dto;
 
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
+import org.springframework.lang.NonNull;
+
+import java.util.Objects;
 
 public class ReservationDTO {
+
     private Long customerId;
     private String startDateTime;
     private String endDateTime;
     private Integer numberOfPeople;
 
-    public ReservationDTO() {
-    }
+    protected ReservationDTO(){
 
-    public ReservationDTO(Long customerId, String startDateTime, String endDateTime, Integer numberOfPeople) {
+    }
+    public ReservationDTO(
+            Long customerId,
+            String startDateTime,
+            String endDateTime,
+            Integer numberOfPeople
+    ) {
         this.customerId = customerId;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
@@ -26,6 +35,7 @@ public class ReservationDTO {
                 reservation.getNumberOfPeople()
         );
     }
+    @NonNull
     public Long getCustomerId() {
         return customerId;
     }
@@ -34,6 +44,7 @@ public class ReservationDTO {
         this.customerId = customerId;
     }
 
+    @NonNull
     public String getStartDateTime() {
         return startDateTime;
     }
@@ -42,6 +53,7 @@ public class ReservationDTO {
         this.startDateTime = startDateTime;
     }
 
+    @NonNull
     public String getEndDateTime() {
         return endDateTime;
     }
@@ -50,6 +62,7 @@ public class ReservationDTO {
         this.endDateTime = endDateTime;
     }
 
+    @NonNull
     public Integer getNumberOfPeople() {
         return numberOfPeople;
     }
@@ -62,4 +75,17 @@ public class ReservationDTO {
         return new ReservationDTO(reservation);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ReservationDTO that)) return false;
+        return Objects.equals(customerId, that.customerId)
+                && Objects.equals(startDateTime, that.startDateTime)
+                && Objects.equals(endDateTime, that.endDateTime)
+                && Objects.equals(numberOfPeople, that.numberOfPeople);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(customerId, startDateTime, endDateTime, numberOfPeople);
+    }
 }

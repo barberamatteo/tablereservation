@@ -71,11 +71,13 @@ public class UserReservationApiController {
 
     }
 
+
     @CrossOrigin
     @PostMapping("/newreservationpn/")
     // TODO: Must be tested.
-    public ResponseEntity<?> newReservation(@RequestBody Map<String, Object> reservation){
-
+    public ResponseEntity<?> newReservation(
+            @RequestBody Map<String, Object> reservation
+    ){
 
         try {
             ReservationDTO r = JSONConstructable.construct(reservation, ReservationDTO.class);
