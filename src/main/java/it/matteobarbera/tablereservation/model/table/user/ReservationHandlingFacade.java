@@ -136,6 +136,9 @@ public class ReservationHandlingFacade {
     @Transactional
     public ReservationAPIResult performActionFromToken(String token) {
         ActionCacheEntry<?> cacheQuery = cacheUtils.getActionCacheEntryBoundToToken(token);
+        if (cacheQuery == null)
+            return new ReservationAPIResult.Failure(ReservationAPIError.INVALID_TOKEN);
+
         if (Objects.equals(cacheQuery.getAction(), CacheConstants.CONFIRM_RESCHEDULE)){
             Reservation reservation = (Reservation) cacheQuery.getObj();
             if (reservation == null) {

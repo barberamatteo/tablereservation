@@ -44,7 +44,7 @@ public class Reservation {
 
     private Integer numberOfPeople;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({
             @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
             @JoinColumn(name = "date", referencedColumnName = "date")

@@ -40,11 +40,9 @@ public class CacheUtils {
     public ActionCacheEntry<?> getActionCacheEntryBoundToToken(String token){
         Cache cache = getTokenCache();
         UUID tokenUUID = UUID.fromString(token);
-        return cache.get(tokenUUID, ActionCacheEntry.class);
-
-        /*
-         * TODO: Understand why CacheWrapper.get() is null
-         */
+        ActionCacheEntry<?> toRet = cache.get(tokenUUID, ActionCacheEntry.class);
+        cache.evict(tokenUUID);
+        return toRet;
     }
 
 
