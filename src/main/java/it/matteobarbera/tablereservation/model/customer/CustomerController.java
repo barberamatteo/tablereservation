@@ -1,10 +1,7 @@
 package it.matteobarbera.tablereservation.model.customer;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -26,5 +23,11 @@ public class CustomerController {
     @GetMapping
     public Set<Customer> getCustomers() {
         return customerService.getCustomers();
+    }
+
+    @GetMapping("/getbyphonenumberstartingwith/")
+    @CrossOrigin
+    public Set<Customer> getCustomersByPhoneNumberStartingWith(@RequestParam("regex") String partialNumber){
+        return customerService.getCustomerByPartialPhoneNumber(partialNumber);
     }
 }
