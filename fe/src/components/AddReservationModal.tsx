@@ -3,6 +3,7 @@ import {useRef, useState} from "react";
 import DatePicker from "./datetime/DatePicker.tsx";
 import {Button, Form, Modal} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.css'
+import CustomersDropdownSearch from "./CustomersDropdownSearch.tsx";
 
 
 
@@ -70,11 +71,8 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
                     <Form ref={formRef}>
                         <Form.Group className="mb-3" controlId="phoneNumber">
                             <Form.Label>Customer phone number</Form.Label>
-                            <Form.Control
-                                type="tel"
-                                placeholder="Also include country code (es. +39)"
-                                autoFocus
-                            />
+                            <CustomersDropdownSearch/>
+
                         </Form.Group>
                         <Form.Group
                             className="mb-3"

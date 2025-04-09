@@ -10,6 +10,10 @@ class Customer {
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
+
+    toString() {
+        return this.phoneNumber + " - " + this.name;
+    }
 }
 
 export default Customer;
