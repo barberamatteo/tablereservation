@@ -7,6 +7,7 @@ import it.matteobarbera.tablereservation.model.dto.JSONConstructable;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,7 @@ public class UserReservationApiController {
             if (result.getStatus() == NO_AVAILABLE_TABLES) {
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .body(
                                 CommonJSONBodies.fromStatusAndMsg(
                                         HttpStatus.CONFLICT.value(),
@@ -90,6 +92,7 @@ public class UserReservationApiController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(
                             CommonJSONBodies.fromStatusAndMsg(
                                     HttpStatus.BAD_REQUEST.value(),
@@ -106,29 +109,37 @@ public class UserReservationApiController {
 
         ReservationAPIResult result = reservationHandlingFacade.deleteReservation(reservationId);
 
-        if (result.isSuccess()){
-            return ResponseEntity.ok(
-                    CommonJSONBodies.fromStatusAndMsg(
-                            HttpStatus.OK.value(),
-                            RESERVATION_DELETED_OK.getMessage()
-                    )
-            );
+        if (result.isSuccess()) {
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON).body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.OK.value(),
+                                    RESERVATION_DELETED_OK.getMessage()
+                            )
+                    );
         } else {
             if (result.getStatus() == NO_RESERVATION_WITH_ID) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.BAD_REQUEST.value(),
-                                NO_RESERVATION_WITH_ID.getMessage(reservationId)
-                        )
-                );
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        NO_RESERVATION_WITH_ID.getMessage(reservationId)
+                                )
+                        );
             }
             if (result.getStatus() == RESERVATION_DELETE_ERROR) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.BAD_REQUEST.value(),
-                                RESERVATION_DELETE_ERROR.getMessage()
-                        )
-                );
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        RESERVATION_DELETE_ERROR.getMessage()
+                                )
+                        );
             }
         }
 
@@ -145,10 +156,13 @@ public class UserReservationApiController {
             if (result.getStatus() == NO_RESERVATION_YET_TODAY){
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
-                        .body(CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.CONFLICT.value(),
-                                NO_RESERVATION_YET_TODAY.getMessage()
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.CONFLICT.value(),
+                                        NO_RESERVATION_YET_TODAY.getMessage()
+                                )
+                        );
             }
         }
         return defaultError();
@@ -163,28 +177,37 @@ public class UserReservationApiController {
         ReservationAPIResult result =
                 reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
         if (result.isSuccess() && result.getStatus() == RESERVATION_UPDATE_OK) {
-            return ResponseEntity.ok(
-                    CommonJSONBodies.fromStatusAndMsg(
-                            HttpStatus.OK.value(),
-                            RESERVATION_UPDATE_OK.getMessage(reservationId, newNumberOfPeople)
-                    )
-            );
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.OK.value(),
+                                    RESERVATION_UPDATE_OK.getMessage(reservationId, newNumberOfPeople)
+                            )
+                    );
         } else {
             if (result.getStatus() == NO_RESERVATION_WITH_ID) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
-                        .body(CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.BAD_REQUEST.value(),
-                                NO_RESERVATION_WITH_ID.getMessage(reservationId)
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        NO_RESERVATION_WITH_ID.getMessage(reservationId)
+                                )
+                        );
             }
             if (result.getStatus() == NO_RESERVATION_WITH_ID_IN_SCHEDULE){
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
-                        .body(CommonJSONBodies.fromStatusAndMsg(
-                                HttpStatus.BAD_REQUEST.value(),
-                                NO_RESERVATION_WITH_ID_IN_SCHEDULE.getMessage(reservationId)
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        NO_RESERVATION_WITH_ID_IN_SCHEDULE.getMessage(reservationId)
+                                )
+                        );
             }
             if (result.getStatus() == NEED_TO_RESCHEDULE){
                 String token = reservationHandlingFacade.triggerUpdateNumberOfPeopleTokenCreation(
@@ -195,11 +218,14 @@ public class UserReservationApiController {
 
                 return ResponseEntity
                         .status(HttpStatus.SEE_OTHER.value())
-                        .body(CommonJSONBodies.fromStatusAndMsgAndX(
-                                HttpStatus.SEE_OTHER.value(),
-                                NEED_TO_RESCHEDULE.getMessage(),
-                                Map.of(CacheConstants.TOKEN, token)
-                        ));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsgAndX(
+                                        HttpStatus.SEE_OTHER.value(),
+                                        NEED_TO_RESCHEDULE.getMessage(),
+                                        Map.of(CacheConstants.TOKEN, token)
+                                )
+                        );
             }
 
         }
@@ -221,6 +247,7 @@ public class UserReservationApiController {
         } else {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(
                             CommonJSONBodies.fromStatusAndMsg(
                                     HttpStatus.CONFLICT.value(),
@@ -233,6 +260,7 @@ public class UserReservationApiController {
     private ResponseEntity<String> defaultError(){
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(
                         CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
