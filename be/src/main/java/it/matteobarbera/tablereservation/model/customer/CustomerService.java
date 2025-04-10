@@ -26,7 +26,7 @@ public class CustomerService {
         return customerRepository.findByPhoneNumber(phoneNumber);
     }
 
-    public Set<Customer> getCustomerByPartialPhoneNumber(String partialNumber) {
+    public Set<Customer> getCustomersByPartialPhoneNumber(String partialNumber) {
         return customerRepository.findByPartialPhoneNumber(partialNumber);
     }
 }

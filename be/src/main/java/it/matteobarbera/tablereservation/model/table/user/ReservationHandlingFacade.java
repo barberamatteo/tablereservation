@@ -139,8 +139,8 @@ public class ReservationHandlingFacade {
         if (cacheQuery == null)
             return new ReservationAPIResult.Failure(ReservationAPIError.INVALID_TOKEN);
 
-        if (Objects.equals(cacheQuery.getAction(), CacheConstants.CONFIRM_RESCHEDULE)){
-            Reservation reservation = (Reservation) cacheQuery.getObj();
+        if (Objects.equals(cacheQuery.action(), CacheConstants.CONFIRM_RESCHEDULE)){
+            Reservation reservation = (Reservation) cacheQuery.obj();
             if (reservation == null) {
                 return new ReservationAPIResult.Failure(ReservationAPIError.INVALID_TOKEN);
             }
