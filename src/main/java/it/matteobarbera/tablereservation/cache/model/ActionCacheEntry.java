@@ -5,20 +5,17 @@ import it.matteobarbera.tablereservation.cache.CacheConstants;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-public class ActionCacheEntry<T>  {
-    private final T obj;
-    private final String action;
-
+public record ActionCacheEntry<T>(T obj, String action) {
     public static final Class<CacheConstants> constantsClass = CacheConstants.class;
 
-    private boolean isActionValid(String action){
+    private boolean isActionValid(String action) {
         try {
             for (Field constant : constantsClass.getDeclaredFields()) {
                 if (Objects.equals(constant.get(null), action)) {
                     return true;
                 }
             }
-        } catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         return false;
@@ -31,14 +28,6 @@ public class ActionCacheEntry<T>  {
         } else {
             throw new RuntimeException("No action with value " + action + " declared in CacheConstants");
         }
-    }
-
-    public T getObj() {
-        return obj;
-    }
-
-    public String getAction() {
-        return action;
     }
 
     public Class<?> getObjClass() {

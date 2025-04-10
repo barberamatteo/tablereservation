@@ -88,4 +88,15 @@ public class ReservationDTO {
     public int hashCode() {
         return Objects.hash(customerId, startDateTime, endDateTime, numberOfPeople);
     }
+
+    @Override
+    public String toString() {
+        String toString = "{"
+                + "        \"customerId\":\"" + customerId + "\""
+                + ",         \"startDateTime\":\"" + startDateTime + "\""
+                + ",         \"endDateTime\":\"" + endDateTime + "\""
+                + ",         \"numberOfPeople\":\"" + numberOfPeople + "\""
+                + "}";
+        return toString.replaceAll("[\n\r]", "   ");
+    }
 }
