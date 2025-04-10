@@ -1,8 +1,9 @@
 package it.matteobarbera.tablereservation.model.reservation.strategies;
 
-import it.matteobarbera.tablereservation.model.reservation.*;
+import it.matteobarbera.tablereservation.model.reservation.Reservation;
+import it.matteobarbera.tablereservation.model.reservation.Schedule;
+import it.matteobarbera.tablereservation.model.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 

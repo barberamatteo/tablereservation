@@ -1,15 +1,11 @@
 package it.matteobarbera.tablereservation.cache;
 
 import it.matteobarbera.tablereservation.cache.model.ActionCacheEntry;
-import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 @Component
