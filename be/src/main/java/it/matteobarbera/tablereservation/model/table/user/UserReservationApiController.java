@@ -5,13 +5,15 @@ import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.http.request.ReservationAPIRequest;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
+import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
+import it.matteobarbera.tablereservation.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Map;
 
 import static it.matteobarbera.tablereservation.Constants.USER_RESERVATION_API_ENDPOINT;
 import static it.matteobarbera.tablereservation.http.ReservationAPIError.*;
@@ -23,11 +25,14 @@ import static it.matteobarbera.tablereservation.http.ReservationAPIInfo.*;
 public class UserReservationApiController {
 
     private final ReservationHandlingFacade reservationHandlingFacade;
+    private final UserPreferences userPreferences;
 
     @Autowired
-    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade) {
+    public UserReservationApiController(ReservationHandlingFacade reservationHandlingFacade, UserPreferences userPreferences) {
         this.reservationHandlingFacade = reservationHandlingFacade;
+        this.userPreferences = userPreferences;
     }
+
 
 
     @CrossOrigin
@@ -38,6 +43,13 @@ public class UserReservationApiController {
             @RequestParam(name = "leaveDateTime", required = false) String leaveDateTime,
             @RequestParam(name = "numberOfPeople") Integer numberOfPeople
     ) {
+
+        if (leaveDateTime == null) {
+            leaveDateTime = DateUtils.offsetFrom(
+                    userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET,
+                    arrivalDateTime
+            );
+        }
 
         ReservationDTO reservationDTO = new ReservationDTO(
                 customerId,
@@ -81,13 +93,13 @@ public class UserReservationApiController {
             @RequestBody ReservationAPIRequest reservation
     ){
 
-        try {
-            return newReservation(
-                    reservation.getCustomerId(),
-                    reservation.getStartDateTime(),
-                    reservation.getEndDateTime(),
-                    reservation.getNumberOfPeople()
-            );
+        return newReservation(
+                reservation.getCustomerId(),
+                reservation.getStartDateTime(),
+                reservation.getEndDateTime(),
+                reservation.getNumberOfPeople()
+        );
+        /*try {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -98,7 +110,7 @@ public class UserReservationApiController {
                                     INVALID_DATA_FORMAT.getMessage()
                             )
                     );
-        }
+        }*/
     }
 
     @DeleteMapping("/deletereservation/")

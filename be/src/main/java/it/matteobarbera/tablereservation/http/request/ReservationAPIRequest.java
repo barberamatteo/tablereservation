@@ -4,7 +4,7 @@ public class ReservationAPIRequest {
     public final Long customerId;
     public final Integer numberOfPeople;
     public final String startDateTime;
-    public final String endDateTime;
+    public String endDateTime;
 
 
     public ReservationAPIRequest(Long customerId, Integer numberOfPeople, String startDateTime, String endDateTime) {

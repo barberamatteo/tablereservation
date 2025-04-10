@@ -1,12 +1,9 @@
 package it.matteobarbera.tablereservation.cache.model;
 
 import it.matteobarbera.tablereservation.cache.CacheConstants;
-import it.matteobarbera.tablereservation.cache.CacheUtils;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Consumer;
 
 public class ActionCacheEntry<T>  {
     private final T obj;

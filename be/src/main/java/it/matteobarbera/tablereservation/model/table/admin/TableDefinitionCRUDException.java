@@ -2,9 +2,7 @@ package it.matteobarbera.tablereservation.model.table.admin;
 
 import it.matteobarbera.tablereservation.AbstractBadRequestException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
-import org.springframework.web.server.ResponseStatusException;
 
 public class TableDefinitionCRUDException extends AbstractBadRequestException {
 

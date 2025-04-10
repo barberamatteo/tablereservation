@@ -1,5 +1,7 @@
 package it.matteobarbera.tablereservation.utils;
 
+import java.time.LocalDateTime;
+
 public class DateUtils {
 
     private DateUtils(){
@@ -15,4 +17,8 @@ public class DateUtils {
     }
 
 
+    public static String offsetFrom(Long defaultLeaveTimeMinutesOffset, String arrivalDateTime) {
+        LocalDateTime parsedArrivalDateTime = LocalDateTime.parse(arrivalDateTime);
+        return parsedArrivalDateTime.plusMinutes(defaultLeaveTimeMinutesOffset).toString();
+    }
 }

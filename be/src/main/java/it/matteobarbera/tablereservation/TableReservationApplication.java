@@ -1,13 +1,8 @@
 package it.matteobarbera.tablereservation;
 
-import it.matteobarbera.tablereservation.model.customer.Customer;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 

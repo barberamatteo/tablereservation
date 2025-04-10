@@ -1,6 +1,5 @@
 package it.matteobarbera.tablereservation.model.table.admin;
 
-import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
