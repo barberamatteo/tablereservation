@@ -1,29 +1,39 @@
-import {Dropdown, DropdownMenu, DropdownToggle, Form} from "react-bootstrap";
+import {Dropdown, Form} from "react-bootstrap";
 import Customer from "../model/Customer.ts";
 import {useState} from "react";
 
 interface CustomersDropdownSearchProps {
-    customers: Customer[],
-    onSelect: (value: string) => void
+    onCustomerSelected: (c: Customer) => void;
 }
-async function getCustomers(regex: string){
-    return await fetch('http://localhost:8080/api/v1/customer/getbyphonenumberstartingwith/?regex=' + regex).then(value => {return value.json()});
+async function getCustomers(regex: string): Promise<Customer[]>{
+    const response = await fetch('http://localhost:8080/api/v1/customer/getbyphonenumberstartingwith/?regex=' + regex);
+    if (response.status === 200) {
+        const data = await response.json();
+        return data.map((c: { id: number; email: string; name: string; phoneNumber: string; }) => new Customer(c.id, c.email, c.name, c.phoneNumber));
+    }
+    return [] as Customer[];
+
 }
-function CustomersDropdownSearch(){
+function CustomersDropdownSearch(props: CustomersDropdownSearchProps){
     const [completionValue, setCompletionValue] = useState<string>("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [customersFound, setCustomersFound] = useState<Customer[]>([]);
-    const handleSelect = (value: string) => {
+    /*const handleSelect = (value: string) => {
         setCompletionValue(value);
         setShowDropdown(false);
         //props.onSelect(value);
-    }
+    }*/
 
     const searchAndFilter = async (value: string) => {
+        setCompletionValue(value);
         await getCustomers(value).then((values) => {
-            console.log(values);
-            setCustomersFound(values);
-            setShowDropdown(true);
+            if (values.length !== 0) {
+                setCustomersFound(values as Customer[]);
+                setShowDropdown(true);
+            } else {
+                setCustomersFound([]);
+                setShowDropdown(false);
+            }
         })
     }
     return (
@@ -37,8 +47,12 @@ function CustomersDropdownSearch(){
             />
             {showDropdown && (
                 <Dropdown.Menu show style={{position: "absolute", width: "100%"}}>
-                    {customersFound.map((item) => (
-                        <Dropdown.Item>
+                    {customersFound.map((item: Customer) => (
+                        <Dropdown.Item
+                            onClick={() => {
+                                setCompletionValue(item.phoneNumber)
+                                props.onCustomerSelected(item)
+                                setShowDropdown(false)}}>
                             {item.toString()}
                         </Dropdown.Item>
                     ))}

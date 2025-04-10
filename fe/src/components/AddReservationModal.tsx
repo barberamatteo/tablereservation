@@ -4,13 +4,14 @@ import DatePicker from "./datetime/DatePicker.tsx";
 import {Button, Form, Modal} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.css'
 import CustomersDropdownSearch from "./CustomersDropdownSearch.tsx";
+import Customer from "../model/Customer.ts";
 
 
 
 async function endpointCall(formData: {
-    customerPhoneNumber: string;
-    numberOfPeople: string;
-    arrivalDateTime: string;
+    customerId: number;
+    numberOfPeople: number;
+    startDateTime: string;
 }){
 
     console.log(JSON.stringify(formData));
@@ -31,32 +32,34 @@ async function endpointCall(formData: {
 
 
 function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose: (exit_code: number) => void}) {
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [date, setDate] = useState<string>("");
     const [time, setTime] = useState<string>("");
 
     const formRef = useRef<HTMLFormElement>(null);
 
     const addReservation = async () => {
-        if (formRef.current) {
-            const form = formRef.current;
-            const formData = {
-                customerPhoneNumber: (form.elements.namedItem("phoneNumber") as HTMLInputElement)?.value,
-                numberOfPeople: (form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value,
-                arrivalDateTime: date+"T"+time
-            };
+        if (selectedCustomer != null) {
+            if (formRef.current) {
+                const form = formRef.current;
+                const formData = {
+                    customerId: selectedCustomer.id,
+                    numberOfPeople: Number.parseInt((form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value),
+                    startDateTime: date + "T" + time
+                };
 
-            await endpointCall(
-                formData
-            ).then((value) => {
-                //const body = value.json() as unknown as Table[];
-                if (value.ok && JSON.stringify(value.json()) != JSON.stringify('[]')) {
-                    handleClose(1);
-                }
-                else{
-                    handleClose(2);
-                }
-                //setReservedTable(body);
-            });
+                await endpointCall(
+                    formData
+                ).then((value) => {
+                    //const body = value.json() as unknown as Table[];
+                    if (value.ok && JSON.stringify(value.json()) != JSON.stringify('[]')) {
+                        handleClose(1);
+                    } else {
+                        handleClose(2);
+                    }
+                    //setReservedTable(body);
+                });
+            }
         }
     }
 
@@ -71,13 +74,13 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
                     <Form ref={formRef}>
                         <Form.Group className="mb-3" controlId="phoneNumber">
                             <Form.Label>Customer phone number</Form.Label>
-                            <CustomersDropdownSearch/>
+                            <CustomersDropdownSearch onCustomerSelected={setSelectedCustomer}/>
 
                         </Form.Group>
                         <Form.Group
                             className="mb-3"
                             controlId="numberOfPeople">
-                            <Form.Label>Example textarea</Form.Label>
+                            <Form.Label>Insert the number of people</Form.Label>
                             <Form.Control type="number" max="50" min="1"/>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="reservationDate">
