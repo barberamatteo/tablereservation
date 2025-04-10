@@ -2,8 +2,8 @@ package it.matteobarbera.tablereservation.model.table.user;
 
 import it.matteobarbera.tablereservation.cache.CacheConstants;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
+import it.matteobarbera.tablereservation.http.request.ReservationAPIRequest;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
-import it.matteobarbera.tablereservation.model.dto.JSONConstructable;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -78,16 +78,15 @@ public class UserReservationApiController {
     @PostMapping("/newreservationpn/")
     // TODO: Must be tested.
     public ResponseEntity<?> newReservation(
-            @RequestBody Map<String, Object> reservation
+            @RequestBody ReservationAPIRequest reservation
     ){
 
         try {
-            ReservationDTO r = JSONConstructable.construct(reservation, ReservationDTO.class);
             return newReservation(
-                    r.getCustomerId(),
-                    r.getStartDateTime(),
-                    r.getEndDateTime(),
-                    r.getNumberOfPeople()
+                    reservation.getCustomerId(),
+                    reservation.getStartDateTime(),
+                    reservation.getEndDateTime(),
+                    reservation.getNumberOfPeople()
             );
         } catch (Exception e) {
             return ResponseEntity
