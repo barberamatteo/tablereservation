@@ -76,4 +76,8 @@ public class ReservationsService {
     public void deleteReservation(Reservation reservation) {
         reservationsRepository.delete(reservation);
     }
+
+    public Set<Reservation> getAllReservationsByDay(String day) {
+        return Set.copyOf(reservationsRepository.getAllByDate(day));
+    }
 }

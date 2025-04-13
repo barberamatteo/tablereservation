@@ -4,10 +4,12 @@ public final class ReservationLog {
     private ReservationLog() {}
 
     public static final String RESERVATION_CREATED = "Reservation {} created";
+    public static final String RESERVATION_FOUND_WITH_ID = "Returning reservation with id {}";
+    public static final String RESERVATION_WITH_ID_NOT_FOUND = "Reservation with id {} doesn't exists";
     public static final String NO_AVAILABLE_TABLE_FOR_RESERVATION = "No available tables for reservation {}";
     public static final String RESERVATION_DELETED = "Reservation with id {} deleted";
     public static final String NO_RESERVATION_TO_DELETE = "Tried to delete non-existing reservation with id {}";
-    public static final String ALL_RESERVATIONS_FOUND = "Returning all reservations";
+    public static final String ALL_RESERVATIONS_FOUND = "Returning all reservations for {}day {}";
     public static final String NO_RESERVATIONS_FOUND = "Tried to return all reservations (0 found)";
     public static final String RESERVATION_UPDATED = "Reservation with id {} updated";
     public static final String NO_RESERVATION_TO_UPDATE = "Tried to update non-existing reservation with id {}";

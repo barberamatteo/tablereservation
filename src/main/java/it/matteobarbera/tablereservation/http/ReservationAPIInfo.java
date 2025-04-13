@@ -2,6 +2,7 @@ package it.matteobarbera.tablereservation.http;
 
 public enum ReservationAPIInfo {
 
+
     RESERVATION_CREATED_OK(null),
 
     RESERVATION_FETCHED_OK(null),
