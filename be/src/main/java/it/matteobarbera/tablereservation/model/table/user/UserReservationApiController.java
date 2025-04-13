@@ -6,6 +6,7 @@ import it.matteobarbera.tablereservation.http.request.ReservationAPIRequest;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
+import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 import static it.matteobarbera.tablereservation.Constants.USER_RESERVATION_API_ENDPOINT;
@@ -52,10 +54,22 @@ public class UserReservationApiController {
     ) {
 
         if (leaveDateTime == null) {
-            leaveDateTime = DateUtils.offsetFrom(
-                    userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET,
-                    arrivalDateTime
-            );
+            try {
+                leaveDateTime = DateUtils.offsetFrom(
+                        userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET,
+                        arrivalDateTime
+                );
+            } catch(DateTimeParseException e){
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        INVALID_DATA_FORMAT.getMessage()
+                                )
+                        );
+            }
         }
 
         ReservationDTO reservationDTO = new ReservationDTO(
@@ -169,13 +183,64 @@ public class UserReservationApiController {
 
         return defaultError();
     }
+
+    @GetMapping("/get/")
+    public ResponseEntity<?> getReservation(@RequestParam Long id){
+        ReservationAPIResult result = reservationHandlingFacade.getReservationById(id);
+        if (result.isSuccess()) {
+            log.atInfo().log(RESERVATION_FOUND_WITH_ID, ((Reservation) result.getSuccess().getResult()).getId());
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            result.getSuccess().getResult()
+                    );
+        } else {
+            log.atError().log(RESERVATION_WITH_ID_NOT_FOUND, id);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.BAD_REQUEST.value(),
+                                    result.getFailure().getError().getMessage(id)
+                            )
+                    );
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping("/getallbyday/")
+    public ResponseEntity<?> getAllReservationsByDay(@RequestParam String day){
+        ReservationAPIResult result = reservationHandlingFacade.getAllReservationsByDay(day);
+        if (result.isSuccess()){
+            log.atInfo().log(ALL_RESERVATIONS_FOUND, "", day);
+            return ResponseEntity.ok(result.getSuccess().getResult());
+        } else {
+            log.atError().log(NO_RESERVATIONS_FOUND);
+            if (result.getStatus() == NO_RESERVATION_YET_TODAY){
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.CONFLICT.value(),
+                                        NO_RESERVATION_YET_TODAY.getMessage()
+                                )
+                        );
+            }
+        }
+        return defaultError();
+    }
+
     @CrossOrigin
     @GetMapping("/getall/")
     public ResponseEntity<?> getAllTodayReservations(){
-        ReservationAPIResult result = reservationHandlingFacade.getAllTodayReservations();
 
+
+        ReservationAPIResult result = reservationHandlingFacade.getAllTodayReservations();
         if (result.isSuccess()){
-            log.atInfo().log(ALL_RESERVATIONS_FOUND);
+            log.atInfo().log(ALL_RESERVATIONS_FOUND, "to", "");
             return ResponseEntity.ok(result.getSuccess().getResult());
         } else {
             log.atError().log(NO_RESERVATIONS_FOUND);

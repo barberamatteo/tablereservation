@@ -51,8 +51,8 @@ public class CustomerController {
         return customerService.getCustomers();
     }
 
-    @GetMapping("/getbyphonenumberstartingwith/")
     @CrossOrigin
+    @GetMapping("/getbyphonenumberstartingwith/")
     public ResponseEntity<?> getCustomersByPhoneNumberStartingWith(@RequestParam("regex") String partialNumber){
         Set<Customer> customersFound = customerService.getCustomersByPartialPhoneNumber(partialNumber);
         log.atInfo().log(FOUND_CUSTOMERS_MATCHING, customersFound.size(), partialNumber);

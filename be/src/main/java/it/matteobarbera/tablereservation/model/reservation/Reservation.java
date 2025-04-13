@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
@@ -49,6 +50,7 @@ public class Reservation {
             @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
             @JoinColumn(name = "date", referencedColumnName = "date")
     })
+    @JsonIgnore
     private Schedule schedule;
 
     public Reservation(

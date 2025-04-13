@@ -19,10 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 @Component
@@ -71,15 +69,6 @@ public class ReservationHandlingFacade {
         }
     }
 
-    public ReservationAPIResult getAllTodayReservations() {
-        Set<Reservation> allReservations = reservationsService.getAllTodayReservations();
-        HashMap<CustomTable, Set<Reservation>> res = getAllReservationsMap(allReservations);
-        return (
-                res.isEmpty()
-                ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_TODAY)
-                : new ReservationAPIResult.Success(res, ReservationAPIInfo.RESERVATION_FETCHED_OK)
-        );
-    }
 
     private HashMap<CustomTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
         Set<CustomTable> allTables = tablesService.getAllTables();
@@ -173,4 +162,27 @@ public class ReservationHandlingFacade {
     }
 
 
+    public ReservationAPIResult getReservationById(Long id) {
+        Reservation reservation = reservationsService.getReservationById(id);
+        return (
+                reservation == null
+                ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID)
+                : new ReservationAPIResult.Success(reservation, ReservationAPIInfo.RESERVATION_FETCHED_OK)
+        );
+    }
+
+    public ReservationAPIResult getAllReservationsByDay(String day) {
+        Set<Reservation> reservationsByDay = reservationsService.getAllReservationsByDay(day);
+        HashMap<CustomTable, Set<Reservation>> res = getAllReservationsMap(reservationsByDay);
+        return (
+                res.isEmpty()
+                        ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_FOR_DAY)
+                        : new ReservationAPIResult.Success(res, ReservationAPIInfo.RESERVATION_FETCHED_OK)
+        );
+    }
+
+    public ReservationAPIResult getAllTodayReservations() {
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        return getAllReservationsByDay(date);
+    }
 }
