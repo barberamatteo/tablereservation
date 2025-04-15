@@ -7,6 +7,11 @@ import CustomersDropdownSearch from "./CustomersDropdownSearch.tsx";
 import Customer from "../model/Customer.ts";
 
 
+interface AddReservationModalProps {
+    shown: boolean;
+    handleClose: (exit_code: number) => void;
+}
+
 
 async function endpointCall(formData: {
     customerId: number;
@@ -15,7 +20,7 @@ async function endpointCall(formData: {
 }){
 
     console.log(JSON.stringify(formData));
-    return await fetch('http://localhost:8080/api/v1.0.0/user/reservation/newreservationpn/', {
+    return await fetch('http://192.168.1.138:8080/api/v1.0.0/user/reservation/newreservationpn/', {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
@@ -30,8 +35,8 @@ async function endpointCall(formData: {
 
 
 
-
-function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose: (exit_code: number) => void}) {
+        
+function AddReservationModal(props: AddReservationModalProps) {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [date, setDate] = useState<string>("");
     const [time, setTime] = useState<string>("");
@@ -53,9 +58,9 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
                 ).then((value) => {
                     //const body = value.json() as unknown as Table[];
                     if (value.ok && JSON.stringify(value.json()) != JSON.stringify('[]')) {
-                        handleClose(1);
+                        props.handleClose(1);
                     } else {
-                        handleClose(2);
+                        props.handleClose(2);
                     }
                     //setReservedTable(body);
                 });
@@ -66,7 +71,7 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
     return (
 
         <>
-            <Modal show={shown} onHide={() => handleClose(0)}>
+            <Modal show={props.shown} onHide={() => props.handleClose(0)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add Reservation</Modal.Title>
                 </Modal.Header>
@@ -85,7 +90,7 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="reservationDate">
                             <Form.Label className="active">Select date of the reservation</Form.Label>
-                            <DatePicker date={date} callback={(newDate: string) => setDate(newDate)} />
+                            <DatePicker date={date} callback={(newDate: string) => setDate(newDate)} showDefault={false} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="reservationTime">
                             <Form.Label className="active">Select time of the reservation</Form.Label>
@@ -94,7 +99,7 @@ function AddReservationModal({shown, handleClose}: {shown: boolean, handleClose:
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => handleClose(0)}>
+                    <Button variant="secondary" onClick={() => props.handleClose(0)}>
                         Close
                     </Button>
                     <Button variant="primary" onClick={addReservation}>

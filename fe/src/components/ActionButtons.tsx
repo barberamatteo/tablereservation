@@ -2,7 +2,10 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import AddReservationModal from "./AddReservationModal.tsx";
 import {useState} from "react";
 import InfoToast from "./InfoToast.tsx";
-function ActionButtons() {
+interface ActionButtonsProps {
+    onActionPerformed: () => void;
+}
+function ActionButtons(props: ActionButtonsProps) {
 
     const [addReservationModalOpen, setAddReservationModalOpen] = useState(false);
     const [addReservationToastExitCode, setAddReservationToastExitCode] = useState(0);
@@ -13,7 +16,7 @@ function ActionButtons() {
                 shown={addReservationToastShow}
                 setShow={setAddReservationToastShow}
                 exit_code={addReservationToastExitCode}  />
-            <div className="btn-group action-btns mx-auto" role="group" aria-label="Action Buttons">
+            <div className="btn-group" style={{marginTop: "100px"}} role="group" aria-label="Action Buttons">
                 <button type="button" className="btn btn-outline-secondary"
                         onClick={() => setAddReservationModalOpen(true)}>
                     <img className="btn-icon" src="src/assets/btn_icon/add_rsv.png" alt="Add reservation"/>
@@ -26,8 +29,11 @@ function ActionButtons() {
                             if (exit_code){
                                 setAddReservationToastExitCode(exit_code)
                                 setAddReservationToastShow(true)
-                            }}
-                        }/>
+                                if (exit_code === 1){
+                                    props.onActionPerformed();
+                                }
+                            }
+                        }}/>
 
 
                 <button type="button" className="btn btn-outline-secondary">

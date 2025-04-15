@@ -1,6 +1,7 @@
 import Table from "../model/Table.ts";
 import Reservation from "../model/Reservation.ts";
 import '@material/web/divider/divider.js';
+import ReservationSubcard from "./ReservationSubcard.tsx";
 interface TableCardProps {
     table?: Table,
     reservations?: Reservation[]
@@ -8,6 +9,7 @@ interface TableCardProps {
 
 function TableCard(props: TableCardProps) {
 
+    console.log("TableCard with reservations.size = ", props.reservations?.length);
     return (
         <>
             <div className="card col shadow-sm" style={{width: "8rem", padding: 0}} >
@@ -26,14 +28,12 @@ function TableCard(props: TableCardProps) {
                             "Capacity: " + props.table?.tableDefinition.standaloneCapacity
                         }
                     </h6>
-                    <md-divider />
-                    <div>
-                        {
-                            props.reservations?.map((reservation: Reservation, index: number) => (
-                                <p>{reservation.customer.name + "(x" + reservation.numberOfPeople + ")"}</p>
-                            ))
-                        }
-                    </div>
+                    {props.reservations && props.reservations.length > 0 && (
+                        <>
+                            <md-divider />
+                            <ReservationSubcard reservations={props.reservations} />
+                        </>
+                    )}
                 </div>
             </div>
         </>

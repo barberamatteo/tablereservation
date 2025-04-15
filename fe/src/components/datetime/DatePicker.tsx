@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 interface DatePickerProps {
     date: string;
     callback: (newDate: string) => void;
+    showDefault: boolean;
 }
 
 
@@ -17,18 +18,22 @@ function DatePicker(props: DatePickerProps) {
         props.callback(
             yyyy + "-" + (mm < 10 ? "0" + mm : mm)+ "-" + (dd < 10 ? "0" + dd : dd)
         );
+
     }
+    console.log("Date is equal to ", props.date)
+
     return(
         <>
             <div className="form-group">
                 <Flatpickr
+                    date={props.date}
                     id="timePicker"
                     className="form-control"
                     options={{
                         onChange: FlatPickrOnChangeHook,
                         minDate: "today",
-                        defaultDate: "today",
                         enableTime: false,
+                        defaultDate: props.date,
                         dateFormat: "d-m-Y"
                     }}
                 />

@@ -6,7 +6,7 @@ interface CustomersDropdownSearchProps {
     onCustomerSelected: (c: Customer) => void;
 }
 async function getCustomers(regex: string): Promise<Customer[]>{
-    const response = await fetch('http://localhost:8080/api/v1/customer/getbyphonenumberstartingwith/?regex=' + regex);
+    const response = await fetch('http://192.168.1.138:8080/api/v1.0.0/customer/getbyphonenumberstartingwith/?regex=' + regex);
     if (response.status === 200) {
         const data = await response.json();
         return data.map((c: { id: number; email: string; name: string; phoneNumber: string; }) => new Customer(c.id, c.email, c.name, c.phoneNumber));
@@ -22,7 +22,7 @@ function CustomersDropdownSearch(props: CustomersDropdownSearchProps){
         setCompletionValue(value);
         setShowDropdown(false);
         //props.onSelect(value);
-    }*/
+    }       */
 
     const searchAndFilter = async (value: string) => {
         setCompletionValue(value);
