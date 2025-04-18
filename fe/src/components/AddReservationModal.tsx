@@ -20,7 +20,7 @@ async function endpointCall(formData: {
 }){
 
     console.log(JSON.stringify(formData));
-    return await fetch('http://192.168.1.138:8080/api/v1.0.0/user/reservation/newreservationpn/', {
+    return await fetch('http://0.0.0.0:8080/api/v1.0.0/user/reservation/newreservationpn/', {
         method: 'POST',
         body: JSON.stringify(formData),
         headers: {
