@@ -39,7 +39,7 @@ public class AdminTablesCRUDRestApiController {
     public Set<CustomTable> getAllTables() {
         Set<CustomTable> tables = tablesService.getAllTables();
         if (tables.isEmpty()) {
-            log.atInfo().log(NO_TABLES_FOUND);
+            log.atWarn().log(NO_TABLES_FOUND);
         } else {
             log.atInfo().log(ALL_TABLES_FOUND, tables.size());
         }
@@ -63,6 +63,7 @@ public class AdminTablesCRUDRestApiController {
     }
 
     @PostMapping("/create/")
+    @CrossOrigin
     public ResponseEntity<?> createTable(
             @RequestParam(name = "category") String category,
             @RequestParam(name = "number") int number
@@ -84,6 +85,7 @@ public class AdminTablesCRUDRestApiController {
                             )
                     );
         }
+
 
         Optional<CustomTable> tableWithSameNumberOptional = tablesService.getTableByNum(number);
         if (tableWithSameNumberOptional.isPresent()) {
@@ -112,6 +114,8 @@ public class AdminTablesCRUDRestApiController {
                         )
                 );
     }
+
+
 
 
 

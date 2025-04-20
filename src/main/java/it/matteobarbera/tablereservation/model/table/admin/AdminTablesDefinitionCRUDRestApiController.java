@@ -9,17 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static it.matteobarbera.tablereservation.http.TableDefinitionAPIError.EXISTING_CATEGORY_NAME;
 import static it.matteobarbera.tablereservation.http.TableDefinitionAPIInfo.TABLE_DEFINITION_CREATED;
-import static it.matteobarbera.tablereservation.log.TableDefinitionLog.DEFINITION_ALREADY_EXISTS;
-import static it.matteobarbera.tablereservation.log.TableDefinitionLog.DEFINITION_CREATED;
+import static it.matteobarbera.tablereservation.log.TableDefinitionLog.*;
 
 @RestController
 @RequestMapping(Constants.ADMIN_TABLESDEFINITION_CRUD_API_ENDPOINT)
@@ -35,6 +32,7 @@ public class AdminTablesDefinitionCRUDRestApiController {
 
 
     @PostMapping("/define/")
+    @CrossOrigin
     public ResponseEntity<?> defineNewCategory(
             @RequestParam("category") String category,
             @RequestParam("standaloneCapacity") Integer standaloneCapacity
@@ -65,5 +63,18 @@ public class AdminTablesDefinitionCRUDRestApiController {
                                 TABLE_DEFINITION_CREATED.getMessage(category, standaloneCapacity)
                         )
                 );
+    }
+
+    @GetMapping("/getall/")
+    @CrossOrigin
+    public Set<TableDefinition> getAllTableDefinitions() {
+        Set<TableDefinition> tableDefinitions = tablesDefinitionService.getAllTablesDefinitions();
+        if (tableDefinitions.isEmpty()) {
+            log.atWarn().log(NO_DEFINITION_FOUND);
+        } else {
+            log.atInfo().log(ALL_DEFINITIONS_FOUND, tableDefinitions.size());
+        }
+
+        return tableDefinitions;
     }
 }
