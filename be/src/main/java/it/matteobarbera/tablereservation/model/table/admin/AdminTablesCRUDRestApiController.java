@@ -2,7 +2,6 @@ package it.matteobarbera.tablereservation.model.table.admin;
 
 import it.matteobarbera.tablereservation.Constants;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
-import it.matteobarbera.tablereservation.http.response.SuccessAdmin;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
