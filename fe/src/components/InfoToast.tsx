@@ -7,6 +7,8 @@ interface InfoToastProps{
 }
 
 const exit_code_rationales = [
+
+    //
     {
         title: "",
         message: "",
@@ -21,7 +23,18 @@ const exit_code_rationales = [
         title: "Failure",
         message: "Reservation was not added due to a failure!",
         iconPath: "src/assets/failure.png"
+    },
+    {
+        title: "Success",
+        message: "Table has been added successfully!",
+        iconPath: "src/assets/check.png"
+    },
+    {
+        title: "Failure",
+        message: "Table was not added due to a failure!",
+        iconPath: "src/assets/failure.png"
     }
+
 ]
 
 function InfoToast(props: InfoToastProps){

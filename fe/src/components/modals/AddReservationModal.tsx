@@ -1,10 +1,10 @@
-import TimePicker from "./datetime/TimePicker.tsx";
+import TimePicker from "../datetime/TimePicker.tsx";
 import {useRef, useState} from "react";
-import DatePicker from "./datetime/DatePicker.tsx";
+import DatePicker from "../datetime/DatePicker.tsx";
 import {Button, Form, Modal} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.css'
-import CustomersDropdownSearch from "./CustomersDropdownSearch.tsx";
-import Customer from "../model/Customer.ts";
+import CustomersDropdownSearch from "../CustomersDropdownSearch.tsx";
+import Customer from "../../model/Customer.ts";
 
 
 interface AddReservationModalProps {

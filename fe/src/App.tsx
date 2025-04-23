@@ -1,14 +1,11 @@
 import './App.css'
-import Navbar from "./components/Navbar.tsx";
-import LoungeCardHolder from "./components/LoungeCardHolder.tsx";
+import MainEntryPoint from "./MainEntryPoint.tsx";
 
 function App() {
 
   return (
     <>
-        <Navbar/>
-
-        <LoungeCardHolder/>
+        <MainEntryPoint />
     </>
   )
 }
