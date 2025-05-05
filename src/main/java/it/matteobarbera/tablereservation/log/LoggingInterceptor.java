@@ -1,4 +1,4 @@
-package it.matteobarbera.tablereservation.http;
+package it.matteobarbera.tablereservation.log;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

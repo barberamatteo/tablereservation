@@ -25,4 +25,14 @@ public abstract class Constants {
 
     public static final String CUSTOMER_CRUD_API_ENDPOINT =
              CUSTOMER_CRUD_API_VERSION + "/customer";
+
+
+    public static final String LOGIN_ENDPOINT = "/login";
+
+    public static final String AUTH_UTILS_ENDPOINT = "/auth";
+    public static final String POST = "POST";
+
+
+
+    public static final String ROLE_ADMIN = "ADMIN";
 }
