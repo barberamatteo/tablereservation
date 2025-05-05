@@ -20,9 +20,10 @@ async function endpointCall(formData: {
 }){
 
     console.log(JSON.stringify(formData));
-    return await fetch('http://0.0.0.0:8080/api/v1.0.0/user/reservation/newreservationpn/', {
+    return await fetch('http://localhost:8080/api/v1.0.0/user/reservation/newreservationpn/', {
         method: 'POST',
         body: JSON.stringify(formData),
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             'Transfer-Encoding': 'chunked',
@@ -79,8 +80,8 @@ function AddReservationModal(props: AddReservationModalProps) {
                     <Form ref={formRef}>
                         <Form.Group className="mb-3" controlId="phoneNumber">
                             <Form.Label>Customer phone number</Form.Label>
-                            <CustomersDropdownSearch onCustomerSelected={setSelectedCustomer}/>
-
+                            <CustomersDropdownSearch
+                                onCustomerSelected={setSelectedCustomer} />
                         </Form.Group>
                         <Form.Group
                             className="mb-3"

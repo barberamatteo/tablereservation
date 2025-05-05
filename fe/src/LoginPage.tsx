@@ -1,6 +1,6 @@
 import Navbar from "./components/Navbar.tsx";
 import {Button, Form} from "react-bootstrap";
-import {useRef} from "react";
+import {useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 
 async function loginCall(username: string, password: string) {
@@ -10,29 +10,48 @@ async function loginCall(username: string, password: string) {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({
-            username: username,
-            password: password
-        }),
+        body: "username=" + username + "&password=" + password,
     })
 }
 
-
+async function authCheck(){
+    const response = await fetch("http://localhost:8080/auth/check",
+        {
+            method: 'GET',
+            credentials: "include",
+        })
+    return response.status === 204;
+}
 function LoginPage(){
+
 
     const navigate = useNavigate();
     const formRef = useRef<HTMLFormElement>(null);
 
+    useEffect(() => {
+        authCheck().then(authenticated => {
+            console.log(`Authenticated = ${authenticated}`);
+            if (authenticated) navigate("/")
+        })
+    });
+
     const doLogin = async () => {
+        console.log("Doing login...");
         if (formRef.current) {
             const form = formRef.current;
             const formData = {
                 username: (form.elements.namedItem("username") as HTMLInputElement)?.value,
                 password: (form.elements.namedItem("password") as HTMLInputElement)?.value,
             }
+            console.log("Entro")
             await loginCall(formData.username, formData.password).then(value => {
+                console.log("Value = ", value.status);
+
                 if (value.ok){
+                    console.log("Successful");
                     navigate("/");
+                } else {
+                    console.log("Error");
                 }
             })
 
@@ -54,7 +73,7 @@ function LoginPage(){
                     <Form.Control type={"password"} />
                 </Form.Group>
 
-                <Button variant="primary" type="submit" onClick={doLogin}>
+                <Button variant="primary" onClick={doLogin}>
                     Login
                 </Button>
             </Form>

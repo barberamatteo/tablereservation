@@ -10,6 +10,7 @@ async function addDefinitionEndpointCall(formData: { name: string; standaloneCap
     return await fetch(`http://localhost:8080/api/v1.0.0/admin/tablesdefinition/define/?category=${formData.name}&standaloneCapacity=${formData.standaloneCapacity}`,
         {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'Transfer-Encoding': 'chunked',

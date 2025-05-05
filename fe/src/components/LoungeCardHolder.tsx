@@ -8,12 +8,18 @@ import ScheduleSelector from "./ScheduleSelector.tsx";
 import DateUtils from "./datetime/DateUtils.ts";
 
 async function fetchTables(): Promise<Table[]> {
-    const response = await fetch('http://0.0.0.0:8080/api/v1.0.0/admin/tables/getall/');
+    const response = await fetch('http://localhost:8080/api/v1.0.0/admin/tables/getall/', {
+        method: 'GET',
+        credentials: 'include'
+    });
     return await response.json();
 }
 
 async function fetchReservations(date: string): Promise<Map<string, Reservation[]>>{
-    const response = await fetch('http://0.0.0.0:8080/api/v1.0.0/user/reservation/getallbyday/?day='+ date);
+    const response = await fetch('http://localhost:8080/api/v1.0.0/user/reservation/getallbyday/?day='+ date, {
+        method: 'GET',
+        credentials: 'include'
+    });
     const data = await response.json();
     return new Map(Object.entries(data));
 }

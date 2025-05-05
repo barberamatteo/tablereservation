@@ -15,6 +15,7 @@ async function addTableEndpointCall(formData: {
     return await fetch(`http://localhost:8080/api/v1.0.0/admin/tables/create/?category=${formData.category}&number=${formData.number}`,
         {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
                 'Transfer-Encoding': 'chunked',
@@ -35,7 +36,11 @@ function AddTableModal(props: AddTableModalProps){
     }, []);
 
     const getAllDefinitions = async () => {
-        const response = await fetch('http://0.0.0.0:8080/api/v1.0.0/admin/tablesdefinition/getall/');
+        const response = await fetch('http://localhost:8080/api/v1.0.0/admin/tablesdefinition/getall/',
+            {
+                method: 'GET',
+                credentials: 'include'
+            });
         if (response.ok){
             const data = await response.json();
             setTableDefinitions(

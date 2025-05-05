@@ -1,12 +1,17 @@
-import {Dropdown, Form} from "react-bootstrap";
+import {Button, Col, Dropdown, Form, Image, InputGroup, Row} from "react-bootstrap";
 import Customer from "../model/Customer.ts";
 import {useState} from "react";
+import AddCustomerModal from "/src/components/modals/AddCustomerModal.tsx";
 
 interface CustomersDropdownSearchProps {
     onCustomerSelected: (c: Customer) => void;
 }
 async function getCustomers(regex: string): Promise<Customer[]>{
-    const response = await fetch('http://0.0.0.0:8080/api/v1.0.0/customer/getbyphonenumberstartingwith/?regex=' + regex);
+    const response = await fetch('http://localhost:8080/api/v1.0.0/customer/getbyphonenumberstartingwith/?regex=' + regex,
+        {
+            method: 'GET',
+            credentials: 'include'
+        });
     if (response.status === 200) {
         const data = await response.json();
         return data.map((c: { id: number; email: string; name: string; phoneNumber: string; }) => new Customer(c.id, c.email, c.name, c.phoneNumber));
@@ -18,12 +23,9 @@ function CustomersDropdownSearch(props: CustomersDropdownSearchProps){
     const [completionValue, setCompletionValue] = useState<string>("");
     const [showDropdown, setShowDropdown] = useState(false);
     const [customersFound, setCustomersFound] = useState<Customer[]>([]);
-    /*const handleSelect = (value: string) => {
-        setCompletionValue(value);
-        setShowDropdown(false);
-        //props.onSelect(value);
-    }       */
-
+    const [isCustomerChosen, setIsCustomerChosen] = useState<boolean>(false);
+    const [showAddCustomerModal, setShowAddCustomerModal] = useState(false);
+    const [addCustomerExitCode, setAddCustomerExitCode] = useState<number | null>(null);
     const searchAndFilter = async (value: string) => {
         setCompletionValue(value);
         await getCustomers(value).then((values) => {
@@ -38,39 +40,58 @@ function CustomersDropdownSearch(props: CustomersDropdownSearchProps){
     }
     return (
         <>
-            <Form.Control
-                type="tel"
-                placeholder="Also include country code (es. +39)"
-                value={completionValue}
-                autoFocus
-                onChange={(e) => searchAndFilter(e.target.value)}
+            <Col>
+                <InputGroup className="mb-3">
+                    <Form.Control
+                        type="tel"
+                        placeholder="Also include country code (es. +39)"
+                        value={completionValue}
+                        autoFocus
+                        onChange={(e) => {
+                            setIsCustomerChosen(false);
+                            searchAndFilter(e.target.value).then();
+                        }}
+                    />
+
+                    {!isCustomerChosen && (
+                        <Button
+                            variant="outline-secondary"
+                            onClick={() => setShowAddCustomerModal(true)}>
+                            <Image className="btn-icon" src="src/assets/btn_icon/add_cust.png"/>
+                        </Button>
+
+                    )}
+
+                </InputGroup>
+                {(addCustomerExitCode == 1 || addCustomerExitCode == -1) && (
+                    <Form.Label>
+                        {addCustomerExitCode == 1 ? "Customer created successfully" : "Customer creation failed!"}
+                    </Form.Label>
+                )}
+                {showDropdown && (
+                    <Dropdown.Menu show style={{position: "absolute", width: "100%"}}>
+                        {customersFound.map((item: Customer) => (
+                            <Dropdown.Item
+                                onClick={() => {
+                                    setCompletionValue(item.phoneNumber);
+                                    props.onCustomerSelected(item);
+                                    setShowDropdown(false);
+                                    setIsCustomerChosen(true);
+                                }}>
+                                {item.toString()}
+                            </Dropdown.Item>
+                        ))}
+                    </Dropdown.Menu>
+                )}
+            </Col>
+            <AddCustomerModal
+                shown={showAddCustomerModal}
+                handleClose={(exit_code: number) => {
+                    setShowAddCustomerModal(false)
+                    setAddCustomerExitCode(exit_code);
+                }}
             />
-            {showDropdown && (
-                <Dropdown.Menu show style={{position: "absolute", width: "100%"}}>
-                    {customersFound.map((item: Customer) => (
-                        <Dropdown.Item
-                            onClick={() => {
-                                setCompletionValue(item.phoneNumber)
-                                props.onCustomerSelected(item)
-                                setShowDropdown(false)}}>
-                            {item.toString()}
-                        </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-            )}
         </>
-        /*
-        <Dropdown>
-                <DropdownToggle>
-                    Prova
-                </DropdownToggle>
-                <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-         */
     )
 }
 
