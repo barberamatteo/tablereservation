@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.customer;
 
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
+import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 
 import static it.matteobarbera.tablereservation.Constants.CUSTOMER_CRUD_API_ENDPOINT;
-import static it.matteobarbera.tablereservation.http.CustomersAPIError.TOO_FEW_DIGITS;
+import static it.matteobarbera.tablereservation.http.CustomerAPIInfo.CUSTOMER_CREATED;
+import static it.matteobarbera.tablereservation.http.CustomersAPIError.*;
 import static it.matteobarbera.tablereservation.log.CustomerLog.*;
 
 @RestController
@@ -25,6 +27,55 @@ public class CustomerController {
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
+
+    @PostMapping("/newcustomer")
+    public ResponseEntity<?> createCustomer(
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("name") String name,
+            @RequestParam(value = "email", required = false) String email
+    ){
+
+        if (email != null && !email.isEmpty()) {
+            if (customerService.getCustomerByEmail(email) != null){
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(
+                                CommonJSONBodies.fromStatusAndMsg(
+                                        HttpStatus.BAD_REQUEST.value(),
+                                        CUSTOMER_WITH_EMAIL_ALREADY_EXISTS.getMessage(email)
+                                )
+                        );
+
+            }
+        }
+
+        if (customerService.getCustomerByPhoneNumber(phoneNumber) != null){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                            CommonJSONBodies.fromStatusAndMsg(
+                                    HttpStatus.BAD_REQUEST.value(),
+                                    CUSTOMER_WITH_PHONE_NUMBER_ALREADY_EXISTS.getMessage(phoneNumber)
+                            )
+                    );
+        }
+
+        CustomerDTO customerDTO = new CustomerDTO(name, phoneNumber, email);
+        customerService.createCustomer(customerDTO);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(
+                        CommonJSONBodies.fromStatusAndMsg(
+                                HttpStatus.OK.value(),
+                                CUSTOMER_CREATED.getMessage(phoneNumber)
+                        )
+                );
+    }
+
+
 
     @GetMapping("/getbyphonenumber/")
     public Customer getCustomerByPhoneNumber(
