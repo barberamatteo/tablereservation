@@ -1,7 +1,6 @@
 package it.matteobarbera.tablereservation;
 
-import it.matteobarbera.tablereservation.http.LoggingInterceptor;
-import org.springframework.boot.CommandLineRunner;
+import it.matteobarbera.tablereservation.log.LoggingInterceptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -9,8 +8,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.Scanner;
 
 
 @SpringBootApplication
