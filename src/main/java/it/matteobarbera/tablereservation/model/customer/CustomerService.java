@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.model.customer;
 
+import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +29,19 @@ public class CustomerService {
 
     public Set<Customer> getCustomersByPartialPhoneNumber(String partialNumber) {
         return customerRepository.findByPartialPhoneNumber(partialNumber);
+    }
+
+    public Customer getCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
+    public void createCustomer(CustomerDTO customerDTO) {
+        customerRepository.save(
+                new Customer(
+                        customerDTO.getPhoneNumber(),
+                        customerDTO.getName(),
+                        customerDTO.getEmail()
+                )
+        );
     }
 }

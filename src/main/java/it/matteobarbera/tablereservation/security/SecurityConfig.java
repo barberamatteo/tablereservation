@@ -102,6 +102,7 @@ public class SecurityConfig {
                                 .build()
                         )
                         .collect(Collectors.toCollection(HashSet::new))
+
         );
     }
 }

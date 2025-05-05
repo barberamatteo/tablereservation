@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.customer;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,11 +18,12 @@ public class Customer {
             generator = "customer_sequence"
     )
     private Long id;
+    @Nullable
     private String email;
     private String name;
     private String phoneNumber;
 
-    public Customer(String phoneNumber, String name, String email) {
+    public Customer(String phoneNumber, String name, @Nullable String email) {
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.email = email;
@@ -34,11 +36,12 @@ public class Customer {
         return id;
     }
 
+    @Nullable
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(@Nullable String email) {
         this.email = email;
     }
 
