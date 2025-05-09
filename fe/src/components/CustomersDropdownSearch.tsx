@@ -1,4 +1,4 @@
-import {Button, Col, Dropdown, Form, Image, InputGroup, Row} from "react-bootstrap";
+import {Button, Col, Dropdown, Form, Image, InputGroup} from "react-bootstrap";
 import Customer from "../model/Customer.ts";
 import {useState} from "react";
 import AddCustomerModal from "/src/components/modals/AddCustomerModal.tsx";
