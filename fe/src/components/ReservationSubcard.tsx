@@ -2,7 +2,7 @@ import Reservation from "../model/Reservation.ts";
 import {Button, Col, Container, Row} from "react-bootstrap";
 import {BiPencil} from "react-icons/bi";
 import {useState} from "react";
-import EditReservationModal from "/src/components/modals/EditReservationModal.tsx";
+import EditReservationModal from "src/components/modals/EditReservationModal.tsx";
 
 interface ReservationSubcardProps {
     reservations: Reservation[] | undefined;

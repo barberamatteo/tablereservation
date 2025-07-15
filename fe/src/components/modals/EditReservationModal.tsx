@@ -1,22 +1,44 @@
-import Reservation from "/src/model/Reservation.ts";
-import {Button, Col, Form, Modal} from "react-bootstrap";
+import Reservation from "src/model/Reservation.ts";
+import {Button, Form, Modal} from "react-bootstrap";
 import {useRef} from "react";
-import reservation from "@/src/model/Reservation.ts";
 
 
 interface EditReservationModalProps {
-    reservation: Reservation;
+    reservation: Reservation | null;
     handleClose: () => void;
-}
-
-function handleDelete(){
-
 }
 
 function EditReservationModal(props: EditReservationModalProps){
     const formRef = useRef<HTMLFormElement>(null);
-    function handleEdit(){
-        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/deletereservation/?reservation_id=${props.reservation.id}`)
+
+    const handleDelete = async () => {
+        await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/deletereservation/?reservation_id=${props.reservation?.id}`,
+            {
+                method: "DELETE",
+                credentials: 'include'
+            })
+            .then(res => {
+                if (res.ok) {
+                    props.handleClose();
+                }
+            })
+    }
+
+    const handleEdit = async () =>{
+
+        if (formRef.current) {
+            const form = formRef.current;
+            const formData = {
+                numberOfPeople: Number.parseInt((form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value)
+            }
+            await callEditNumberOfPeopleEndpoint(formData.numberOfPeople)
+        }
+
+
+    }
+
+    async function callEditNumberOfPeopleEndpoint(numberOfPeople: number){
+        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/editnumberofpeople/?reservation_id=${props.reservation?.id}&numberOfPeople=${formData.numberOfPeople}`)
     }
     
     return (
@@ -52,9 +74,9 @@ function EditReservationModal(props: EditReservationModalProps){
                         </Form>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => props.handleClose}>
-                        Close
-                    </Button>
+                    {/*<Button variant="secondary" onClick={() => props.handleClose}>*/}
+                    {/*    Close*/}
+                    {/*</Button>*/}
                     <Button variant="danger" onClick={handleDelete}>Delete this reservation</Button>
                     <Button variant="primary" onClick={handleEdit}>
                         Edit

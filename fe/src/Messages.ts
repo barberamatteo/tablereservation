@@ -7,6 +7,9 @@ class Messages {
 
     static DEFINITION_ADD_OK = "Table definition has been added successfully!";
     static DEFINITION_ADD_FAILED = "Table definition was not added due to a failure!";
+
+    static RESERVATION_DELETE_OK = "Reservation has been deleted successfully!";
+    static RESERVATION_DELETE_FAILED = "Reservation was not deleted due to a failure!";
 }
 
 export default Messages;
