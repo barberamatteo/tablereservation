@@ -3,6 +3,7 @@ import {Button, Col, Container, Row} from "react-bootstrap";
 import {BiPencil} from "react-icons/bi";
 import {useState} from "react";
 import EditReservationModal from "src/components/modals/EditReservationModal.tsx";
+import GenericToast from "./GenericToast.tsx";
 
 interface ReservationSubcardProps {
     reservations: Reservation[] | undefined;
@@ -10,7 +11,9 @@ interface ReservationSubcardProps {
 
 function ReservationSubcard(props: ReservationSubcardProps) {
     const [reservationToEdit, setReservationToEdit] = useState<Reservation | null>(null);
-
+    const [toastShown, setToastShown] = useState(false);
+    const [isToastSuccess, setIsToastSuccess] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
     if (props.reservations == null || props.reservations.length === 0) {
         return null;
     }
@@ -40,7 +43,37 @@ function ReservationSubcard(props: ReservationSubcardProps) {
             ))
         }
 
-        <EditReservationModal reservation={reservationToEdit} handleClose={() => setReservationToEdit(null)} />
+        <EditReservationModal reservation={reservationToEdit} handleClose={(exit_code: number) => {
+            setReservationToEdit(null);
+            switch (exit_code) {
+                case 4:
+                    setIsToastSuccess(true);
+                    setToastMessage("Reservation deleted successfully.");
+                    setToastShown(true);
+                    break;
+                case 0:
+                    setToastShown(false);
+                    break;
+                case 1:
+                    setIsToastSuccess(true);
+                    setToastMessage("Reservation edited successfully.");
+                    setToastShown(true);
+                    break;
+                case 2:
+                    setIsToastSuccess(false);
+                    setToastMessage("No available tables for the required operation.");
+                    setToastShown(true);
+                    break;
+                default:
+                    setIsToastSuccess(false);
+                    setToastMessage("An unexpected error has occurred.");
+                    setToastShown(true);
+            }
+        }} />
+
+        <GenericToast shown={toastShown} setShow={setToastShown} isSuccess={isToastSuccess}>
+            {toastMessage}
+        </GenericToast>
         </>
 )
 }

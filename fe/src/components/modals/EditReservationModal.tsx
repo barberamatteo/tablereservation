@@ -1,16 +1,19 @@
 import Reservation from "src/model/Reservation.ts";
 import {Button, Form, Modal} from "react-bootstrap";
-import {useRef} from "react";
+import {useRef, useState} from "react";
+import AddCustomerModal from "./AddCustomerModal.tsx";
+import RescheduleModal from "./RescheduleModal.tsx";
 
 
 interface EditReservationModalProps {
     reservation: Reservation | null;
-    handleClose: () => void;
+    handleClose: (exit_code: number) => void;
 }
 
 function EditReservationModal(props: EditReservationModalProps){
     const formRef = useRef<HTMLFormElement>(null);
-
+    const [needToRescheduleModalShown, setNeedToRescheduleModalShown] = useState(false);
+    const [token, setToken] = useState("");
     const handleDelete = async () => {
         await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/deletereservation/?reservation_id=${props.reservation?.id}`,
             {
@@ -19,7 +22,7 @@ function EditReservationModal(props: EditReservationModalProps){
             })
             .then(res => {
                 if (res.ok) {
-                    props.handleClose();
+                    props.handleClose(4);
                 }
             })
     }
@@ -31,19 +34,32 @@ function EditReservationModal(props: EditReservationModalProps){
             const formData = {
                 numberOfPeople: Number.parseInt((form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value)
             }
-            await callEditNumberOfPeopleEndpoint(formData.numberOfPeople)
+            console.log("Doing call")
+            const response = await callEditNumberOfPeopleEndpoint(formData.numberOfPeople)
+            if (response.ok){
+                props.handleClose(1);
+            } else if(response.status === 303){
+                const data = await response.json();
+                setToken(data.token)
+                setNeedToRescheduleModalShown(true);
+            }
         }
 
 
     }
 
     async function callEditNumberOfPeopleEndpoint(numberOfPeople: number){
-        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/editnumberofpeople/?reservation_id=${props.reservation?.id}&numberOfPeople=${formData.numberOfPeople}`)
+        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/editnumberofpeople/?reservation_id=${props.reservation?.id}&numberOfPeople=${numberOfPeople}`,
+            {
+                method: "PATCH",
+                credentials: 'include'
+            }
+        )
     }
     
     return (
         <>
-            <Modal show={props.reservation != null} onHide={props.handleClose}>
+            <Modal show={props.reservation != null} onHide={() => props.handleClose(0)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit Reservation</Modal.Title>
                 </Modal.Header>
@@ -81,8 +97,15 @@ function EditReservationModal(props: EditReservationModalProps){
                     <Button variant="primary" onClick={handleEdit}>
                         Edit
                     </Button>
+
                 </Modal.Footer>
             </Modal>
+            <RescheduleModal shown={needToRescheduleModalShown} token={token} handleClose={
+                (exit_code: number) => {
+                    setNeedToRescheduleModalShown(false)
+                    props.handleClose(exit_code)
+                }} />
+
         </>
     );
 }

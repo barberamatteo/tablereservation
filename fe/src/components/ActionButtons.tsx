@@ -1,7 +1,6 @@
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import AddReservationModal from "./modals/AddReservationModal.tsx";
 import {useState} from "react";
-import InfoToast from "./InfoToast.tsx";
 import AddTableModal from "./modals/AddTableModal.tsx";
 import GenericToast from "./GenericToast.tsx";
 import Messages from "../Messages.ts";
