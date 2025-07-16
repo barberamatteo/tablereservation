@@ -45,7 +45,8 @@ public class DebugConfig {
             tablesService.createTable("Tavolo piccolo", 5);
             tablesService.createTable("Tavolo piccolo", 6);
 
-            securityService.createAdmin("admin", "admin");
+            securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
+            securityService.createAdmin("admin_pm", "admin"); //Postman admin for debugging/testing
             reservationHandlingFacade.newReservation(
                     new ReservationDTO(
                             1L,

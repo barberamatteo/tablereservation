@@ -259,6 +259,7 @@ public class UserReservationApiController {
         return defaultError();
     }
 
+    @CrossOrigin
     @PatchMapping("/editnumberofpeople/")
     public ResponseEntity<?> editReservationNumberOfPeople(
             @RequestParam(name = "reservation_id") Long reservationId,
@@ -331,6 +332,7 @@ public class UserReservationApiController {
         return defaultError();
     }
 
+    @CrossOrigin
     @PatchMapping("/confirm/")
     public ResponseEntity<?> performPatchByToken(
             @RequestParam(name = "token") String token
