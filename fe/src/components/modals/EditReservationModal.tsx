@@ -1,7 +1,6 @@
 import Reservation from "src/model/Reservation.ts";
 import {Button, Form, Modal} from "react-bootstrap";
 import {useRef, useState} from "react";
-import AddCustomerModal from "./AddCustomerModal.tsx";
 import RescheduleModal from "./RescheduleModal.tsx";
 
 

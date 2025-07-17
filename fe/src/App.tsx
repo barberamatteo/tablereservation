@@ -1,11 +1,14 @@
 import './App.css'
 import MainEntryPoint from "./MainEntryPoint.tsx";
+import {ToastProvider} from "./components/ToastPortal.tsx";
 
 function App() {
 
   return (
     <>
-        <MainEntryPoint />
+        <ToastProvider>
+            <MainEntryPoint />
+        </ToastProvider>
     </>
   )
 }
