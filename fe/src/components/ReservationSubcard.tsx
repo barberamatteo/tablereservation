@@ -22,10 +22,10 @@ function ReservationSubcard(props: ReservationSubcardProps) {
             props.reservations.map((reservation: Reservation) => (
                 <Container>
                     <Row>
-                        <Col className="overflow-auto" style={{whiteSpace: "nowrap"}}>
-                            <p>{reservation.customer.name + "(x" + reservation.numberOfPeople + ")"}</p>
+                        <Col md={8} className="overflow-auto" style={{whiteSpace: "nowrap"}}>
+                            <p>{nameShortener(reservation.customer.name) + "(x" + reservation.numberOfPeople + ")"}</p>
                         </Col>
-                        <Col>
+                        <Col md={4}>
                             <Button
                                 variant="outline-danger"
                                 size="sm"
@@ -64,5 +64,16 @@ function ReservationSubcard(props: ReservationSubcardProps) {
 )
 }
 
+function nameShortener(fullname: string) {
+    const names = fullname.trim().split(" ");
+    if (names.length == 1) return fullname;
+    let toRet = ""
+    console.log("names size", names.length);
+    for (let i = 0; i < names.length - 1; i++) {
+        toRet += names[i].charAt(0).toUpperCase().concat(". ");
+    }
+    toRet += (names[names.length - 1]);
+    return toRet;
+}
 
 export default ReservationSubcard;
