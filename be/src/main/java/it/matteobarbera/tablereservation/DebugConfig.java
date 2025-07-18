@@ -1,8 +1,6 @@
 package it.matteobarbera.tablereservation;
 
-import it.matteobarbera.tablereservation.model.admin.Admin;
 import it.matteobarbera.tablereservation.model.admin.AdminService;
-import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -15,8 +13,6 @@ import it.matteobarbera.tablereservation.security.SecurityService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Set;
 
 @Configuration
 public class DebugConfig {
