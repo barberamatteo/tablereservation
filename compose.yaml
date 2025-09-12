@@ -12,8 +12,6 @@ services:
   db:
     image: postgres
     restart: always
-    secrets:
-      - db-password
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
@@ -34,8 +32,5 @@ services:
 
 volumes:
   db-data:
-secrets:
-  db-password:
-    file: .env
 networks:
   spring-postgres:
