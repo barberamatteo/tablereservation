@@ -1,5 +1,6 @@
 import {Button, Form, Modal} from "react-bootstrap";
 import {useRef} from "react";
+import Messages from "../../Messages.ts";
 
 interface AddDefinitionModalProps {
     shown: boolean;
@@ -7,7 +8,7 @@ interface AddDefinitionModalProps {
 }
 
 async function addDefinitionEndpointCall(formData: { name: string; standaloneCapacity: number }){
-    return await fetch(`http://localhost:8080/api/v1.0.0/admin/tablesdefinition/define/?category=${formData.name}&standaloneCapacity=${formData.standaloneCapacity}`,
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/admin/tablesdefinition/define/?category=${formData.name}&standaloneCapacity=${formData.standaloneCapacity}`,
         {
             method: 'POST',
             credentials: 'include',

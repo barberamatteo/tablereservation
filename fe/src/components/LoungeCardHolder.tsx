@@ -6,9 +6,10 @@ import TableCard from "./TableCard.tsx";
 import ActionButtons from "./ActionButtons.tsx";
 import ScheduleSelector from "./ScheduleSelector.tsx";
 import DateUtils from "./datetime/DateUtils.ts";
+import Messages from "../Messages.ts";
 
 async function fetchTables(): Promise<Table[]> {
-    const response = await fetch('http://localhost:8080/api/v1.0.0/admin/tables/getall/', {
+    const response = await fetch(`${Messages.BACKEND}/api/v1.0.0/admin/tables/getall/`, {
         method: 'GET',
         credentials: 'include'
     });
@@ -16,7 +17,7 @@ async function fetchTables(): Promise<Table[]> {
 }
 
 async function fetchReservations(date: string): Promise<Map<string, Reservation[]>>{
-    const response = await fetch('http://localhost:8080/api/v1.0.0/user/reservation/getallbyday/?day='+ date, {
+    const response = await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/getallbyday/?day=`+ date, {
         method: 'GET',
         credentials: 'include'
     });

@@ -3,9 +3,10 @@ import Lounge from "./Lounge.tsx";
 import LoginPage from "./LoginPage.tsx";
 import {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
+import Messages from "./Messages.ts";
 
 async function authCheck(){
-    const response = await fetch("http://localhost:8080/auth/check",
+    const response = await fetch(`${Messages.BACKEND}/auth/check`,
         {
             method: 'GET',
             credentials: "include",

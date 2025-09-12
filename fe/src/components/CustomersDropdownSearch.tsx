@@ -2,12 +2,13 @@ import {Button, Col, Dropdown, Form, Image, InputGroup} from "react-bootstrap";
 import Customer from "../model/Customer.ts";
 import {useState} from "react";
 import AddCustomerModal from "/src/components/modals/AddCustomerModal.tsx";
+import Messages from "../Messages.ts";
 
 interface CustomersDropdownSearchProps {
     onCustomerSelected: (c: Customer) => void;
 }
 async function getCustomers(regex: string): Promise<Customer[]>{
-    const response = await fetch('http://localhost:8080/api/v1.0.0/customer/getbyphonenumberstartingwith/?regex=' + regex,
+    const response = await fetch(`${Messages.BACKEND}/api/v1.0.0/customer/getbyphonenumberstartingwith/?regex=` + regex,
         {
             method: 'GET',
             credentials: 'include'

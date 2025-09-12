@@ -5,6 +5,7 @@ import {Button, Form, Modal} from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.css'
 import CustomersDropdownSearch from "../CustomersDropdownSearch.tsx";
 import Customer from "../../model/Customer.ts";
+import Messages from "../../Messages.ts";
 
 
 interface AddReservationModalProps {
@@ -20,7 +21,7 @@ async function endpointCall(formData: {
 }){
 
     console.log(JSON.stringify(formData));
-    return await fetch('http://localhost:8080/api/v1.0.0/user/reservation/newreservationpn/', {
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/newreservationpn/`, {
         method: 'POST',
         body: JSON.stringify(formData),
         credentials: 'include',

@@ -2,6 +2,7 @@ import Reservation from "src/model/Reservation.ts";
 import {Button, Form, Modal} from "react-bootstrap";
 import {useRef, useState} from "react";
 import RescheduleModal from "./RescheduleModal.tsx";
+import Messages from "../../Messages.ts";
 
 
 interface EditReservationModalProps {
@@ -14,7 +15,7 @@ function EditReservationModal(props: EditReservationModalProps){
     const [needToRescheduleModalShown, setNeedToRescheduleModalShown] = useState(false);
     const [token, setToken] = useState("");
     const handleDelete = async () => {
-        await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/deletereservation/?reservation_id=${props.reservation?.id}`,
+        await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/deletereservation/?reservation_id=${props.reservation?.id}`,
             {
                 method: "DELETE",
                 credentials: 'include'
@@ -48,7 +49,7 @@ function EditReservationModal(props: EditReservationModalProps){
     }
 
     async function callEditNumberOfPeopleEndpoint(numberOfPeople: number){
-        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/editnumberofpeople/?reservation_id=${props.reservation?.id}&numberOfPeople=${numberOfPeople}`,
+        return await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/editnumberofpeople/?reservation_id=${props.reservation?.id}&numberOfPeople=${numberOfPeople}`,
             {
                 method: "PATCH",
                 credentials: 'include'

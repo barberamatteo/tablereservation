@@ -77,7 +77,14 @@ public class SecurityConfig {
             public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry
                         .addMapping("/**")
-                        .allowedOrigins("http://0.0.0.0:5173", "http://localhost:5173")
+                        .allowedOrigins(
+                                "http://0.0.0.0",
+                                "http://localhost",
+                                "http://0.0.0.0:80",
+                                "http://localhost:80",
+                                "http://0.0.0.0:5173",
+                                "http://localhost:5173"
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .exposedHeaders("*")

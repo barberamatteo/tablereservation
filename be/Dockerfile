@@ -10,6 +10,6 @@ FROM amazoncorretto:17-alpine
 WORKDIR /appruntime
 COPY --from=builder /build/server/target/*.jar tablereservation.jar
 
-EXPOSE 9996
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "tablereservation.jar"]

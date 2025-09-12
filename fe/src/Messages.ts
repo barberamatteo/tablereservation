@@ -10,6 +10,7 @@ class Messages {
 
     static RESERVATION_DELETE_OK = "Reservation has been deleted successfully!";
     static RESERVATION_DELETE_FAILED = "Reservation was not deleted due to a failure!";
+    static BACKEND = "http://localhost:8080"
 }
 
 export default Messages;

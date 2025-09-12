@@ -2,9 +2,10 @@ import Navbar from "./components/Navbar.tsx";
 import {Button, Form} from "react-bootstrap";
 import {useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom";
+import Messages from "./Messages.ts";
 
 async function loginCall(username: string, password: string) {
-    return await fetch("http://localhost:8080/login", {
+    return await fetch(`${Messages.BACKEND}/login`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -15,7 +16,7 @@ async function loginCall(username: string, password: string) {
 }
 
 async function authCheck(){
-    const response = await fetch("http://localhost:8080/auth/check",
+    const response = await fetch(`${Messages.BACKEND}/auth/check`,
         {
             method: 'GET',
             credentials: "include",

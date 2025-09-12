@@ -23,6 +23,15 @@ services:
       - POSTGRES_PASSWORD=prova
     expose:
       - 5432
+  frontend:
+    build: fe
+    ports:
+      - 80:80
+    environment:
+      - BE_SERVER=http://backend:8080
+    stdin_open: true
+    tty: true
+
 volumes:
   db-data:
 secrets:

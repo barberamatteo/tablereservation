@@ -1,6 +1,7 @@
 import {Button, Form, Modal} from "react-bootstrap";
 import {useEffect, useRef, useState} from "react";
 import TableDefinition from "../../model/TableDefinition.ts";
+import Messages from "../../Messages.ts";
 
 interface AddTableModalProps{
     shown: boolean;
@@ -12,7 +13,7 @@ async function addTableEndpointCall(formData: {
     category: string;
     number: number;
 }) {
-    return await fetch(`http://localhost:8080/api/v1.0.0/admin/tables/create/?category=${formData.category}&number=${formData.number}`,
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/admin/tables/create/?category=${formData.category}&number=${formData.number}`,
         {
             method: 'POST',
             credentials: 'include',
@@ -36,7 +37,7 @@ function AddTableModal(props: AddTableModalProps){
     }, []);
 
     const getAllDefinitions = async () => {
-        const response = await fetch('http://localhost:8080/api/v1.0.0/admin/tablesdefinition/getall/',
+        const response = await fetch(`${Messages.BACKEND}/api/v1.0.0/admin/tablesdefinition/getall/`,
             {
                 method: 'GET',
                 credentials: 'include'

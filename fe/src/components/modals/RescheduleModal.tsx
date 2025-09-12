@@ -1,4 +1,5 @@
 import {Button, Modal} from "react-bootstrap";
+import Messages from "../../Messages.ts";
 interface RescheduleModalProps {
     shown: boolean;
     handleClose: (exit_code: number) => void;
@@ -7,7 +8,7 @@ interface RescheduleModalProps {
 
 function RescheduleModal(props: RescheduleModalProps) {
     const callToConfirmEndpoint = async () =>{
-        return await fetch(`http://localhost:8080/api/v1.0.0/user/reservation/confirm/?token=${props.token}`,
+        return await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/confirm/?token=${props.token}`,
             {
                 method: "PATCH",
                 credentials: "include"

@@ -1,5 +1,6 @@
 import {Button, Form, Modal} from "react-bootstrap";
 import {useRef} from "react";
+import Messages from "../../Messages.ts";
 
 interface AddCustomerModalProps {
     shown: boolean;
@@ -11,7 +12,7 @@ async function addCustomerCall(formData: {
     name: string,
     email: string
 }){
-    return await fetch(`http://localhost:8080/api/v1.0.0/customer/newcustomer?phoneNumber=${formData.phoneNumber}&name=${formData.name}&email=${formData.email}`, {
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/customer/newcustomer?phoneNumber=${formData.phoneNumber}&name=${formData.name}&email=${formData.email}`, {
         method: 'POST',
         credentials: 'include'
     });
