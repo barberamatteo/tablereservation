@@ -39,7 +39,7 @@ Once the installation process is terminated, it is necessary to create an admin 
 To do it:
 1) Run
 ```
-docker attach tablereservation_app-backend-1
+docker compose attach backend
 ```
 to attach your terminal's standard input to the container running the Spring Boot Application.
 

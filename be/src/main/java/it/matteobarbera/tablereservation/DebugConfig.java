@@ -11,10 +11,12 @@ import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.controller.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(name = "debug", havingValue = "true")
 public class DebugConfig {
 
     @Bean

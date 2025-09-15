@@ -18,7 +18,7 @@ services:
       - spring-postgres
     environment:
       - POSTGRES_DB=tablereservation
-      - POSTGRES_PASSWORD=prova
+      - POSTGRES_PASSWORD=tablereservation
     expose:
       - 5432
   frontend:
