@@ -12,9 +12,10 @@ The web UI helps you easily visualize and manage your table layout, from which i
 ## Installation
 
 1) Install [Docker](https://www.docker.com/) on your machine.
-2) Clone the main branch with
+2) Clone this repository
 ```
 git clone https://github.com/barberamatteo/tablereservation_app
+cd tablereservation_app
 ```
 3) Build with Docker Compose via
 ```
