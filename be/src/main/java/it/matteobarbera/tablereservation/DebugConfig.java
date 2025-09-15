@@ -1,15 +1,15 @@
 package it.matteobarbera.tablereservation;
 
-import it.matteobarbera.tablereservation.model.admin.AdminService;
-import it.matteobarbera.tablereservation.model.customer.CustomerService;
+import it.matteobarbera.tablereservation.service.admin.AdminService;
+import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
-import it.matteobarbera.tablereservation.model.reservation.ReservationsService;
-import it.matteobarbera.tablereservation.model.reservation.ScheduleService;
-import it.matteobarbera.tablereservation.model.table.admin.TablesDefinitionService;
-import it.matteobarbera.tablereservation.model.table.admin.TablesService;
-import it.matteobarbera.tablereservation.model.table.user.ReservationHandlingFacade;
-import it.matteobarbera.tablereservation.security.SecurityService;
+import it.matteobarbera.tablereservation.service.reservation.ReservationsService;
+import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
+import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
+import it.matteobarbera.tablereservation.service.table.TablesService;
+import it.matteobarbera.tablereservation.controller.ReservationHandlingFacade;
+import it.matteobarbera.tablereservation.service.security.SecurityService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

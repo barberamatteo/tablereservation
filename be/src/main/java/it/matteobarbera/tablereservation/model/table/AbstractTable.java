@@ -1,7 +1,6 @@
 package it.matteobarbera.tablereservation.model.table;
 
 
-import it.matteobarbera.tablereservation.model.table.admin.TableDefinition;
 import jakarta.persistence.*;
 
 import java.io.Serializable;

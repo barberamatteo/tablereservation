@@ -1,7 +1,6 @@
 package it.matteobarbera.tablereservation.cache;
 
-import it.matteobarbera.tablereservation.cache.model.ActionCacheEntry;
-import it.matteobarbera.tablereservation.log.CacheLog;
+import it.matteobarbera.tablereservation.logging.CacheLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static it.matteobarbera.tablereservation.log.CacheLog.ACTION_TOKEN_CREATED;
+import static it.matteobarbera.tablereservation.logging.CacheLog.ACTION_TOKEN_CREATED;
+
 
 @Component
 public class CacheUtils {
@@ -32,6 +32,12 @@ public class CacheUtils {
         return cacheManager.getCache(CacheConstants.TOKEN_CACHE);
     }
 
+    /**
+     * Creates a random UUID associated with a domain object. Then it saves the token to the token cache
+     * @param action an action (validated at construction time)
+     * @param obj a domain object
+     * @return the generated UUID
+     */
     public String createActionTokenBoundToObj(String action, Object obj){
         UUID token = UUID.randomUUID();
         ActionCacheEntry<Object> entry = new ActionCacheEntry<>(obj, action);
@@ -40,6 +46,11 @@ public class CacheUtils {
         return token.toString();
     }
 
+    /**
+     * Returns the ActionCacheEntry object bound to the token, then it consumes the token by freeing the cache
+     * @param token the token of the required obj
+     * @return an ActionCacheEntry record
+     */
     public ActionCacheEntry<?> getActionCacheEntryBoundToToken(String token){
         Cache cache = getTokenCache();
         UUID tokenUUID = UUID.fromString(token);

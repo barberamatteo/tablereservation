@@ -14,7 +14,7 @@ public enum ReservationAPIError {
 
     NO_RESERVATION_WITH_ID( "No reservation with ID %d was found"),
 
-    NO_RESERVATION_YET_TODAY("There are no reservations yet today   ."),
+    NO_RESERVATION_YET_TODAY("There are no reservations yet today."),
     NO_RESERVATION_YET_FOR_DAY("There are no reservations yet for day %s"),
 
     NEED_TO_RESCHEDULE("New numberOfPeople exceeds the total capacity of table cluster. Need to reschedule"),

@@ -5,74 +5,83 @@
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 
-TableReservation is an open source web application that let you define and create your custom table, each one with a specific maximum capacity, so that it's easy to take all the customers' reservations.
+TableReservation is an open source web application that lets you define and create your custom tables, each one with a specific maximum capacity, so that it's easy to take all the customers' reservations.
 <br>
-The web UI will help you visualize and handle with ease the tables schema, from which it's possible to read, update or delete those reservation-per-table.
+The web UI helps you easily visualize and manage your table layout, from which it's possible to read, update or delete those reservations for each table
 
 ## Installation
 
-OS X & Linux:
-
-```sh
-npm install my-crazy-module --save
+1) Install [Docker](https://www.docker.com/) on your machine.
+2) Clone the main branch with
+```
+git clone https://github.com/barberamatteo/tablereservation_app
+```
+3) Build with Docker Compose via
+```
+docker compose up --build -d
 ```
 
-Windows:
 
-```sh
-edit autoexec.bat
+After that, the backend web server will run at localhost:8080, the frontend nginx web server will run at localhost:80 and the PostgreSQL DB will run at localhost:5342.
+
+You can stop the containers with
+```
+docker compose stop
+```
+and restart them with
+```
+docker compose start
 ```
 
-## Usage example
+## Setup
 
-A few motivating and useful examples of how your product can be used. Spice this up with code blocks and potentially more screenshots.
+Once the installation process is terminated, it is necessary to create an admin account.
+To do it:
+1) Run
+```
+docker attach tablereservation_app-backend-1
+```
+to attach your terminal's standard input to the container running the Spring Boot Application.
 
-_For more examples and usage, please refer to the [Wiki][wiki]._
-
-## Development setup
-
-Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
-
-```sh
-make install
-npm test
+2) Press ENTER to enter CLI mode.
+3) Create a pair of credentials using:
+```
+> createadmin <username> <password>
+```
+4) Quit CLI mode using:
+```
+> q
 ```
 
-## Release History
+5) Detach the backend container by pressing Ctrl + P + Q
 
-* 0.2.1
-    * CHANGE: Update docs (module code remains unchanged)
-* 0.2.0
-    * CHANGE: Remove `setDefaultXYZ()`
-    * ADD: Add `init()`
-* 0.1.1
-    * FIX: Crash when calling `baz()` (Thanks @GenerousContributorName!)
-* 0.1.0
-    * The first proper release
-    * CHANGE: Rename `foo()` to `bar()`
-* 0.0.1
-    * Work in progress
+Eventually, you can navigate to http://localhost to access to the app GUI with the credentials you just created.
+## Architecture
 
-## Meta
+This project follows the MVC pattern:
 
-Your Name – [@YourTwitter](https://twitter.com/dbader_org) – YourEmail@example.com
+- **View:** Built with React + Vite (TypeScript). Provides a simple, minimal and responsive UI to manipulate reservation, add customer details, create tables, delete reservations quickly;
+- **Controller:** Implemented using *Spring Boot* & *Spring MVC*. This layer handles the HTTP requests from the frontend, coordinates the application flow and features authentication.
+- **Model**: Powered by Spring's dependency injection mechanisms, Hibernate (JPA) for ORM, and PostgreSQL for storing business data.
 
-Distributed under the XYZ license. See ``LICENSE`` for more information.
+The backend codebase is structured into clear layers: Service, Repository and (obviously) Controller.
 
-[https://github.com/yourname/github-link](https://github.com/dbader/)
+![Architecture](assets/tablereservation_arch.png)
 
-## Contributing
+## DB Schema
 
-1. Fork it (<https://github.com/yourname/yourproject/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
-4. Push to the branch (`git push origin feature/fooBar`)
-5. Create a new Pull Request
+Here follows an ER diagram of the data schema:
 
-<!-- Markdown link & img dfn's -->
-[npm-image]: https://img.shields.io/npm/v/datadog-metrics.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/datadog-metrics
-[npm-downloads]: https://img.shields.io/npm/dm/datadog-metrics.svg?style=flat-square
-[travis-image]: https://img.shields.io/travis/dbader/node-datadog-metrics/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/dbader/node-datadog-metrics
-[wiki]: https://github.com/yourname/yourproject/wiki
+![ER Diagram](assets/tablereservation_er.png)
+
+The ORM generates automatically some join tables, which are not included in this diagram.
+
+## Documentation
+
+The API documentation page, generated with Swagger OpenAPI, can be retrieved by accessing http://localhost:8080/swagger-ui/index.html after getting authenticated.
+Most of non-trivial and non-boilerplate code (e.g. methods) is documented as well.
+To generate the Javadoc, just execute the Maven goal (inside the ```be``` directory):
+ ```
+ mvn javadoc:javadoc
+ ```
+The static resources can be found in the ```target/reports/``` directory.

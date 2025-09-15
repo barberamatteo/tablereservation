@@ -1,8 +1,8 @@
 package it.matteobarbera.tablereservation;
 
 import it.matteobarbera.tablereservation.model.admin.Admin;
-import it.matteobarbera.tablereservation.model.admin.AdminService;
-import it.matteobarbera.tablereservation.security.SecurityService;
+import it.matteobarbera.tablereservation.service.admin.AdminService;
+import it.matteobarbera.tablereservation.service.security.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
