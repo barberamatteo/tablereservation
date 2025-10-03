@@ -37,26 +37,7 @@ public class ReservationsService {
         );
     }
 
-    public Set<AbstractTable> newReservation(
-            CustomerService customerService,
-            ScheduleService scheduleService,
-            ReservationDTO reservationDTO
-    ) {
-        LocalDateTime startDateTime = LocalDateTime.parse(reservationDTO.getStartDateTime());
-        LocalDateTime endDateTime;
-        if (reservationDTO.getEndDateTime() == null) {
-            endDateTime = startDateTime.plusMinutes(userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET);
-        } else {
-            endDateTime = LocalDateTime.parse(reservationDTO.getEndDateTime());
-        }
-
-        Reservation reservation = new Reservation(
-                startDateTime,
-                endDateTime,
-                customerService.getCustomerById(reservationDTO.getCustomerId()),
-                reservationDTO.getNumberOfPeople()
-        );
-
+    public Set<AbstractTable> newReservation(ScheduleService scheduleService, Reservation reservation) {
         return reservationStrategy.postReservation(scheduleService, reservation);
     }
 

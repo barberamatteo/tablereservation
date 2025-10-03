@@ -1,7 +1,11 @@
 package it.matteobarbera.tablereservation.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
@@ -9,6 +13,9 @@ public class ReservationDTO {
 
     private Long customerId;
     private String startDateTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Nullable
     private String endDateTime;
     private Integer numberOfPeople;
 
@@ -18,7 +25,7 @@ public class ReservationDTO {
     public ReservationDTO(
             Long customerId,
             String startDateTime,
-            String endDateTime,
+            @Nullable String endDateTime,
             Integer numberOfPeople
     ) {
         this.customerId = customerId;
@@ -53,12 +60,13 @@ public class ReservationDTO {
         this.startDateTime = startDateTime;
     }
 
-    @NonNull
+    @Nullable
     public String getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(String endDateTime) {
+    @JsonSetter(nulls = Nulls.SKIP)
+    public void setEndDateTime(@Nullable String endDateTime) {
         this.endDateTime = endDateTime;
     }
 

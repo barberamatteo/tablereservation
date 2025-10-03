@@ -17,11 +17,11 @@ interface AddReservationModalProps {
 async function endpointCall(formData: {
     customerId: number;
     numberOfPeople: number;
-    arrivalDateTime: string;
+    startDateTime: string;
 }){
 
     console.log(JSON.stringify(formData));
-    return await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/newreservationpn/`, {
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/user/reservation/newreservation/`, {
         method: 'POST',
         body: JSON.stringify(formData),
         credentials: 'include',
@@ -52,7 +52,7 @@ function AddReservationModal(props: AddReservationModalProps) {
                 const formData = {
                     customerId: selectedCustomer.id,
                     numberOfPeople: Number.parseInt((form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value),
-                    arrivalDateTime: date + "T" + time
+                    startDateTime: date + "T" + time
                 };
 
                 await endpointCall(

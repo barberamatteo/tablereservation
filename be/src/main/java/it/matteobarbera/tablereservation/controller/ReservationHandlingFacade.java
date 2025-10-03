@@ -6,6 +6,7 @@ import it.matteobarbera.tablereservation.cache.ActionCacheEntry;
 import it.matteobarbera.tablereservation.http.ReservationAPIError;
 import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
+import it.matteobarbera.tablereservation.mapper.ReservationMapper;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -16,6 +17,7 @@ import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.utils.DateUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
@@ -38,18 +40,22 @@ public class ReservationHandlingFacade {
     private final TablesService tablesService;
     private final ReservationsService reservationsService;
     private final CacheUtils cacheUtils;
+    private final ModelMapper modelMapper;
+    private final ReservationMapper reservationMapper;
 
     public ReservationHandlingFacade(
             CustomerService customerService,
             ScheduleService scheduleService,
             TablesService tablesService,
             ReservationsService reservationsService,
-            CacheUtils cacheUtils) {
+            CacheUtils cacheUtils, ModelMapper modelMapper, ReservationMapper reservationMapper) {
         this.customerService = customerService;
         this.scheduleService = scheduleService;
         this.tablesService = tablesService;
         this.reservationsService = reservationsService;
         this.cacheUtils = cacheUtils;
+        this.modelMapper = modelMapper;
+        this.reservationMapper = reservationMapper;
     }
 
     /**
@@ -59,17 +65,12 @@ public class ReservationHandlingFacade {
      * Failure object otherwise
      */
     public ReservationAPIResult newReservation(ReservationDTO reservationDTO) {
-        scheduleService.initScheduleIfAbsent(
-                tablesService,
-                reservationDTO.getStartDateTime(),
-                reservationDTO.getEndDateTime()
-        );
 
-        Set<AbstractTable> reservationOutcome =  reservationsService.newReservation(
-                customerService,
-                scheduleService,
-                reservationDTO
-        );
+        initScheduleIfAbsent(reservationDTO.getStartDateTime(), reservationDTO.getEndDateTime());
+        Customer customer = customerService.getCustomerById(reservationDTO.getCustomerId());
+        Reservation reservation = reservationMapper.toEntity(reservationDTO, customer);
+        Set<AbstractTable> reservationOutcome =  reservationsService.newReservation(scheduleService, reservation);
+
         if (!reservationOutcome.isEmpty()) {
             return new ReservationAPIResult.Success(
                     reservationOutcome,
@@ -80,6 +81,14 @@ public class ReservationHandlingFacade {
                     ReservationAPIError.NO_AVAILABLE_TABLES
             );
         }
+    }
+
+    private void initScheduleIfAbsent(String startDateTime, String endDateTime) {
+        scheduleService.initScheduleIfAbsent(
+                tablesService,
+                startDateTime,
+                endDateTime
+        );
     }
 
 
@@ -265,4 +274,5 @@ public class ReservationHandlingFacade {
         }
         return null;
     }
+
 }

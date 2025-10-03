@@ -37,14 +37,16 @@ public class UserReservationApiController {
     private static final Logger log = LoggerFactory.getLogger(UserReservationApiController.class);
     private final ReservationHandlingFacade reservationHandlingFacade;
     private final UserPreferences userPreferences;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public UserReservationApiController(
             ReservationHandlingFacade reservationHandlingFacade,
-            UserPreferences userPreferences
-    ) {
+            UserPreferences userPreferences,
+            ModelMapper modelMapper) {
         this.reservationHandlingFacade = reservationHandlingFacade;
         this.userPreferences = userPreferences;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -68,17 +70,16 @@ public class UserReservationApiController {
     @CrossOrigin
     @PostMapping("/newreservation/")
     public ResponseEntity<?> newReservation(
-            @RequestParam(name = "customer") Long customerId,
-            @RequestParam(name = "arrivalDateTime") String arrivalDateTime,
-            @RequestParam(name = "leaveDateTime", required = false) String leaveDateTime,
-            @RequestParam(name = "numberOfPeople") Integer numberOfPeople
+            @RequestBody ReservationDTO reservationDTO
     ) {
 
-        if (leaveDateTime == null) {
+        if (reservationDTO.getEndDateTime() == null) {
             try {
-                leaveDateTime = DateUtils.offsetFrom(
-                        userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET,
-                        arrivalDateTime
+                reservationDTO.setEndDateTime(
+                        DateUtils.offsetFrom(
+                                userPreferences.DEFAULT_LEAVE_TIME_MINUTES_OFFSET,
+                                reservationDTO.getStartDateTime()
+                        )
                 );
             } catch(DateTimeParseException e){
                 return ResponseEntity
@@ -92,14 +93,6 @@ public class UserReservationApiController {
                         );
             }
         }
-
-        ReservationDTO reservationDTO = new ReservationDTO(
-                customerId,
-                arrivalDateTime,
-                leaveDateTime,
-                numberOfPeople
-        );
-
         ReservationAPIResult result = reservationHandlingFacade.newReservation(reservationDTO);
 
 
@@ -128,22 +121,6 @@ public class UserReservationApiController {
         return defaultError();
 
 
-    }
-
-
-    @Operation(summary = "Convenience endpoint for frontend. See /newreservation.")
-    @CrossOrigin
-    @PostMapping("/newreservationpn/")
-    // TODO: Must be tested.
-    public ResponseEntity<?> newReservation(
-            @RequestBody ReservationAPIRequest reservation
-    ){
-        return newReservation(
-                reservation.getCustomerId(),
-                reservation.getStartDateTime(),
-                reservation.getEndDateTime(),
-                reservation.getNumberOfPeople()
-        );
     }
 
     @Operation(

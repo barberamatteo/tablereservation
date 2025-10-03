@@ -33,8 +33,4 @@ public class TableReservationApplication implements WebMvcConfigurer {
         registry.addInterceptor(loggingInterceptor);
     }
 
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }
