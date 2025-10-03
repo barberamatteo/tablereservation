@@ -12,9 +12,13 @@ async function addCustomerCall(formData: {
     name: string,
     email: string
 }){
-    return await fetch(`${Messages.BACKEND}/api/v1.0.0/customer/newcustomer?phoneNumber=${formData.phoneNumber}&name=${formData.name}&email=${formData.email}`, {
+    return await fetch(`${Messages.BACKEND}/api/v1.0.0/customer/newcustomer`, {
         method: 'POST',
-        credentials: 'include'
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
     });
 }
 function AddCustomerModal(props: AddCustomerModalProps){

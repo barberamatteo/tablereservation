@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation;
 
+import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.service.admin.AdminService;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
@@ -10,6 +11,7 @@ import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.controller.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -23,15 +25,22 @@ public class DebugConfig {
     CommandLineRunner commandLineRunner(
             TablesDefinitionService tablesDefinitionService,
             TablesService tablesService,
-            AdminService adminService, ReservationsService reservationsService, CustomerService customerService, ScheduleService scheduleService, SecurityService securityService, ReservationHandlingFacade reservationHandlingFacade) {
+            AdminService adminService,
+            ReservationsService reservationsService,
+            CustomerService customerService,
+            ScheduleService scheduleService,
+            SecurityService securityService,
+            ReservationHandlingFacade reservationHandlingFacade,
+            ModelMapper modelMapper
+    ) {
         return args -> {
-            customerService.createCustomer(
-                    new CustomerDTO(
-                            "Matteo",
-                            "3333333333",
-                            "email@example.com"
-                    )
+            CustomerDTO customerDTO = new CustomerDTO(
+                    "Matteo",
+                    "3333333333",
+                    "email@example.com"
             );
+            Customer customer = modelMapper.map(customerDTO, Customer.class);
+            customerService.createCustomer(customer);
 
             tablesDefinitionService.createNewDef("Tavolo piccolo", 4);
             tablesDefinitionService.createNewDef("Tavolo grande", 6);

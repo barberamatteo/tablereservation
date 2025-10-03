@@ -12,6 +12,7 @@ import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.controller.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.utils.DateUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

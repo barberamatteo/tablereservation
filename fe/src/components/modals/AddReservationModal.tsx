@@ -17,7 +17,7 @@ interface AddReservationModalProps {
 async function endpointCall(formData: {
     customerId: number;
     numberOfPeople: number;
-    startDateTime: string;
+    arrivalDateTime: string;
 }){
 
     console.log(JSON.stringify(formData));
@@ -52,7 +52,7 @@ function AddReservationModal(props: AddReservationModalProps) {
                 const formData = {
                     customerId: selectedCustomer.id,
                     numberOfPeople: Number.parseInt((form.elements.namedItem("numberOfPeople") as HTMLInputElement)?.value),
-                    startDateTime: date + "T" + time
+                    arrivalDateTime: date + "T" + time
                 };
 
                 await endpointCall(

@@ -54,8 +54,6 @@ public class TablesService {
     }
 
 
-    public Set<CustomTable> getAdequateTables(Integer numberOfPeople) {
-        return tablesRepository.getAdequateTables(numberOfPeople);
-    }
+
 
 }

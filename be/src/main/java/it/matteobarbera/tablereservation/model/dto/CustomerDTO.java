@@ -1,8 +1,18 @@
 package it.matteobarbera.tablereservation.model.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class CustomerDTO {
+    @NotBlank(message = "Please provide a valid name (must not be blank).")
     private String name;
+
+    @NotBlank(message = "Please provide a valid phone number (must not be blank).")
+    @Size(min = 9, max = 15, message = "The phone number length must be between 9 and 15.")
     private String phoneNumber;
+
+    @Email(message = "Please provide a valid email address.")
     private String email;
 
     public CustomerDTO(String name, String phoneNumber, String email) {

@@ -37,13 +37,7 @@ public class CustomerService {
         return customerRepository.findByEmail(email);
     }
 
-    public void createCustomer(CustomerDTO customerDTO) {
-        customerRepository.save(
-                new Customer(
-                        customerDTO.getPhoneNumber(),
-                        customerDTO.getName(),
-                        customerDTO.getEmail()
-                )
-        );
+    public void createCustomer(Customer customer) {
+        customerRepository.save(customer);
     }
 }

@@ -7,6 +7,8 @@ import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
+import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +30,11 @@ public class CustomerController {
     private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
     private final CustomerService customerService;
 
+    private final ModelMapper modelMapper;
     @Autowired
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, ModelMapper modelMapper) {
         this.customerService = customerService;
+        this.modelMapper = modelMapper;
     }
 
 
@@ -53,48 +57,43 @@ public class CustomerController {
                                     "customer. Please use another phone number")
     })
     @PostMapping("/newcustomer")
-    public ResponseEntity<?> createCustomer(
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("name") String name,
-            @RequestParam(value = "email", required = false) String email
-    ){
-
-        if (email != null && !email.isEmpty()) {
-            if (customerService.getCustomerByEmail(email) != null){
+    public ResponseEntity<?> createCustomer(@Valid @RequestBody CustomerDTO customerDTO){
+        if (customerDTO.getEmail() != null && !customerDTO.getEmail().isEmpty()) {
+            if (customerService.getCustomerByEmail(customerDTO.getEmail()) != null){
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
                                 CommonJSONBodies.fromStatusAndMsg(
                                         HttpStatus.BAD_REQUEST.value(),
-                                        CUSTOMER_WITH_EMAIL_ALREADY_EXISTS.getMessage(email)
+                                        CUSTOMER_WITH_EMAIL_ALREADY_EXISTS.getMessage(customerDTO.getEmail())
                                 )
                         );
 
             }
         }
 
-        if (customerService.getCustomerByPhoneNumber(phoneNumber) != null){
+        if (customerService.getCustomerByPhoneNumber(customerDTO.getPhoneNumber()) != null){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(
                             CommonJSONBodies.fromStatusAndMsg(
                                     HttpStatus.BAD_REQUEST.value(),
-                                    CUSTOMER_WITH_PHONE_NUMBER_ALREADY_EXISTS.getMessage(phoneNumber)
+                                    CUSTOMER_WITH_PHONE_NUMBER_ALREADY_EXISTS.getMessage(customerDTO.getPhoneNumber())
                             )
                     );
         }
 
-        CustomerDTO customerDTO = new CustomerDTO(name, phoneNumber, email);
-        customerService.createCustomer(customerDTO);
+        Customer customer = modelMapper.map(customerDTO, Customer.class);
+        customerService.createCustomer(customer);
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
                         CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.OK.value(),
-                                CUSTOMER_CREATED.getMessage(phoneNumber)
+                                CUSTOMER_CREATED.getMessage(customerDTO.getPhoneNumber())
                         )
                 );
     }

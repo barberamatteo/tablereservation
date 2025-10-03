@@ -15,11 +15,14 @@ import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
+import it.matteobarbera.tablereservation.utils.DateUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -251,5 +254,15 @@ public class ReservationHandlingFacade {
     public ReservationAPIResult getAllTodayReservations() {
         String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         return getAllReservationsByDay(date);
+    }
+
+    public ReservationAPIResult getScheduleCompliantTables(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        LocalDate startDate = startDateTime.toLocalDate();
+        LocalDate endDate = endDateTime.toLocalDate();
+        if (startDate.equals(endDate)) {
+            getAllReservationsByDay(startDate.toString());
+
+        }
+        return null;
     }
 }
