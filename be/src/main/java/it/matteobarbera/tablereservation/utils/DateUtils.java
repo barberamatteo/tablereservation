@@ -1,6 +1,8 @@
 package it.matteobarbera.tablereservation.utils;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 public class DateUtils {
 
@@ -19,6 +21,8 @@ public class DateUtils {
 
     public static String offsetFrom(Long defaultLeaveTimeMinutesOffset, String arrivalDateTime) {
         LocalDateTime parsedArrivalDateTime = LocalDateTime.parse(arrivalDateTime);
-        return parsedArrivalDateTime.plusMinutes(defaultLeaveTimeMinutesOffset).toString();
+        return parsedArrivalDateTime
+                .plusMinutes(defaultLeaveTimeMinutesOffset)
+                .toString();
     }
 }

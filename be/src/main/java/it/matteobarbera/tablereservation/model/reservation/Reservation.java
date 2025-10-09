@@ -79,6 +79,14 @@ public class Reservation {
         this.numberOfPeople = numberOfPeople;
     }
 
+    public Reservation(
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime,
+            Integer numberOfPeople
+    ) {
+        this(startDateTime, endDateTime, null, numberOfPeople);
+    }
+
     public Reservation(Reservation reservation, Schedule schedule) {
         this(
                 reservation.jointTables,
