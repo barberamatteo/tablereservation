@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.service.reservation;
 
+import it.matteobarbera.tablereservation.model.reservation.Interval;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -56,7 +59,7 @@ public class ScheduleService {
 
     private Schedule getScheduleByReservation(Reservation reservation) {
         return scheduleRepository
-                .getScheduleByReservationContaining(reservation)
+                .getScheduleByReservationsContaining(reservation)
                 .orElse(
                         null
                 );
@@ -85,4 +88,43 @@ public class ScheduleService {
         updateSchedule(scheduleOfReservation);
         return true;
     }
+
+
+    public Set<Schedule> getSchedulesByInterval(Interval interval) {
+        String parsedStartDate = DateUtils.estrapolateDate(interval.getStartDateTime().toLocalDate());
+        String parsedEndDate = DateUtils.estrapolateDate(interval.getEndDateTime().toLocalDate());
+
+        final Set<Schedule> toRet = new HashSet<>(
+                scheduleRepository.getSchedulesByParsedDate(parsedStartDate)
+        );
+        if (!parsedStartDate.equals(parsedEndDate)) {
+            toRet.addAll(scheduleRepository.getSchedulesByParsedDate(parsedEndDate));
+        }
+
+        return toRet;
+    }
+
+    private Set<Schedule> filterIntervalCompliantSchedules(
+            Interval interval,
+            Set<Schedule> schedules
+    ) {
+        return schedules.stream().filter(schedule -> {
+            for (Reservation reservation : schedule.getReservations()) {
+                if (interval.clashes(reservation.getInterval())) {
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toSet());
+    }
+
+    public Set<CustomTable> getIntervalCompliantTables(Interval interval) {
+        Set<Schedule> schedules = getSchedulesByInterval(interval);
+        Set<Schedule> compliantSchedules = filterIntervalCompliantSchedules(interval, schedules);
+        return compliantSchedules
+                .stream()
+                .map(schedule -> schedule.getId().getTable()).collect(Collectors.toSet());
+    }
+
+
 }

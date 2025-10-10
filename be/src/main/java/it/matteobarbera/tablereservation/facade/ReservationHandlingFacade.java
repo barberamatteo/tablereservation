@@ -1,4 +1,4 @@
-package it.matteobarbera.tablereservation.controller;
+package it.matteobarbera.tablereservation.facade;
 
 import it.matteobarbera.tablereservation.cache.CacheConstants;
 import it.matteobarbera.tablereservation.cache.CacheUtils;
@@ -16,7 +16,6 @@ import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
-import it.matteobarbera.tablereservation.utils.DateUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

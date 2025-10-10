@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.utils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -16,6 +17,10 @@ public class DateUtils {
         String month = dateTime.substring(5, 7);
         String day = dateTime.substring(8, 10);
         return year + "-" + month + "-" + day;
+    }
+
+    public static String estrapolateDate(LocalDate date){
+        return date.toString();
     }
 
 

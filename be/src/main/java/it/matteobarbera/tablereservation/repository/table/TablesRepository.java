@@ -18,4 +18,6 @@ public interface TablesRepository extends JpaRepository<CustomTable, Long> {
             "WHERE td.standaloneCapacity >= :numberOfPeople"
     )
     Set<CustomTable> getAdequateTables(Integer numberOfPeople);
+
+
 }

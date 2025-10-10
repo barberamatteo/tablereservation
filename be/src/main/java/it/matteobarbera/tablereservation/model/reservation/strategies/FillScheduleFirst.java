@@ -31,7 +31,7 @@ public class FillScheduleFirst implements ReservationStrategy{
         for (Schedule schedule : adequateSchedules) {
             boolean conflictualReservation = false;
 
-            for (Reservation r : schedule.getReservation()) {
+            for (Reservation r : schedule.getReservations()) {
                 conflictualReservation =
                         conflictualReservation || reservation.getInterval().clashes(r.getInterval());
 

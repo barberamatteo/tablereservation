@@ -34,5 +34,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
     )
     Set<Schedule> getSchedulesByParsedDate(String arrivalDate);
 
-    Optional<Schedule> getScheduleByReservationContaining(Reservation reservation);
+    Optional<Schedule> getScheduleByReservationsContaining(Reservation reservation);
 }

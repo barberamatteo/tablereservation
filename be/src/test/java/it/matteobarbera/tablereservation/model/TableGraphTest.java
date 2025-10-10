@@ -2,7 +2,7 @@ package it.matteobarbera.tablereservation.model;
 
 import it.matteobarbera.tablereservation.model.table.CustomTable;
 import it.matteobarbera.tablereservation.model.table.TableDefinition;
-import it.matteobarbera.tablereservation.model.table.TableGraph;
+import it.matteobarbera.tablereservation.model.table.layout.TableGraph;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -22,10 +22,8 @@ public class TableGraphTest {
                 new CustomTable(6, tableDefinition2)
         };
         var tableList = Arrays.asList(tables);
-        var tableGraph = new TableGraph(tableList);
+        var tableGraph = new TableGraph<>(tableList);
 
-
-
-        System.out.println(Arrays.toString(tableGraph.getTablesSortedByCapacity()));
+        //System.out.println(List.toString(tableGraph.getTablesSortedByCapacity()));
     }
 }

@@ -9,7 +9,7 @@ import it.matteobarbera.tablereservation.service.reservation.ReservationsService
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
-import it.matteobarbera.tablereservation.controller.ReservationHandlingFacade;
+import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;

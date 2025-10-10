@@ -19,7 +19,7 @@ public class Schedule {
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
-    private Set<Reservation> reservation = new HashSet<>();
+    private Set<Reservation> reservations = new HashSet<>();
 
     public Schedule() {
     }
@@ -38,34 +38,34 @@ public class Schedule {
         this.id = id;
     }
 
-    public Set<Reservation> getReservation() {
-        return reservation;
+    public Set<Reservation> getReservations() {
+        return reservations;
     }
 
-    public void setReservation(Set<Reservation> reservations) {
-        this.reservation = reservations;
+    public void setReservations(Set<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
 
     public void addReservation(Reservation reservation) {
-        this.reservation.add(reservation);
+        this.reservations.add(reservation);
         reservation.setSchedule(this);
     }
 
     public boolean removeReservation(Reservation reservation) {
-        return this.reservation.remove(reservation);
+        return this.reservations.remove(reservation);
     }
 
     public void editReservation(Reservation reservation) {
-        this.reservation.remove(reservation);
-        this.reservation.add(reservation);
+        this.reservations.remove(reservation);
+        this.reservations.add(reservation);
     }
 
     @Override
     public String toString() {
         String toString = "{"
                 + "        \"id\":" + id
-                + ",         \"reservation\":" + reservation
+                + ",         \"reservation\":" + reservations
                 + "}";
         return toString.replaceAll("[\n\r]", "   ");
     }
@@ -73,11 +73,11 @@ public class Schedule {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Schedule schedule)) return false;
-        return Objects.equals(id, schedule.id) && Objects.equals(reservation, schedule.reservation);
+        return Objects.equals(id, schedule.id) && Objects.equals(reservations, schedule.reservations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reservation);
+        return Objects.hash(id, reservations);
     }
 }

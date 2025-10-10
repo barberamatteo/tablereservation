@@ -10,4 +10,6 @@ public class SimpleMatrixLayout extends AbstractTableLayout {
     public SimpleMatrixLayout(Set<AbstractTable> tables) {
         super(tables);
     }
+
+
 }
