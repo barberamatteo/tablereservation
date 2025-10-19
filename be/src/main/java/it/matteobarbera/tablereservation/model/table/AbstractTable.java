@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-@MappedSuperclass
+@Entity(name = "tables")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "table_type")
 public abstract class AbstractTable implements Serializable {
 
     @Id

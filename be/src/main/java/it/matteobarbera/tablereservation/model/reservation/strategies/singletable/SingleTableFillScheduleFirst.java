@@ -1,4 +1,4 @@
-package it.matteobarbera.tablereservation.model.reservation.strategies;
+package it.matteobarbera.tablereservation.model.reservation.strategies.singletable;
 
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
@@ -12,10 +12,10 @@ import java.util.Set;
 
 @Component
 @Primary
-public class FillScheduleFirst implements ReservationStrategy{
+public class SingleTableFillScheduleFirst implements SingleTableReservationStrategy {
 
 
-    public FillScheduleFirst() {
+    public SingleTableFillScheduleFirst() {
     }
 
 

@@ -1,17 +1,15 @@
 package it.matteobarbera.tablereservation.service.reservation;
 
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
+import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.repository.reservation.ReservationsRepository;
-import it.matteobarbera.tablereservation.service.customer.CustomerService;
-import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
-import it.matteobarbera.tablereservation.model.reservation.strategies.ReservationStrategy;
+import it.matteobarbera.tablereservation.model.reservation.strategies.singletable.SingleTableReservationStrategy;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -20,13 +18,17 @@ public class ReservationsService {
 
     private final ReservationsRepository reservationsRepository;
     private final UserPreferences userPreferences;
-    private final ReservationStrategy reservationStrategy;
+    private final SingleTableReservationStrategy singleTableReservationStrategy;
 
     @Autowired
-    public ReservationsService(ReservationsRepository reservationsRepository, UserPreferences userPreferences, ReservationStrategy reservationStrategy) {
+    public ReservationsService(
+            ReservationsRepository reservationsRepository,
+            UserPreferences userPreferences,
+            SingleTableReservationStrategy singleTableReservationStrategy
+    ) {
         this.reservationsRepository = reservationsRepository;
         this.userPreferences = userPreferences;
-        this.reservationStrategy = reservationStrategy;
+        this.singleTableReservationStrategy = singleTableReservationStrategy;
     }
 
 
@@ -38,7 +40,13 @@ public class ReservationsService {
     }
 
     public Set<AbstractTable> newReservation(ScheduleService scheduleService, Reservation reservation) {
-        return reservationStrategy.postReservation(scheduleService, reservation);
+        Set<AbstractTable> singleTableOutcome = singleTableReservationStrategy.postReservation(scheduleService, reservation);
+        if (!singleTableOutcome.isEmpty())
+            return singleTableOutcome;
+        return Set.of();
+//        Set<SimpleJoinableTable> multiTableOutcome =
+//        return multiTableOutcome;
+
     }
 
 

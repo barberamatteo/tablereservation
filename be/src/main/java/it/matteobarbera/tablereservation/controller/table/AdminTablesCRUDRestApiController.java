@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.matteobarbera.tablereservation.Constants;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
-import it.matteobarbera.tablereservation.model.table.CustomTable;
+import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import it.matteobarbera.tablereservation.model.table.TableCRUDException;
 import it.matteobarbera.tablereservation.model.table.TableDefinition;
 import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
@@ -49,8 +49,8 @@ public class AdminTablesCRUDRestApiController {
     })
     @CrossOrigin
     @GetMapping("/getall/")
-    public Set<CustomTable> getAllTables() {
-        Set<CustomTable> tables = tablesService.getAllTables();
+    public Set<SimpleTable> getAllTables() {
+        Set<SimpleTable> tables = tablesService.getAllTables();
         if (tables.isEmpty()) {
             log.atWarn().log(NO_TABLES_FOUND);
         } else {
@@ -70,8 +70,8 @@ public class AdminTablesCRUDRestApiController {
                     description = "Table <num> does not exist.")
     })
     @GetMapping("/getbynum/{num}")
-    public CustomTable getTableByNum(@PathVariable("num") Integer num) {
-        Optional<CustomTable> tableByNum = tablesService.getTableByNum(num);
+    public SimpleTable getTableByNum(@PathVariable("num") Integer num) {
+        Optional<SimpleTable> tableByNum = tablesService.getTableByNum(num);
         if (tableByNum.isPresent()) {
             log.atInfo().log(TABLE_FOUND, tableByNum.get().getId());
         } else {
@@ -129,7 +129,7 @@ public class AdminTablesCRUDRestApiController {
         }
 
 
-        Optional<CustomTable> tableWithSameNumberOptional = tablesService.getTableByNum(number);
+        Optional<SimpleTable> tableWithSameNumberOptional = tablesService.getTableByNum(number);
         if (tableWithSameNumberOptional.isPresent()) {
             log.atError().log(TABLE_WITH_SAME_NUMBER, number);
             return ResponseEntity

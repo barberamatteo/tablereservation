@@ -14,7 +14,7 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.service.reservation.ReservationsService;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.CustomTable;
+import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -68,8 +68,7 @@ public class ReservationHandlingFacade {
         initScheduleIfAbsent(reservationDTO.getStartDateTime(), reservationDTO.getEndDateTime());
         Customer customer = customerService.getCustomerById(reservationDTO.getCustomerId());
         Reservation reservation = reservationMapper.toEntity(reservationDTO, customer);
-        Set<AbstractTable> reservationOutcome =  reservationsService.newReservation(scheduleService, reservation);
-
+        Set<AbstractTable> reservationOutcome = reservationsService.newReservation(scheduleService, reservation);
         if (!reservationOutcome.isEmpty()) {
             return new ReservationAPIResult.Success(
                     reservationOutcome,
@@ -96,14 +95,14 @@ public class ReservationHandlingFacade {
      * @param allReservations a set of reservations.
      * @return a map
      */
-    private HashMap<CustomTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
-        Set<CustomTable> allTables = tablesService.getAllTables();
+    private HashMap<SimpleTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
+        Set<SimpleTable> allTables = tablesService.getAllTables();
         return new HashMap<>(){{
             for (Reservation reservation : allReservations)
-                for (CustomTable jointTable : reservation.getJointTables())
+                for (SimpleTable jointTable : reservation.getJointTables())
                     computeIfAbsent(jointTable, unused -> new HashSet<>()).add(reservation);
 
-            for (CustomTable table : allTables){
+            for (SimpleTable table : allTables){
                 if (!containsKey(table))
                     put(table, new HashSet<>());
             }
@@ -245,7 +244,7 @@ public class ReservationHandlingFacade {
      */
     public ReservationAPIResult getAllReservationsByDay(String day) {
         Set<Reservation> reservationsByDay = reservationsService.getAllReservationsByDay(day);
-        HashMap<CustomTable, Set<Reservation>> res = getAllReservationsMap(reservationsByDay);
+        HashMap<SimpleTable, Set<Reservation>> res = getAllReservationsMap(reservationsByDay);
         return (
                 res.isEmpty()
                         ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_FOR_DAY)

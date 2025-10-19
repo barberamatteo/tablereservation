@@ -1,10 +1,10 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 
 import java.util.*;
 
-public class TableGraph<TableType extends AbstractTable> {
+public class TableGraph<TableType extends SimpleJoinableTable> {
 
     private final HashMap<TableType, Set<TableType>> adjacencyTable;
     private final List<TableType> tablesSortedByCapacity;
@@ -17,8 +17,8 @@ public class TableGraph<TableType extends AbstractTable> {
     private List<TableType> sortByDESCCapacity(Collection<TableType> tables) {
         return tables.stream().sorted(
                 (o1, o2) -> {
-                    Integer c1 = o1.getTableDefinition().getStandaloneCapacity();
-                    Integer c2 = o2.getTableDefinition().getStandaloneCapacity();
+                    Integer c1 = o1.getStandaloneCapacity();
+                    Integer c2 = o2.getStandaloneCapacity();
                     return c2.compareTo(c1);
                 }).toList();
     }
@@ -33,8 +33,10 @@ public class TableGraph<TableType extends AbstractTable> {
         adjacencyTable.get(t2).remove(t1);
     }
 
-//    public List<TableType> minGreedyPathWithExclusions(Collection<TableType> tables){
-//        tables.forEach(table ->);
+//
+//    public List<TableType> getAllPathsWithExclusions(Set<TableType> allowedTables) {
+//        List<TableType> paths = new ArrayList<>();
+//
 //    }
 
     public List<TableType> getTablesSortedByCapacity() {

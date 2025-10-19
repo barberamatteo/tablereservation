@@ -4,7 +4,7 @@ package it.matteobarbera.tablereservation.model.reservation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.CustomTable;
+import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ public class Reservation {
     private Long id;
 
     @ManyToMany
-    private Set<CustomTable> jointTables;
+    private Set<SimpleTable> jointTables;
 
     @Embedded
     @AttributeOverrides({
@@ -54,7 +54,7 @@ public class Reservation {
     private Schedule schedule;
 
     public Reservation(
-            Set<CustomTable> jointTables,
+            Set<SimpleTable> jointTables,
             Interval interval,
             Customer customer,
             Integer numberOfPeople,
@@ -107,14 +107,14 @@ public class Reservation {
         this.id = id;
     }
 
-    public Set<CustomTable> getJointTables() {
+    public Set<SimpleTable> getJointTables() {
         return jointTables;
     }
 
 
     public void setJointTables(Set<AbstractTable> jointTables) {
         this.jointTables = jointTables.stream().map(
-                abstractTable -> (CustomTable) abstractTable
+                abstractTable -> (SimpleTable) abstractTable
         ).collect(Collectors.toSet());
     }
 
