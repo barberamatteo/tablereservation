@@ -14,12 +14,13 @@ import java.util.Set;
 @Primary
 public class MultiTableFillScheduleFirst implements MultiTableReservationStrategy {
 
+//
+//    private final SimpleMatrixLayout simpleMatrixLayout;
+//
+//    public MultiTableFillScheduleFirst(SimpleMatrixLayout simpleMatrixLayout) {
+//        this.simpleMatrixLayout = simpleMatrixLayout;
+//    }
 
-    private final SimpleMatrixLayout simpleMatrixLayout;
-
-    public MultiTableFillScheduleFirst(SimpleMatrixLayout simpleMatrixLayout) {
-        this.simpleMatrixLayout = simpleMatrixLayout;
-    }
 
     @Override
     public Set<SimpleJoinableTable> postReservation(ScheduleService scheduleService, Reservation reservation) {

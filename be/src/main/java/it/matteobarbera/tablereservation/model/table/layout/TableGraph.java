@@ -14,6 +14,11 @@ public class TableGraph<TableType extends SimpleJoinableTable> {
         this.tablesSortedByCapacity = sortByDESCCapacity(tables);
     }
 
+    public TableGraph(HashMap<TableType, Set<TableType>> adjacencyTable) {
+        this.adjacencyTable = adjacencyTable;
+        this.tablesSortedByCapacity = sortByDESCCapacity(adjacencyTable.keySet());
+    }
+
     private List<TableType> sortByDESCCapacity(Collection<TableType> tables) {
         return tables.stream().sorted(
                 (o1, o2) -> {
@@ -33,11 +38,29 @@ public class TableGraph<TableType extends SimpleJoinableTable> {
         adjacencyTable.get(t2).remove(t1);
     }
 
-//
-//    public List<TableType> getAllPathsWithExclusions(Set<TableType> allowedTables) {
-//        List<TableType> paths = new ArrayList<>();
-//
-//    }
+    public Set<List<TableType>> getPathsWithinTablesHavingCapacities(
+            Collection<TableType> tables,
+            List<Integer> capacities,
+            int targetCapacity) {
+        Set<List<TableType>> paths = new HashSet<>();
+        for (TableType table : tables) {
+            List<TableType> path = buildPath(table, capacities, targetCapacity);
+            if (!path.isEmpty()) {
+                paths.add(path);
+            }
+        }
+        return paths;
+    }
+
+    private List<TableType> buildPath(TableType table, List<Integer> capacities, int capacity) {
+        int residualCapacity = capacity;
+        List<TableType> toRet = new ArrayList<>();
+        TableType currentTable = table;
+        while (residualCapacity > 0 && !capacities.isEmpty()) {
+
+        }
+        return toRet;
+    }
 
     public List<TableType> getTablesSortedByCapacity() {
         return tablesSortedByCapacity;

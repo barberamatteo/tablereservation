@@ -4,6 +4,7 @@ import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 
 import java.util.*;
 
+
 public class SubsetSumSolver<TableType extends SimpleJoinableTable> {
 
     private final List<TableType> pool;
