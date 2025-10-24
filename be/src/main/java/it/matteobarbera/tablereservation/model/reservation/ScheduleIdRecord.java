@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -13,7 +14,7 @@ import java.util.Objects;
 public class ScheduleIdRecord implements Serializable{
     @ManyToOne(optional = false)
     @JoinColumn(name = "table_id", nullable = false)
-    private SimpleTable table;
+    private AbstractTable table;
 
     @Column(name = "date")
     private String parsedDate;
@@ -21,16 +22,16 @@ public class ScheduleIdRecord implements Serializable{
     public ScheduleIdRecord() {
     }
 
-    public ScheduleIdRecord(SimpleTable table, String parsedDate) {
+    public ScheduleIdRecord(AbstractTable table, String parsedDate) {
         this.table = table;
         this.parsedDate = parsedDate;
     }
 
-    public SimpleTable getTable() {
+    public AbstractTable getTable() {
         return table;
     }
 
-    public void setTable(SimpleTable table) {
+    public void setTable(AbstractTable table) {
         this.table = table;
     }
 

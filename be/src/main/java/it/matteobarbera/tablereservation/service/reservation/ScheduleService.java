@@ -3,6 +3,7 @@ package it.matteobarbera.tablereservation.service.reservation;
 import it.matteobarbera.tablereservation.model.reservation.Interval;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.repository.reservation.ScheduleRepository;
@@ -44,7 +45,7 @@ public class ScheduleService {
         String arrivalDate = DateUtils.estrapolateDate(arrivalDateTime);
         String leaveDate = DateUtils.estrapolateDate(leaveDateTime);
 
-        Set<SimpleTable> allTables = tablesService.getAllTables();
+        Set<AbstractTable> allTables = tablesService.getAllTables();
         if (scheduleRepository.getSchedulesByParsedDate(arrivalDate).isEmpty()) {
             scheduleRepository.saveAll(
                     allTables.stream().map(table -> (new Schedule(table, arrivalDate))).toList()
@@ -104,6 +105,8 @@ public class ScheduleService {
         return toRet;
     }
 
+
+
     private Set<Schedule> filterIntervalCompliantSchedules(
             Interval interval,
             Set<Schedule> schedules
@@ -118,12 +121,11 @@ public class ScheduleService {
         }).collect(Collectors.toSet());
     }
 
-    public Set<SimpleTable> getIntervalCompliantTables(Interval interval) {
+
+
+    public Set<Schedule> getIntervalCompliantSchedules(Interval interval) {
         Set<Schedule> schedules = getSchedulesByInterval(interval);
-        Set<Schedule> compliantSchedules = filterIntervalCompliantSchedules(interval, schedules);
-        return compliantSchedules
-                .stream()
-                .map(schedule -> schedule.getId().getTable()).collect(Collectors.toSet());
+        return filterIntervalCompliantSchedules(interval, schedules);
     }
 
 

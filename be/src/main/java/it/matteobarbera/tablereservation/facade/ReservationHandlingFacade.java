@@ -95,14 +95,14 @@ public class ReservationHandlingFacade {
      * @param allReservations a set of reservations.
      * @return a map
      */
-    private HashMap<SimpleTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
-        Set<SimpleTable> allTables = tablesService.getAllTables();
+    private HashMap<AbstractTable, Set<Reservation>> getAllReservationsMap(Set<Reservation> allReservations) {
+        Set<AbstractTable> allTables = tablesService.getAllTables();
         return new HashMap<>(){{
             for (Reservation reservation : allReservations)
-                for (SimpleTable jointTable : reservation.getJointTables())
+                for (AbstractTable jointTable : reservation.getJointTables())
                     computeIfAbsent(jointTable, unused -> new HashSet<>()).add(reservation);
 
-            for (SimpleTable table : allTables){
+            for (AbstractTable table : allTables){
                 if (!containsKey(table))
                     put(table, new HashSet<>());
             }
@@ -244,7 +244,7 @@ public class ReservationHandlingFacade {
      */
     public ReservationAPIResult getAllReservationsByDay(String day) {
         Set<Reservation> reservationsByDay = reservationsService.getAllReservationsByDay(day);
-        HashMap<SimpleTable, Set<Reservation>> res = getAllReservationsMap(reservationsByDay);
+        HashMap<AbstractTable, Set<Reservation>> res = getAllReservationsMap(reservationsByDay);
         return (
                 res.isEmpty()
                         ? new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_YET_FOR_DAY)

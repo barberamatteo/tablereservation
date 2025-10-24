@@ -28,39 +28,60 @@ public class TableGraph<TableType extends SimpleJoinableTable> {
                 }).toList();
     }
 
-    public void connect(TableType t1, TableType t2) {
-        adjacencyTable.get(t1).add(t2);
-        adjacencyTable.get(t2).add(t1);
+    public boolean connect(TableType t1, TableType t2) {
+        return adjacencyTable.get(t1).add(t2) && adjacencyTable.get(t2).add(t1);
     }
 
-    public void disconnect(TableType t1, TableType t2) {
-        adjacencyTable.get(t1).remove(t2);
-        adjacencyTable.get(t2).remove(t1);
+    public boolean disconnect(TableType t1, TableType t2) {
+        return adjacencyTable.get(t1).remove(t2) && adjacencyTable.get(t2).remove(t1);
     }
 
-    public Set<List<TableType>> getPathsWithinTablesHavingCapacities(
-            Collection<TableType> tables,
-            List<Integer> capacities,
-            int targetCapacity) {
+    public Set<List<TableType>> getAllPaths(Set<TableType> tables, List<Integer> capacities){
         Set<List<TableType>> paths = new HashSet<>();
         for (TableType table : tables) {
-            List<TableType> path = buildPath(table, capacities, targetCapacity);
-            if (!path.isEmpty()) {
-                paths.add(path);
-            }
+            paths.addAll(getAllPathsByStartingTable(table, capacities));
         }
         return paths;
     }
 
-    private List<TableType> buildPath(TableType table, List<Integer> capacities, int capacity) {
-        int residualCapacity = capacity;
-        List<TableType> toRet = new ArrayList<>();
-        TableType currentTable = table;
-        while (residualCapacity > 0 && !capacities.isEmpty()) {
 
-        }
-        return toRet;
+    public Set<List<TableType>> getAllPathsByStartingTable(
+            TableType start,
+            List<Integer> capacities
+    ){
+        Set<List<TableType>> paths = new HashSet<>();
+        List<TableType> path = new ArrayList<>();
+        path.add(start);
+        List<Integer> pathCapacity = new ArrayList<>(capacities);
+        pathCapacity.remove(Integer.valueOf(start.getStandaloneCapacity()));
+
+        buildPath(paths, path, start, pathCapacity);
+        return paths;
     }
+
+    private void buildPath(
+            Set<List<TableType>> paths,
+            List<TableType> path,
+            TableType start,
+            List<Integer> pathCapacity
+    ) {
+        if (pathCapacity.isEmpty()) {
+            paths.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (TableType currTable : adjacencyTable.get(start)) {
+            if (path.contains(currTable))
+                continue;
+            if (!pathCapacity.remove(Integer.valueOf(currTable.getStandaloneCapacity())))
+                continue;
+            path.add(currTable);
+            buildPath(paths, path, currTable, pathCapacity);
+            pathCapacity.add(currTable.getStandaloneCapacity());
+            path.removeLast();
+        }
+    }
+
 
     public List<TableType> getTablesSortedByCapacity() {
         return tablesSortedByCapacity;

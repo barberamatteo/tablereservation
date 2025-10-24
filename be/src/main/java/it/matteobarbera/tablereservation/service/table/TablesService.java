@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.service.table;
 
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import it.matteobarbera.tablereservation.model.table.TableCRUDException;
 import it.matteobarbera.tablereservation.model.table.TableDefinition;
@@ -25,7 +26,7 @@ public class TablesService {
         this.tablesDefinitionService = tablesDefinitionService;
     }
 
-    public Optional<SimpleTable> getTableByNum(Integer num) {
+    public Optional<AbstractTable> getTableByNum(Integer num) {
         return tablesRepository.findByNumberInLounge(num);
     }
 
@@ -49,7 +50,7 @@ public class TablesService {
     }
 
 
-    public Set<SimpleTable> getAllTables() {
+    public Set<AbstractTable> getAllTables() {
         return Set.copyOf(tablesRepository.findAll());
     }
 //

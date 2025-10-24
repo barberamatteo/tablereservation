@@ -1,6 +1,6 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public class Schedule {
 
 
 
-    public Schedule(SimpleTable table, String parsedDate) {
+    public Schedule(AbstractTable table, String parsedDate) {
         this.id = new ScheduleIdRecord(table, parsedDate);
     }
 
