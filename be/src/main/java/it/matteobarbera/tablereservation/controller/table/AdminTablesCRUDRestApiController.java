@@ -4,11 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.matteobarbera.tablereservation.Constants;
+import it.matteobarbera.tablereservation.http.TableAPIInfo;
 import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
-import it.matteobarbera.tablereservation.model.table.TableCRUDException;
-import it.matteobarbera.tablereservation.model.table.TableDefinition;
+import it.matteobarbera.tablereservation.mapper.TableMapper;
+import it.matteobarbera.tablereservation.model.dto.TableDTO;
+import it.matteobarbera.tablereservation.model.table.*;
 import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import org.slf4j.Logger;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.Set;
 
+import static it.matteobarbera.tablereservation.http.TableAPIInfo.JOINABLE_TABLE_CREATED;
 import static it.matteobarbera.tablereservation.http.TableAPIInfo.TABLE_CREATED;
 import static it.matteobarbera.tablereservation.http.TablesAPIError.NO_SUCH_CATEGORY_DEFINED;
 import static it.matteobarbera.tablereservation.http.TablesAPIError.NUMBER_CONFLICT;
@@ -34,11 +35,13 @@ public class AdminTablesCRUDRestApiController {
     private static final Logger log = LoggerFactory.getLogger(AdminTablesCRUDRestApiController.class);
     private final TablesService tablesService;
     private final TablesDefinitionService tablesDefinitionService;
+    private final TableMapper tableMapper;
 
     @Autowired
-    public AdminTablesCRUDRestApiController(TablesService tablesService, TablesDefinitionService tablesDefinitionService) {
+    public AdminTablesCRUDRestApiController(TablesService tablesService, TablesDefinitionService tablesDefinitionService, TableMapper tableMapper) {
         this.tablesService = tablesService;
         this.tablesDefinitionService = tablesDefinitionService;
+        this.tableMapper = tableMapper;
     }
 
     @Operation(
@@ -107,53 +110,68 @@ public class AdminTablesCRUDRestApiController {
     })
     @PostMapping("/create/")
     @CrossOrigin
-    public ResponseEntity<?> createTable(
-            @RequestParam(name = "category") String category,
-            @RequestParam(name = "number") int number
-    ){
+    public ResponseEntity<?> createTable(@RequestBody TableDTO tableDTO){
 
 
-        Optional<TableDefinition> tableDefinitionOptional =
-                tablesDefinitionService.getDefByCategory(category);
+        Optional<TableDefinition> tableDefinition =
+                tablesDefinitionService.getDefByCategory(tableDTO.getCategory());
 
-        if (tableDefinitionOptional.isEmpty()) {
-            log.atError().log(NO_CATEGORY_DEFINED, category);
+
+        if (tableDefinition.isEmpty()) {
+            log.atError().log(NO_CATEGORY_DEFINED, tableDTO.getCategory());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(
                             CommonJSONBodies.fromStatusAndMsg(
                                     HttpStatus.BAD_REQUEST.value(),
-                                    NO_SUCH_CATEGORY_DEFINED.getMessage(category)
+                                    NO_SUCH_CATEGORY_DEFINED.getMessage(tableDTO.getCategory())
                             )
                     );
         }
 
 
-        Optional<AbstractTable> tableWithSameNumberOptional = tablesService.getTableByNum(number);
+        Optional<AbstractTable> tableWithSameNumberOptional = tablesService.getTableByNum(tableDTO.getNumber());
         if (tableWithSameNumberOptional.isPresent()) {
-            log.atError().log(TABLE_WITH_SAME_NUMBER, number);
+            log.atError().log(TABLE_WITH_SAME_NUMBER, tableDTO.getNumber());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(
                             CommonJSONBodies.fromStatusAndMsg(
                                     HttpStatus.BAD_REQUEST.value(),
-                                    NUMBER_CONFLICT.getMessage(number)
+                                    NUMBER_CONFLICT.getMessage(tableDTO.getNumber())
                             )
                     );
         }
 
+        AbstractTable table = tableMapper.toEntity(tableDTO, tableDefinition.get());
 
-        tablesService.createTable(category.toLowerCase(), number);
-        log.atInfo().log(TABLE_CREATED_WITH_NUMBER_AND_CATEGORY, number, category);
+
+
+        if (table instanceof SimpleTable simpleTable) {
+            tablesService.createSimpleTable(simpleTable);
+            log.atInfo().log(SIMPLE_TABLE_CREATED,
+                    simpleTable.getNumberInLounge(),
+                    simpleTable.getTableDefinition()
+            );
+        }
+        if (table instanceof SimpleJoinableTable simpleJoinableTable) {
+            tablesService.createSimpleJoinableTable(simpleJoinableTable);
+            log.atInfo().log(SIMPLE_JOINABLE_TABLE_CREATED,
+                    simpleJoinableTable.getNumberInLounge(),
+                    simpleJoinableTable.getTableDefinition().getCategoryName(),
+                    simpleJoinableTable.getHeadCapacity(),
+                    simpleJoinableTable.getJoiningCapacity()
+            );
+        }
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
                         CommonJSONBodies.fromStatusAndMsg(
                                 HttpStatus.OK.value(),
-                                TABLE_CREATED.getMessage(number, category)
+                                TableAPIInfo.getMessage(table)
                         )
                 );
     }

@@ -1,9 +1,6 @@
 package it.matteobarbera.tablereservation.service.table;
 
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
-import it.matteobarbera.tablereservation.model.table.TableCRUDException;
-import it.matteobarbera.tablereservation.model.table.TableDefinition;
+import it.matteobarbera.tablereservation.model.table.*;
 import it.matteobarbera.tablereservation.repository.table.TablesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,10 +46,18 @@ public class TablesService {
         );
     }
 
+    public void createSimpleTable(SimpleTable simpleTable) {
+        tablesRepository.save(simpleTable);
+    }
+
+    public void createSimpleJoinableTable(SimpleJoinableTable simpleJoinableTable) {
+        tablesRepository.save(simpleJoinableTable);
+    }
 
     public Set<AbstractTable> getAllTables() {
         return Set.copyOf(tablesRepository.findAll());
     }
+
 //
 //    public Set<CustomTable> getAllIntervalCompliantTables(Interval interval) {
 //

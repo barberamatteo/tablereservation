@@ -10,6 +10,9 @@ public class SimpleTable extends AbstractTable {
         super(numberInLounge, category);
     }
 
+    public SimpleTable(int numberInLounge){
+        this(numberInLounge, null);
+    }
     public SimpleTable() {
 
     }

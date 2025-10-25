@@ -4,7 +4,6 @@ package it.matteobarbera.tablereservation.model.reservation.strategies.multitabl
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
-import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;

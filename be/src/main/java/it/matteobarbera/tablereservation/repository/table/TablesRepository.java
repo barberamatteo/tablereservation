@@ -10,15 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface TablesRepository extends JpaRepository<SimpleTable, Long> {
+public interface TablesRepository extends JpaRepository<AbstractTable, Long> {
     Optional<AbstractTable> findByNumberInLounge(int numberInLounge);
-
-    @Query(
-            "SELECT t " +
-            "FROM SimpleTable t JOIN TableDefinition td ON t.tableDefinition = td " +
-            "WHERE td.standaloneCapacity >= :numberOfPeople"
-    )
-    Set<SimpleTable> getAdequateTables(Integer numberOfPeople);
-
 
 }

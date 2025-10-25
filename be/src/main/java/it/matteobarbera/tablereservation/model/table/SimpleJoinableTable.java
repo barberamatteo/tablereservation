@@ -16,6 +16,12 @@ public class SimpleJoinableTable extends AbstractTable implements Joinable {
         this.joiningCapacity = tableDefinition.getStandaloneCapacity() - 2 * headCapacity;
     }
 
+    public SimpleJoinableTable(int numberInLounge, Integer headCapacity, Integer joiningCapacity) {
+        super(numberInLounge, null);
+        this.headCapacity = headCapacity;
+        this.joiningCapacity = joiningCapacity;
+    }
+
     public SimpleJoinableTable(
             int numberInLounge,
             TableDefinition category,

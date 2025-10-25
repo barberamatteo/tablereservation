@@ -30,7 +30,7 @@ public class Reservation {
     private Long id;
 
     @ManyToMany
-    private Set<SimpleTable> jointTables;
+    private Set<AbstractTable> jointTables;
 
     @Embedded
     @AttributeOverrides({
@@ -54,7 +54,7 @@ public class Reservation {
     private Schedule schedule;
 
     public Reservation(
-            Set<SimpleTable> jointTables,
+            Set<AbstractTable> jointTables,
             Interval interval,
             Customer customer,
             Integer numberOfPeople,
@@ -107,15 +107,13 @@ public class Reservation {
         this.id = id;
     }
 
-    public Set<SimpleTable> getJointTables() {
+    public Set<AbstractTable> getJointTables() {
         return jointTables;
     }
 
 
     public void setJointTables(Set<AbstractTable> jointTables) {
-        this.jointTables = jointTables.stream().map(
-                abstractTable -> (SimpleTable) abstractTable
-        ).collect(Collectors.toSet());
+        this.jointTables = jointTables;
     }
 
     public Interval getInterval() {
