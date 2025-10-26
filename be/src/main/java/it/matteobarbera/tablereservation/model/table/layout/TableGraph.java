@@ -1,56 +1,86 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class TableGraph<TableType extends SimpleJoinableTable> {
+@Entity
+public class TableGraph {
 
-    private final HashMap<TableType, Set<TableType>> adjacencyTable;
-    private final List<TableType> tablesSortedByCapacity;
-    public TableGraph(Collection<TableType> tables) {
+
+    private static final Logger log = LoggerFactory.getLogger(TableGraph.class);
+    @Id
+    @SequenceGenerator(
+            name = "graph_sequence",
+            sequenceName = "graph_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "graph_sequence"
+    )
+    private Long id;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "graph_id")
+    private Set<AbstractTable> tables = new HashSet<>();
+
+    @OneToMany(mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TableEdge> edges = new HashSet<>();
+
+    @Transient
+    private HashMap<AbstractTable, Set<AbstractTable>> adjacencyTable;
+
+    public TableGraph(Collection<AbstractTable> tables) {
+        initAdjacencyMap();
+
+    }
+
+    public TableGraph() {
+    }
+
+    @PostLoad
+    private void initAdjacencyMap() {
+        log.info("Running initAdjacencyMap");
         this.adjacencyTable = new HashMap<>();
         tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
-        this.tablesSortedByCapacity = sortByDESCCapacity(tables);
+        log.info("Finish initAdjacencyMap, size = " +  adjacencyTable.size());
     }
 
-    public TableGraph(HashMap<TableType, Set<TableType>> adjacencyTable) {
-        this.adjacencyTable = adjacencyTable;
-        this.tablesSortedByCapacity = sortByDESCCapacity(adjacencyTable.keySet());
+    public boolean containsTable(AbstractTable table) {
+        return adjacencyTable.containsKey(table);
+    }
+    public boolean connect(AbstractTable t1, AbstractTable t2) {
+        TableEdge e = new TableEdge(this, t1, t2);
+        boolean alreadyPresent = edges.add(e);
+        return adjacencyTable.get(t1).add(t2) && adjacencyTable.get(t2).add(t1) && alreadyPresent;
     }
 
-    private List<TableType> sortByDESCCapacity(Collection<TableType> tables) {
-        return tables.stream().sorted(
-                (o1, o2) -> {
-                    Integer c1 = o1.getStandaloneCapacity();
-                    Integer c2 = o2.getStandaloneCapacity();
-                    return c2.compareTo(c1);
-                }).toList();
+    public boolean disconnect(AbstractTable t1, AbstractTable t2) {
+        TableEdge corresponding1 = new TableEdge(this, t1, t2);
+        TableEdge corresponding2 = new TableEdge(this, t2, t1);
+        boolean sanityCheck = edges.remove(corresponding1) && edges.remove(corresponding2);
+        return adjacencyTable.get(t1).remove(t2) && adjacencyTable.get(t2).remove(t1) && sanityCheck;
     }
 
-    public boolean connect(TableType t1, TableType t2) {
-        return adjacencyTable.get(t1).add(t2) && adjacencyTable.get(t2).add(t1);
-    }
-
-    public boolean disconnect(TableType t1, TableType t2) {
-        return adjacencyTable.get(t1).remove(t2) && adjacencyTable.get(t2).remove(t1);
-    }
-
-    public Set<List<TableType>> getAllPaths(Set<TableType> tables, List<Integer> capacities){
-        Set<List<TableType>> paths = new HashSet<>();
-        for (TableType table : tables) {
+    public Set<List<SimpleJoinableTable>> getAllPaths(Set<SimpleJoinableTable> tables, List<Integer> capacities){
+        Set<List<SimpleJoinableTable>> paths = new HashSet<>();
+        for (SimpleJoinableTable table : tables) {
             paths.addAll(getAllPathsByStartingTable(table, capacities));
         }
         return paths;
     }
 
-
-    public Set<List<TableType>> getAllPathsByStartingTable(
-            TableType start,
+    public Set<List<SimpleJoinableTable>> getAllPathsByStartingTable(
+            SimpleJoinableTable start,
             List<Integer> capacities
     ){
-        Set<List<TableType>> paths = new HashSet<>();
-        List<TableType> path = new ArrayList<>();
+        Set<List<SimpleJoinableTable>> paths = new HashSet<>();
+        List<SimpleJoinableTable> path = new ArrayList<>();
         path.add(start);
         List<Integer> pathCapacity = new ArrayList<>(capacities);
         pathCapacity.remove(Integer.valueOf(start.getStandaloneCapacity()));
@@ -60,9 +90,9 @@ public class TableGraph<TableType extends SimpleJoinableTable> {
     }
 
     private void buildPath(
-            Set<List<TableType>> paths,
-            List<TableType> path,
-            TableType start,
+            Set<List<SimpleJoinableTable>> paths,
+            List<SimpleJoinableTable> path,
+            AbstractTable start,
             List<Integer> pathCapacity
     ) {
         if (pathCapacity.isEmpty()) {
@@ -70,20 +100,26 @@ public class TableGraph<TableType extends SimpleJoinableTable> {
             return;
         }
 
-        for (TableType currTable : adjacencyTable.get(start)) {
-            if (path.contains(currTable))
-                continue;
-            if (!pathCapacity.remove(Integer.valueOf(currTable.getStandaloneCapacity())))
-                continue;
-            path.add(currTable);
-            buildPath(paths, path, currTable, pathCapacity);
-            pathCapacity.add(currTable.getStandaloneCapacity());
-            path.removeLast();
+        for (AbstractTable currTable : adjacencyTable.get(start)) {
+            if (currTable instanceof SimpleJoinableTable currSimpleJoinableTable) {
+                if (path.contains(currSimpleJoinableTable))
+                    continue;
+                if (!pathCapacity.remove(Integer.valueOf(currSimpleJoinableTable.getStandaloneCapacity())))
+                    continue;
+                path.add(currSimpleJoinableTable);
+                buildPath(paths, path, currTable, pathCapacity);
+                pathCapacity.add(currSimpleJoinableTable.getStandaloneCapacity());
+                path.removeLast();
+            }
         }
     }
 
-
-    public List<TableType> getTablesSortedByCapacity() {
-        return tablesSortedByCapacity;
+    public Long getId() {
+        return id;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
 }

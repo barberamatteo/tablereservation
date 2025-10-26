@@ -1,6 +1,8 @@
 package it.matteobarbera.tablereservation;
 
 import it.matteobarbera.tablereservation.model.customer.Customer;
+import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.admin.AdminService;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
@@ -16,6 +18,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @ConditionalOnProperty(name = "debug", havingValue = "true")
@@ -25,14 +33,10 @@ public class DebugConfig {
     CommandLineRunner commandLineRunner(
             TablesDefinitionService tablesDefinitionService,
             TablesService tablesService,
-            AdminService adminService,
-            ReservationsService reservationsService,
             CustomerService customerService,
-            ScheduleService scheduleService,
             SecurityService securityService,
             ReservationHandlingFacade reservationHandlingFacade,
-            ModelMapper modelMapper
-    ) {
+            ModelMapper modelMapper) {
         return args -> {
             CustomerDTO customerDTO = new CustomerDTO(
                     "Matteo",
@@ -70,7 +74,58 @@ public class DebugConfig {
                             6
                     )
             );
+
+//            TableGraph g = new TableGraph();
+//            List<AbstractTable> tables = new ArrayList<>(tablesService.getAllTables());
+//            g.connect(tables.get(0), tables.get(1));
+//            g.connect(tables.get(1), tables.get(2));
+//            tableGraphRepository.save(g);
+
+            var tables = tablesService.getAllTables();
+            SimpleMatrixLayout layout = new SimpleMatrixLayout(tables);
+            AbstractTable[] a = new AbstractTable[tables.size()];
+            for (int i = 0; i < a.length; i++) {
+                int finalI = i +1;
+                a[i] = tables.stream().filter(abstractTable -> Objects.equals(abstractTable.getId(), (long) finalI)).findFirst().get();
+            }
+            layout.connect(a[0], a[1]);
+            layout.connect(a[1], a[2]);
+            layout.connect(a[0], a[3]);
+            layout.connect(a[3], a[4]);
+            layout.connect(a[1], a[4]);
+            layout.connect(a[4], a[5]);
+            layout.connect(a[2], a[5]);
         };
 
     }
+
+//    @Bean
+//    CommandLineRunner layout(
+//            TablesDefinitionService tablesDefinitionService,
+//            TablesService tablesService,
+//            CustomerService customerService,
+//            SecurityService securityService,
+//            ReservationHandlingFacade reservationHandlingFacade,
+//            ModelMapper modelMapper
+//    ){
+//        return args -> {
+//            commandLineRunner(
+//                    tablesDefinitionService,
+//                    tablesService,
+//                    customerService,
+//                    securityService,
+//                    reservationHandlingFacade,
+//                    modelMapper
+//            );
+//
+//            var tables = tablesService.getAllTables();
+//            SimpleMatrixLayout layout = new SimpleMatrixLayout(tables);
+//            layout.connect(tablesService.getTableByNum(1).get(), tablesService.getTableByNum(2).get());
+//            layout.connect(tablesService.getTableByNum(2).get(), tablesService.getTableByNum(3).get());
+//            layout.connect(tablesService.getTableByNum(1).get(), tablesService.getTableByNum(4).get());
+//            layout.connect(tablesService.getTableByNum(2).get(), tablesService.getTableByNum(4).get());
+//            layout.connect(tablesService.getTableByNum(3).get(), tablesService.getTableByNum(5).get());
+//
+//        };
+//    }
 }

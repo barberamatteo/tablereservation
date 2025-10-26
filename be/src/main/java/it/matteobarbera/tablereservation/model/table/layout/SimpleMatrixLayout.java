@@ -1,15 +1,55 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import jakarta.persistence.*;
 
-import java.util.Set;
+import java.util.Collection;
 
-public class SimpleMatrixLayout extends AbstractTableLayout {
+@Entity
+@Table(name = "table_layout")
+public class SimpleMatrixLayout {
+    @Id
+    @SequenceGenerator(
+            name = "layout_sequence",
+            sequenceName = "layout_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "layout_sequence"
+    )
+    private Long id;
 
+    private String name;
 
-    public SimpleMatrixLayout(Set<AbstractTable> tables) {
-        super(tables);
+    @OneToOne(cascade = CascadeType.ALL)
+    private TableGraph tableGraph;
+
+    public void setId(Long id) {
+        this.id = id;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    protected SimpleMatrixLayout() {
+
+    }
+
+    public SimpleMatrixLayout(Collection<AbstractTable> tables) {
+        this.tableGraph = new TableGraph(tables);
+    }
+
+    public boolean connect(AbstractTable t1, AbstractTable t2) {
+        return tableGraph.connect(t1, t2);
+    }
+
+    public boolean disconnect(AbstractTable t1, AbstractTable t2) {
+        return tableGraph.disconnect(t1, t2);
+    }
+
+
 
 
 }
