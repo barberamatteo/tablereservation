@@ -37,7 +37,9 @@ public class SimpleMatrixLayout {
 
     }
 
-    public SimpleMatrixLayout(Collection<AbstractTable> tables) {
+
+    public SimpleMatrixLayout(String name, Collection<AbstractTable> tables) {
+        this.name = name;
         this.tableGraph = new TableGraph(tables);
     }
 
@@ -49,6 +51,10 @@ public class SimpleMatrixLayout {
         return tableGraph.disconnect(t1, t2);
     }
 
+
+    public TableGraph getGraph() {
+        return tableGraph;
+    }
 
 
 

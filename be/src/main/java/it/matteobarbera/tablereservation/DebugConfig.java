@@ -3,31 +3,30 @@ package it.matteobarbera.tablereservation;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
-import it.matteobarbera.tablereservation.service.admin.AdminService;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
-import it.matteobarbera.tablereservation.service.reservation.ReservationsService;
-import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
+import it.matteobarbera.tablereservation.service.table.layout.LayoutService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.Repository;
+import org.springframework.context.annotation.DependsOn;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Configuration
 @ConditionalOnProperty(name = "debug", havingValue = "true")
 public class DebugConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(DebugConfig.class);
 
     @Bean
     CommandLineRunner commandLineRunner(
@@ -36,7 +35,7 @@ public class DebugConfig {
             CustomerService customerService,
             SecurityService securityService,
             ReservationHandlingFacade reservationHandlingFacade,
-            ModelMapper modelMapper) {
+            ModelMapper modelMapper, LayoutService layoutService) {
         return args -> {
             CustomerDTO customerDTO = new CustomerDTO(
                     "Matteo",
@@ -75,14 +74,8 @@ public class DebugConfig {
                     )
             );
 
-//            TableGraph g = new TableGraph();
-//            List<AbstractTable> tables = new ArrayList<>(tablesService.getAllTables());
-//            g.connect(tables.get(0), tables.get(1));
-//            g.connect(tables.get(1), tables.get(2));
-//            tableGraphRepository.save(g);
-
             var tables = tablesService.getAllTables();
-            SimpleMatrixLayout layout = new SimpleMatrixLayout(tables);
+            SimpleMatrixLayout layout = new SimpleMatrixLayout("Layout1", tables);
             AbstractTable[] a = new AbstractTable[tables.size()];
             for (int i = 0; i < a.length; i++) {
                 int finalI = i +1;
@@ -95,37 +88,25 @@ public class DebugConfig {
             layout.connect(a[1], a[4]);
             layout.connect(a[4], a[5]);
             layout.connect(a[2], a[5]);
+
+            layoutService.saveLayout(layout);
+        };
+    }
+
+
+    @Bean
+    @DependsOn("commandLineRunner")
+    CommandLineRunner commandLineRunner2(LayoutService layoutService){
+        return args -> {
+            var layout = layoutService.getLayout(1L);
+            log.info("Layout fetched");
+
+            var graph = layout.getGraph();
+            var tables = graph.getTables();
+            var edges =  graph.getEdges();
+            System.out.println(tables);
+            System.out.println(edges);
         };
 
     }
-
-//    @Bean
-//    CommandLineRunner layout(
-//            TablesDefinitionService tablesDefinitionService,
-//            TablesService tablesService,
-//            CustomerService customerService,
-//            SecurityService securityService,
-//            ReservationHandlingFacade reservationHandlingFacade,
-//            ModelMapper modelMapper
-//    ){
-//        return args -> {
-//            commandLineRunner(
-//                    tablesDefinitionService,
-//                    tablesService,
-//                    customerService,
-//                    securityService,
-//                    reservationHandlingFacade,
-//                    modelMapper
-//            );
-//
-//            var tables = tablesService.getAllTables();
-//            SimpleMatrixLayout layout = new SimpleMatrixLayout(tables);
-//            layout.connect(tablesService.getTableByNum(1).get(), tablesService.getTableByNum(2).get());
-//            layout.connect(tablesService.getTableByNum(2).get(), tablesService.getTableByNum(3).get());
-//            layout.connect(tablesService.getTableByNum(1).get(), tablesService.getTableByNum(4).get());
-//            layout.connect(tablesService.getTableByNum(2).get(), tablesService.getTableByNum(4).get());
-//            layout.connect(tablesService.getTableByNum(3).get(), tablesService.getTableByNum(5).get());
-//
-//        };
-//    }
 }

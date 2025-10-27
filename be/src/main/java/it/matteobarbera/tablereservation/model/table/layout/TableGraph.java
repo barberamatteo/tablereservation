@@ -25,30 +25,30 @@ public class TableGraph {
     )
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "graph_id")
     private Set<AbstractTable> tables = new HashSet<>();
 
-    @OneToMany(mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<TableEdge> edges = new HashSet<>();
 
     @Transient
     private HashMap<AbstractTable, Set<AbstractTable>> adjacencyTable;
 
     public TableGraph(Collection<AbstractTable> tables) {
-        initAdjacencyMap();
+        initAdjacencyMap(tables);
 
     }
 
     public TableGraph() {
     }
 
-    @PostLoad
-    private void initAdjacencyMap() {
+
+    private void initAdjacencyMap(Collection<AbstractTable> tables) {
         log.info("Running initAdjacencyMap");
         this.adjacencyTable = new HashMap<>();
         tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
-        log.info("Finish initAdjacencyMap, size = " +  adjacencyTable.size());
+        log.info("Finish initAdjacencyMap, size = {}", adjacencyTable.size());
     }
 
     public boolean containsTable(AbstractTable table) {
@@ -120,6 +120,14 @@ public class TableGraph {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<AbstractTable> getTables() {
+        return tables;
+    }
+
+    public Set<TableEdge> getEdges() {
+        return edges;
     }
 
 }
