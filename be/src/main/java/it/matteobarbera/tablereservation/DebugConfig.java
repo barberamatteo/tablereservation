@@ -10,7 +10,7 @@ import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
-import it.matteobarbera.tablereservation.service.table.layout.LayoutService;
+import it.matteobarbera.tablereservation.service.table.layout.TableLayoutService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DebugConfig {
             CustomerService customerService,
             SecurityService securityService,
             ReservationHandlingFacade reservationHandlingFacade,
-            ModelMapper modelMapper, LayoutService layoutService) {
+            ModelMapper modelMapper, TableLayoutService tableLayoutService) {
         return args -> {
             CustomerDTO customerDTO = new CustomerDTO(
                     "Matteo",
@@ -73,40 +73,24 @@ public class DebugConfig {
                             6
                     )
             );
-
-            var tables = tablesService.getAllTables();
-            SimpleMatrixLayout layout = new SimpleMatrixLayout("Layout1", tables);
-            AbstractTable[] a = new AbstractTable[tables.size()];
-            for (int i = 0; i < a.length; i++) {
-                int finalI = i +1;
-                a[i] = tables.stream().filter(abstractTable -> Objects.equals(abstractTable.getId(), (long) finalI)).findFirst().get();
-            }
-            layout.connect(a[0], a[1]);
-            layout.connect(a[1], a[2]);
-            layout.connect(a[0], a[3]);
-            layout.connect(a[3], a[4]);
-            layout.connect(a[1], a[4]);
-            layout.connect(a[4], a[5]);
-            layout.connect(a[2], a[5]);
-
-            layoutService.saveLayout(layout);
         };
     }
 
 
-    @Bean
-    @DependsOn("commandLineRunner")
-    CommandLineRunner commandLineRunner2(LayoutService layoutService){
-        return args -> {
-            var layout = layoutService.getLayout(1L);
-            log.info("Layout fetched");
-
-            var graph = layout.getGraph();
-            var tables = graph.getTables();
-            var edges =  graph.getEdges();
-            System.out.println(tables);
-            System.out.println(edges);
-        };
-
-    }
+//    @Bean
+//    @DependsOn("commandLineRunner")
+//    CommandLineRunner commandLineRunner2(TableLayoutService tableLayoutService){
+//        return args -> {
+//
+//            var layout = tableLayoutService.getLayout(1L);
+//            log.info("Layout fetched");
+//
+//            var graph = layout.getGraph();
+//            var tables = graph.getTables();
+//            var edges =  graph.getEdges();
+//            System.out.println(tables);
+//            System.out.println(edges);
+//        };
+//
+//    }
 }

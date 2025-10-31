@@ -4,6 +4,7 @@ import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import jakarta.persistence.*;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table(name = "table_layout")
@@ -37,14 +38,27 @@ public class SimpleMatrixLayout {
 
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public SimpleMatrixLayout(String name, Collection<AbstractTable> tables) {
         this.name = name;
         this.tableGraph = new TableGraph(tables);
     }
 
-    public boolean connect(AbstractTable t1, AbstractTable t2) {
-        return tableGraph.connect(t1, t2);
+    public void connect(AbstractTable t1, AbstractTable t2) {
+        tableGraph.connect(t1, t2);
+    }
+
+    public void connectAll(AbstractTable t1, Set<AbstractTable> tables) {
+        for (AbstractTable t2 : tables) {
+            connect(t1, t2);
+        }
     }
 
     public boolean disconnect(AbstractTable t1, AbstractTable t2) {

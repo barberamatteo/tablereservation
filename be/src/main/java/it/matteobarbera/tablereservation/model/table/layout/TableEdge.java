@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import jakarta.persistence.*;
 
@@ -7,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table
-final class TableEdge {
+public class TableEdge {
     @Id
     @SequenceGenerator(
             name = "edge_sequence",
@@ -21,6 +22,7 @@ final class TableEdge {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private TableGraph graph;
 
     @ManyToOne
@@ -49,38 +51,46 @@ final class TableEdge {
         this.t2 = t2;
     }
 
-    AbstractTable getT1() {
+    public AbstractTable getT1() {
         return t1;
     }
 
-    void setT1(AbstractTable t1) {
+    public void setT1(AbstractTable t1) {
         this.t1 = t1;
     }
 
-    AbstractTable getT2() {
+    public AbstractTable getT2() {
         return t2;
     }
 
-    void setT2(AbstractTable t2) {
+    public void setT2(AbstractTable t2) {
         this.t2 = t2;
     }
 
-    TableGraph getGraph() {
+    public TableGraph getGraph() {
         return graph;
     }
 
-    void setGraph(TableGraph graph) {
+    public void setGraph(TableGraph graph) {
         this.graph = graph;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TableEdge tableEdge)) return false;
-        return Objects.equals(graph, tableEdge.graph) && Objects.equals(t1, tableEdge.t1) && Objects.equals(t2, tableEdge.t2);
+        if (!(o instanceof TableEdge tableEdge)) {
+            return false;
+        } else {
+            boolean weakEquality =
+                    (Objects.equals(t1, tableEdge.t2) && Objects.equals(t2, tableEdge.t1));
+            boolean strongEquality =
+                    Objects.equals(t1, tableEdge.t1) && Objects.equals(t2, tableEdge.t2);
+
+            return Objects.equals(graph, tableEdge.graph) && (strongEquality || weakEquality);
+        }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(graph, t1, t2);
+        return 0;
     }
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 public class TableGraph {
@@ -25,39 +26,49 @@ public class TableGraph {
     )
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "graph_id")
-    private Set<AbstractTable> tables = new HashSet<>();
-
     @OneToMany(mappedBy = "graph", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<TableEdge> edges = new HashSet<>();
+
+    @Transient
+    private Set<AbstractTable> tables;
 
     @Transient
     private HashMap<AbstractTable, Set<AbstractTable>> adjacencyTable;
 
     public TableGraph(Collection<AbstractTable> tables) {
-        initAdjacencyMap(tables);
+        this.tables = new HashSet<>(tables);
+        initAdjacencyMap();
 
     }
+
+    @PostLoad
+    public void loadTables(){
+        if (tables == null) {
+            tables = new HashSet<>();
+            tables.addAll(edges.stream().map(TableEdge::getT1).collect(Collectors.toSet()));
+            tables.addAll(edges.stream().map(TableEdge::getT2).collect(Collectors.toSet()));
+        }
+    }
+
 
     public TableGraph() {
     }
 
 
-    private void initAdjacencyMap(Collection<AbstractTable> tables) {
-        log.info("Running initAdjacencyMap");
+    private void initAdjacencyMap() {
         this.adjacencyTable = new HashMap<>();
         tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
-        log.info("Finish initAdjacencyMap, size = {}", adjacencyTable.size());
     }
 
     public boolean containsTable(AbstractTable table) {
         return adjacencyTable.containsKey(table);
     }
-    public boolean connect(AbstractTable t1, AbstractTable t2) {
+
+    public void connect(AbstractTable t1, AbstractTable t2) {
         TableEdge e = new TableEdge(this, t1, t2);
-        boolean alreadyPresent = edges.add(e);
-        return adjacencyTable.get(t1).add(t2) && adjacencyTable.get(t2).add(t1) && alreadyPresent;
+        edges.add(e);
+        adjacencyTable.get(t1).add(t2);
+        adjacencyTable.get(t2).add(t1);
     }
 
     public boolean disconnect(AbstractTable t1, AbstractTable t2) {

@@ -14,6 +14,13 @@ public abstract class Constants {
     private static final String USER_RESERVATION_API_VERSION =
             "/api/v1.0.0";
 
+    private static final String LAYOUT_API_VERSION =
+            "/api/v1.0.0";
+
+
+    public static final String LAYOUT_API_ENDPOINT =
+            LAYOUT_API_VERSION + "/layout";
+
     public static final String ADMIN_TABLES_CRUD_API_ENDPOINT =
             ADMIN_TABLES_CRUD_API_VERSION + "/admin/tables";
 
