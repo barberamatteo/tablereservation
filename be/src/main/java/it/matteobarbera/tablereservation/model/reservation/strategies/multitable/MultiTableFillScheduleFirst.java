@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import it.matteobarbera.tablereservation.model.table.layout.SubsetSumSolver;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,9 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
         Set<Schedule> intervalCompliantSchedules = scheduleService.getIntervalCompliantSchedules(
                 reservation.getInterval()
         );
-        Set<SimpleJoinableTable> joinableTables = extractJoinableTables(intervalCompliantSchedules);
+        var joinableTables = extractJoinableTables(intervalCompliantSchedules);
+        var subsetSumSolver = new SubsetSumSolver<>(joinableTables.stream().toList());
+        var subsetsOfCapacities = subsetSumSolver.getSubsetsOfCapacities(reservation.getNumberOfPeople());
 
 
         return null;

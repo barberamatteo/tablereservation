@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 

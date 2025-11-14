@@ -20,7 +20,7 @@ public class LayoutController {
     }
 
     @PostMapping("/create/")
-    public ResponseEntity<?> createLayout(@RequestBody LayoutDTO layoutDTO){
+    public ResponseEntity<?> createLayout(@RequestBody LayoutDTO layoutDTO) {
 
         LayoutAPIResult result = tableLayoutService.createLayout(
                 layoutDTO.getName(),
@@ -30,13 +30,14 @@ public class LayoutController {
 
         if (result instanceof LayoutAPIResult.Success)
             return ResponseEntity.ok().body(result);
-        return ResponseEntity.badRequest().body(result.getStatus());
+
+        return ResponseEntity.badRequest().body(result);
     }
 
 
     @GetMapping("/getbyid/{id}")
     public ResponseEntity<?> getLayoutById(@PathVariable Long id){
-        LayoutAPIResult result = tableLayoutService.getLayout(id);
+        LayoutAPIResult result = tableLayoutService.getLayoutById(id);
         if (result instanceof LayoutAPIResult.Success)
             return ResponseEntity.ok().body(result);
         return ResponseEntity.badRequest().body(result);

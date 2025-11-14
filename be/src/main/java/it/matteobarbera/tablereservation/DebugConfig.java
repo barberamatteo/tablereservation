@@ -1,8 +1,8 @@
 package it.matteobarbera.tablereservation;
 
 import it.matteobarbera.tablereservation.model.customer.Customer;
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
+import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import it.matteobarbera.tablereservation.model.table.TableDefinition;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -10,7 +10,6 @@ import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
-import it.matteobarbera.tablereservation.service.table.layout.TableLayoutService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +17,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-
-import java.util.Objects;
 
 @Configuration
 @ConditionalOnProperty(name = "debug", havingValue = "true")
@@ -35,7 +31,7 @@ public class DebugConfig {
             CustomerService customerService,
             SecurityService securityService,
             ReservationHandlingFacade reservationHandlingFacade,
-            ModelMapper modelMapper, TableLayoutService tableLayoutService) {
+            ModelMapper modelMapper) {
         return args -> {
             CustomerDTO customerDTO = new CustomerDTO(
                     "Matteo",
@@ -44,16 +40,26 @@ public class DebugConfig {
             );
             Customer customer = modelMapper.map(customerDTO, Customer.class);
             customerService.createCustomer(customer);
-
             tablesDefinitionService.createNewDef("Tavolo piccolo", 4);
             tablesDefinitionService.createNewDef("Tavolo grande", 6);
 
-            tablesService.createTable("Tavolo grande", 1);
-            tablesService.createTable("Tavolo grande", 2);
-            tablesService.createTable("Tavolo grande", 3);
-            tablesService.createTable("Tavolo piccolo", 4);
-            tablesService.createTable("Tavolo piccolo", 5);
-            tablesService.createTable("Tavolo piccolo", 6);
+            TableDefinition piccoloDef = tablesDefinitionService.getDefByCategory("Tavolo piccolo").get();
+            TableDefinition grandeDef = tablesDefinitionService.getDefByCategory("Tavolo grande").get();
+
+            SimpleJoinableTable t1 = new SimpleJoinableTable(1, grandeDef);
+            SimpleJoinableTable t2 = new SimpleJoinableTable(2, grandeDef);
+            SimpleJoinableTable t3 = new SimpleJoinableTable(3, grandeDef);
+
+            SimpleJoinableTable t4 = new SimpleJoinableTable(4, piccoloDef);
+            SimpleJoinableTable t5 = new SimpleJoinableTable(5, piccoloDef);
+            SimpleJoinableTable t6 = new SimpleJoinableTable(6, piccoloDef);
+
+            tablesService.createSimpleJoinableTable(t1);
+            tablesService.createSimpleJoinableTable(t2);
+            tablesService.createSimpleJoinableTable(t3);
+            tablesService.createSimpleJoinableTable(t4);
+            tablesService.createSimpleJoinableTable(t5);
+            tablesService.createSimpleJoinableTable(t6);
 
             securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
             securityService.createAdmin("admin_pm", "admin"); //Postman admin for debugging/testing
@@ -75,22 +81,4 @@ public class DebugConfig {
             );
         };
     }
-
-
-//    @Bean
-//    @DependsOn("commandLineRunner")
-//    CommandLineRunner commandLineRunner2(TableLayoutService tableLayoutService){
-//        return args -> {
-//
-//            var layout = tableLayoutService.getLayout(1L);
-//            log.info("Layout fetched");
-//
-//            var graph = layout.getGraph();
-//            var tables = graph.getTables();
-//            var edges =  graph.getEdges();
-//            System.out.println(tables);
-//            System.out.println(edges);
-//        };
-//
-//    }
 }

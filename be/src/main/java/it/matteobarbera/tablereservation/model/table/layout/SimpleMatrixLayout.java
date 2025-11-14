@@ -1,10 +1,11 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import jakarta.persistence.*;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "table_layout")
@@ -66,10 +67,49 @@ public class SimpleMatrixLayout {
     }
 
 
+    // TODO: Align table type (remove List<AbstractTable> ---> List<SimpleJoinableTable> conversion)
+    public List<SimpleJoinableTable> findBestPathWithExclusionsAndCapacities(
+            Set<AbstractTable> whitelistedTables,
+            List<Integer> capacities
+    ){
+        var allPaths = tableGraph.getAllPaths(
+                whitelistedTables.stream().map(abstractTable -> new SimpleJoinableTable(abstractTable.getNumberInLounge(), abstractTable.getTableDefinition())).collect(Collectors.toSet()),
+                capacities
+        );
+
+        PathOptimizationPipeline pipeline = new PathOptimizationPipeline(allPaths);
+        var aPath = pipeline.getShortest().getRandom();
+        return aPath;
+
+    }
+
     public TableGraph getGraph() {
         return tableGraph;
     }
 
 
 
+    private static final class PathOptimizationPipeline {
+        private Set<List<SimpleJoinableTable>> paths;
+        public PathOptimizationPipeline(Set<List<SimpleJoinableTable>> paths) {
+            this.paths = paths;
+        }
+
+        public PathOptimizationPipeline getShortest(){
+            TreeSet<List<SimpleJoinableTable>> pathsOrderedBySize = new TreeSet<>(Comparator.comparingInt(List::size));
+            pathsOrderedBySize.addAll(paths);
+            int minLength = pathsOrderedBySize.first().size();
+
+            paths = pathsOrderedBySize.stream().takeWhile(simpleJoinableTables ->
+                    simpleJoinableTables.size() == minLength
+            ).collect(Collectors.toSet());
+            return this;
+        }
+
+
+        public List<SimpleJoinableTable> getRandom(){
+            return paths.iterator().next();
+        }
+
+    }
 }

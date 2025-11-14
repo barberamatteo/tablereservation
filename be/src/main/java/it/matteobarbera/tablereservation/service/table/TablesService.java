@@ -59,6 +59,7 @@ public class TablesService {
         tablesRepository.save(simpleTable);
     }
 
+
     public void createSimpleJoinableTable(SimpleJoinableTable simpleJoinableTable) {
         tablesRepository.save(simpleJoinableTable);
     }
