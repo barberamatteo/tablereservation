@@ -30,9 +30,13 @@ public class TableLayoutService {
         tableLayoutRepository.save(layout);
     }
 
-    public SimpleMatrixLayout getLayout(Long id) {
+    public LayoutAPIResult getLayout(Long id) {
         var res = tableLayoutRepository.findById(id);
-        return res.orElse(null);
+        if (res.isPresent()) {
+            return new LayoutAPIResult.Success(res, LayoutAPIInfo.LAYOUT_FETCHED_OK);
+        } else {
+            return new LayoutAPIResult.Failure(LayoutAPIError.NO_SUCH_LAYOUT_WITH_ID);
+        }
     }
 
     public LayoutAPIResult createLayout(String name, Map<Long, Set<Long>> idsMap) {

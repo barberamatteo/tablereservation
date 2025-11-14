@@ -1,7 +1,8 @@
 package it.matteobarbera.tablereservation.http;
 
 public enum LayoutAPIInfo {
-    LAYOUT_CREATED_OK("Layout with name %s was created successfully"),;
+    LAYOUT_CREATED_OK("Layout with name %s was created successfully"),
+    LAYOUT_FETCHED_OK("Layout with id %d was fetched successfully"),;
 
 
 
