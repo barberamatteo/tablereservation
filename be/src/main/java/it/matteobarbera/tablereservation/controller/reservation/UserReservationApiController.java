@@ -47,6 +47,10 @@ public class UserReservationApiController {
 
 
 
+
+
+
+
     @Operation(
             summary = "Add a reservation",
             description = "Adds a reservation specifying customer id, number of people, arrival and leave datetime"
@@ -66,7 +70,8 @@ public class UserReservationApiController {
     @CrossOrigin
     @PostMapping("/newreservation/")
     public ResponseEntity<?> newReservation(
-            @RequestBody ReservationDTO reservationDTO
+            @RequestBody ReservationDTO reservationDTO,
+            @RequestParam Long layoutId
     ) {
 
         if (reservationDTO.getEndDateTime() == null) {
@@ -89,7 +94,7 @@ public class UserReservationApiController {
                         );
             }
         }
-        ReservationAPIResult result = reservationHandlingFacade.newReservation(reservationDTO);
+        ReservationAPIResult result = reservationHandlingFacade.newReservation(reservationDTO, layoutId);
 
 
         if (result.isSuccess()) {

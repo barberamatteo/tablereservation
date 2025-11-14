@@ -32,7 +32,7 @@ public class TableLayoutService {
         this.tablesService = tablesService;
     }
 
-    private void saveLayout(SimpleMatrixLayout layout) {
+    public void saveLayout(SimpleMatrixLayout layout) {
         tableLayoutRepository.save(layout);
     }
 

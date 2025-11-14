@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.model.table.layout.SubsetSumSolver;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Primary;
@@ -19,7 +20,11 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
 
 
     @Override
-    public Set<AbstractTable> postReservation(ScheduleService scheduleService, Reservation reservation) {
+    public Set<AbstractTable> postReservation(
+            ScheduleService scheduleService,
+            Reservation reservation,
+            SimpleMatrixLayout layout
+    ) {
         Set<Schedule> intervalCompliantSchedules = scheduleService.getIntervalCompliantSchedules(
                 reservation.getInterval()
         );

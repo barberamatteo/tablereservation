@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static it.matteobarbera.tablereservation.Constants.CUSTOMER_CRUD_API_ENDPOINT;
 import static it.matteobarbera.tablereservation.http.CustomerAPIInfo.CUSTOMER_CREATED;
-import static it.matteobarbera.tablereservation.http.CustomersAPIError.*;
+import static it.matteobarbera.tablereservation.http.CustomerAPIError.*;
 import static it.matteobarbera.tablereservation.logging.CustomerLog.*;
 
 @RestController

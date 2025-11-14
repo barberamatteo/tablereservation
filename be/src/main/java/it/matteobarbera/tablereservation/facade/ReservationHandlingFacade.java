@@ -8,6 +8,7 @@ import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
 import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.mapper.ReservationMapper;
 import it.matteobarbera.tablereservation.model.customer.Customer;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
@@ -16,6 +17,7 @@ import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import it.matteobarbera.tablereservation.service.table.TablesService;
+import it.matteobarbera.tablereservation.service.table.layout.TableLayoutService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,13 +43,17 @@ public class ReservationHandlingFacade {
     private final CacheUtils cacheUtils;
     private final ModelMapper modelMapper;
     private final ReservationMapper reservationMapper;
+    private final TableLayoutService tableLayoutService;
 
     public ReservationHandlingFacade(
             CustomerService customerService,
             ScheduleService scheduleService,
             TablesService tablesService,
             ReservationsService reservationsService,
-            CacheUtils cacheUtils, ModelMapper modelMapper, ReservationMapper reservationMapper) {
+            CacheUtils cacheUtils,
+            ModelMapper modelMapper,
+            ReservationMapper reservationMapper,
+            TableLayoutService tableLayoutService) {
         this.customerService = customerService;
         this.scheduleService = scheduleService;
         this.tablesService = tablesService;
@@ -55,20 +61,35 @@ public class ReservationHandlingFacade {
         this.cacheUtils = cacheUtils;
         this.modelMapper = modelMapper;
         this.reservationMapper = reservationMapper;
+        this.tableLayoutService = tableLayoutService;
     }
 
     /**
      * Tries to create a new reservation
-     * @param reservationDTO A DTO passed by the controller, containing the state of the reservation to be scheduled
+     * @param reservationDTO A DTO passed by the controller, containing the state of the reservation to be scheduled.
+     * @param layout The chosen table layout
      * @return a Success object (carrying the tables assigned) if the reservation is successfully inserted, a
      * Failure object otherwise
      */
-    public ReservationAPIResult newReservation(ReservationDTO reservationDTO) {
+    public ReservationAPIResult newReservation(ReservationDTO reservationDTO, Long layoutId) {
+        initScheduleIfAbsent(
+                reservationDTO.getStartDateTime(),
+                reservationDTO.getEndDateTime()
+        );
 
-        initScheduleIfAbsent(reservationDTO.getStartDateTime(), reservationDTO.getEndDateTime());
         Customer customer = customerService.getCustomerById(reservationDTO.getCustomerId());
+        /*
+        TODO : INSERT SUCCESS / FAILURE FLOWS
+         */
         Reservation reservation = reservationMapper.toEntity(reservationDTO, customer);
-        Set<AbstractTable> reservationOutcome = reservationsService.newReservation(scheduleService, reservation);
+        // SimpleMatrixLayout layout = tableLayoutService.getLayoutById(layoutId);
+
+        Set<AbstractTable> reservationOutcome = reservationsService.newReservation(
+                scheduleService,
+                reservation,
+                layout
+        );
+
         if (!reservationOutcome.isEmpty()) {
             return new ReservationAPIResult.Success(
                     reservationOutcome,
@@ -79,7 +100,10 @@ public class ReservationHandlingFacade {
                     ReservationAPIError.NO_AVAILABLE_TABLES
             );
         }
+
+
     }
+
 
     private void initScheduleIfAbsent(String startDateTime, String endDateTime) {
         scheduleService.initScheduleIfAbsent(

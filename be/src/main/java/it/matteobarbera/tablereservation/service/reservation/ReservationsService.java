@@ -3,6 +3,7 @@ package it.matteobarbera.tablereservation.service.reservation;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.strategies.multitable.MultiTableReservationStrategy;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.repository.reservation.ReservationsRepository;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
 import it.matteobarbera.tablereservation.model.reservation.strategies.singletable.SingleTableReservationStrategy;
@@ -42,15 +43,39 @@ public class ReservationsService {
         );
     }
 
+
+    // TODO: TEMP
+    public Set<AbstractTable> newReservation(
+            ScheduleService scheduleService,
+            Reservation reservation,
+            SimpleMatrixLayout layout
+    ) {
+        Set<AbstractTable> singleTableOutcome = singleTableReservationStrategy.postReservation(scheduleService, reservation);
+        if (!singleTableOutcome.isEmpty())
+            return singleTableOutcome;
+        Set<AbstractTable> multiTableOutcome = multiTableReservationStrategy.postReservation(
+                scheduleService,
+                reservation,
+                layout
+        );
+        if (!multiTableOutcome.isEmpty())
+            return multiTableOutcome;
+        return Set.of();
+    }
+
+
+
+
     public Set<AbstractTable> newReservation(ScheduleService scheduleService, Reservation reservation) {
         Set<AbstractTable> singleTableOutcome = singleTableReservationStrategy.postReservation(scheduleService, reservation);
         if (!singleTableOutcome.isEmpty())
             return singleTableOutcome;
-        Set<AbstractTable> multiTableOutcome = multiTableReservationStrategy.postReservation(scheduleService, reservation);
+        Set<AbstractTable> multiTableOutcome = multiTableReservationStrategy.postReservation(
+                scheduleService,
+                reservation);
         if (!multiTableOutcome.isEmpty())
             return multiTableOutcome;
         return Set.of();
-
     }
 
 
