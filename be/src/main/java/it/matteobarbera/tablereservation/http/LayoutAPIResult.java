@@ -11,6 +11,18 @@ public abstract class LayoutAPIResult {
         return status;
     }
 
+    public boolean isSuccess(){
+        return this instanceof Success;
+    }
+
+    public Success getSuccess(){
+        if (isSuccess())
+            return (Success) this;
+        else
+            throw new ClassCastException("The layout result is not a success");
+    }
+
+
     public static class Success extends LayoutAPIResult {
         private final Object result;
         public Success(LayoutAPIInfo info){

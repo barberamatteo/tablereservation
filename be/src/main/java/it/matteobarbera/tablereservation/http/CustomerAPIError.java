@@ -5,7 +5,8 @@ public enum CustomerAPIError {
     CUSTOMER_WITH_EMAIL_ALREADY_EXISTS("The specified email %s is already associated with an existing customer." +
                                             "Please use another email."),
     CUSTOMER_WITH_PHONE_NUMBER_ALREADY_EXISTS("The specified phone number %s is already associated with an existing customer." +
-                                         "Please use another phone number");
+                                         "Please use another phone number"),
+    NO_SUCH_CUSTOMER_WITH_ID("No such customer with id %s exists");
     private final String template;
     CustomerAPIError(String template) {
         this.template = template;

@@ -3,11 +3,11 @@ package it.matteobarbera.tablereservation.facade;
 import it.matteobarbera.tablereservation.cache.CacheConstants;
 import it.matteobarbera.tablereservation.cache.CacheUtils;
 import it.matteobarbera.tablereservation.cache.ActionCacheEntry;
-import it.matteobarbera.tablereservation.http.ReservationAPIError;
-import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
-import it.matteobarbera.tablereservation.http.ReservationAPIResult;
+import it.matteobarbera.tablereservation.http.*;
 import it.matteobarbera.tablereservation.mapper.ReservationMapper;
 import it.matteobarbera.tablereservation.model.customer.Customer;
+import it.matteobarbera.tablereservation.model.customer.NoSuchCustomerWithIdException;
+import it.matteobarbera.tablereservation.model.table.layout.NoSuchLayoutWithIdException;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.customer.CustomerService;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
@@ -67,7 +67,7 @@ public class ReservationHandlingFacade {
     /**
      * Tries to create a new reservation
      * @param reservationDTO A DTO passed by the controller, containing the state of the reservation to be scheduled.
-     * @param layout The chosen table layout
+     * @param layoutId The chosen table layout id
      * @return a Success object (carrying the tables assigned) if the reservation is successfully inserted, a
      * Failure object otherwise
      */
@@ -77,12 +77,23 @@ public class ReservationHandlingFacade {
                 reservationDTO.getEndDateTime()
         );
 
-        Customer customer = customerService.getCustomerById(reservationDTO.getCustomerId());
-        /*
-        TODO : INSERT SUCCESS / FAILURE FLOWS
-         */
+        CustomerAPIResult customerAPIResult = customerService.getCustomerById(reservationDTO.getCustomerId());
+        if (!customerAPIResult.isSuccess())
+            throw new NoSuchCustomerWithIdException(
+                    reservationDTO.getCustomerId(),
+                    NoSuchCustomerWithIdException.Cause.NO_SUCH_CUSTOMER_WITH_ID
+            );
+
+        Customer customer = (Customer) customerAPIResult.getSuccess().getResult();
         Reservation reservation = reservationMapper.toEntity(reservationDTO, customer);
-        // SimpleMatrixLayout layout = tableLayoutService.getLayoutById(layoutId);
+        LayoutAPIResult layoutAPIResult = tableLayoutService.getLayoutById(layoutId);
+        if (!layoutAPIResult.isSuccess()){
+            throw new NoSuchLayoutWithIdException(+
+                    layoutId,
+                    NoSuchLayoutWithIdException.Cause.NO_SUCH_LAYOUT_WITH_ID
+            );
+        }
+        SimpleMatrixLayout layout = (SimpleMatrixLayout) layoutAPIResult.getSuccess().getResult();
 
         Set<AbstractTable> reservationOutcome = reservationsService.newReservation(
                 scheduleService,
@@ -207,6 +218,7 @@ public class ReservationHandlingFacade {
             if (!deleteReservation(reservation).isSuccess()){
                 return new ReservationAPIResult.Failure(ReservationAPIError.GENERAL_ERROR);
             }
+            // TODO: FIX
             ReservationAPIResult recreateResult = newReservation(ReservationDTO.from(reservation));
             if (recreateResult.getStatus() == ReservationAPIError.NO_AVAILABLE_TABLES) {
                 TransactionInterceptor.currentTransactionStatus().setRollbackOnly();

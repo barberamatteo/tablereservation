@@ -1,5 +1,8 @@
 package it.matteobarbera.tablereservation.service.customer;
 
+import it.matteobarbera.tablereservation.http.CustomerAPIError;
+import it.matteobarbera.tablereservation.http.CustomerAPIInfo;
+import it.matteobarbera.tablereservation.http.CustomerAPIResult;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.repository.customer.CustomerRepository;
@@ -21,8 +24,13 @@ public class CustomerService {
         return Set.copyOf(customerRepository.findAll());
     }
 
-    public Customer getCustomerById(Long customerId) {
-        return customerRepository.findById(customerId).orElse(null);
+    public CustomerAPIResult getCustomerById(Long customerId) {
+        var result = customerRepository.findById(customerId);
+        if (result.isPresent()) {
+            return new CustomerAPIResult.Success(result, CustomerAPIInfo.CUSTOMER_FETCHED_OK);
+        } else {
+            return new CustomerAPIResult.Failure(CustomerAPIError.NO_SUCH_CUSTOMER_WITH_ID);
+        }
     }
 
     public Customer getCustomerByPhoneNumber(String phoneNumber) {

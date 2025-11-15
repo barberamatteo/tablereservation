@@ -42,7 +42,7 @@ public class CustomerAPIResult {
     }
 
     public static class Failure extends CustomerAPIResult {
-        public Failure(CustomerAPIInfo error) {
+        public Failure(CustomerAPIError error) {
             super(error);
         }
         public CustomerAPIError getError(){

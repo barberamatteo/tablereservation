@@ -24,6 +24,8 @@ public class UnjoinableTableException extends AbstractBadRequestException {
         this.cause = cause;
     }
 
+
+
     @NonNull
     @Override
     public String getMessage() {
