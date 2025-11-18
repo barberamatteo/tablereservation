@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.Set;
 
-import static it.matteobarbera.tablereservation.http.TableAPIInfo.JOINABLE_TABLE_CREATED;
-import static it.matteobarbera.tablereservation.http.TableAPIInfo.TABLE_CREATED;
 import static it.matteobarbera.tablereservation.http.TablesAPIError.NO_SUCH_CATEGORY_DEFINED;
 import static it.matteobarbera.tablereservation.http.TablesAPIError.NUMBER_CONFLICT;
 import static it.matteobarbera.tablereservation.logging.TableLog.*;
@@ -157,7 +155,7 @@ public class AdminTablesCRUDRestApiController {
             );
         }
         if (table instanceof SimpleJoinableTable simpleJoinableTable) {
-            tablesService.createSimpleJoinableTable(simpleJoinableTable);
+            tablesService.saveSimpleJoinableTable(simpleJoinableTable);
             log.atInfo().log(SIMPLE_JOINABLE_TABLE_CREATED,
                     simpleJoinableTable.getNumberInLounge(),
                     simpleJoinableTable.getTableDefinition().getCategoryName(),

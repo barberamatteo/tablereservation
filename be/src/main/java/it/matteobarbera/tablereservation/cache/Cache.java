@@ -4,7 +4,6 @@ import it.matteobarbera.tablereservation.logging.CacheLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.stereotype.Component;
 
@@ -14,35 +13,33 @@ import static it.matteobarbera.tablereservation.logging.CacheLog.ACTION_TOKEN_CR
 
 
 @Component
-public class CacheUtils {
+public class Cache {
 
 
-    private static final Logger log = LoggerFactory.getLogger(CacheUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(Cache.class);
     private final ConcurrentMapCacheManager cacheManager;
 
     @Autowired
-    public CacheUtils(ConcurrentMapCacheManager cacheManager) {
+    public Cache(ConcurrentMapCacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
 
 
 
-    private Cache getTokenCache(){
+    private org.springframework.cache.Cache getTokenCache(){
         return cacheManager.getCache(CacheConstants.TOKEN_CACHE);
     }
 
     /**
      * Creates a random UUID associated with a domain object. Then it saves the token to the token cache
-     * @param action an action (validated at construction time)
-     * @param obj a domain object
+     * @param task a task object
      * @return the generated UUID
      */
-    public String createActionTokenBoundToObj(String action, Object obj){
+    public String createTokenBoundToTask(AbstractTask task){
         UUID token = UUID.randomUUID();
-        ActionCacheEntry<Object> entry = new ActionCacheEntry<>(obj, action);
-        getTokenCache().put(token, entry);
-        log.atInfo().log(ACTION_TOKEN_CREATED, token, obj, action);
+        getTokenCache().put(token, task);
+        log.atInfo().log(ACTION_TOKEN_CREATED, token, task);
         return token.toString();
     }
 
@@ -51,8 +48,8 @@ public class CacheUtils {
      * @param token the token of the required obj
      * @return an ActionCacheEntry record
      */
-    public ActionCacheEntry<?> getActionCacheEntryBoundToToken(String token){
-        Cache cache = getTokenCache();
+    public ActionCacheEntry<?> getTaskFromToken(String token){
+        org.springframework.cache.Cache cache = getTokenCache();
         UUID tokenUUID = UUID.fromString(token);
         ActionCacheEntry<?> toRet = cache.get(tokenUUID, ActionCacheEntry.class);
         cache.evict(tokenUUID);

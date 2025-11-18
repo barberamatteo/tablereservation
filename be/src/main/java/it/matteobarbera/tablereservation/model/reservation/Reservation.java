@@ -48,7 +48,8 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({
             @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
-            @JoinColumn(name = "date", referencedColumnName = "date")
+            @JoinColumn(name = "date", referencedColumnName = "date"),
+            @JoinColumn(name = "layout_id", referencedColumnName = "layout_id")
     })
     @JsonIgnore
     private Schedule schedule;

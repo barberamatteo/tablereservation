@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleTable;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.repository.reservation.ScheduleRepository;
 import it.matteobarbera.tablereservation.utils.DateUtils;
@@ -41,19 +42,24 @@ public class ScheduleService {
         scheduleRepository.saveAndFlush(schedule);
     }
 
-    public void initScheduleIfAbsent(TablesService tablesService, String arrivalDateTime, String leaveDateTime) {
+    public void initScheduleIfAbsent(
+            TablesService tablesService,
+            String arrivalDateTime,
+            String leaveDateTime,
+            SimpleMatrixLayout layout
+    ) {
         String arrivalDate = DateUtils.estrapolateDate(arrivalDateTime);
         String leaveDate = DateUtils.estrapolateDate(leaveDateTime);
 
         Set<AbstractTable> allTables = tablesService.getAllTables();
         if (scheduleRepository.getSchedulesByParsedDate(arrivalDate).isEmpty()) {
             scheduleRepository.saveAll(
-                    allTables.stream().map(table -> (new Schedule(table, arrivalDate))).toList()
+                    allTables.stream().map(table -> (new Schedule(table, arrivalDate, layout))).toList()
             );
         }
         if (scheduleRepository.getSchedulesByParsedDate(leaveDate).isEmpty()) {
             scheduleRepository.saveAll(
-                    allTables.stream().map(table -> (new Schedule(table, leaveDate))).toList()
+                    allTables.stream().map(table -> (new Schedule(table, leaveDate, layout))).toList()
             );
         }
     }

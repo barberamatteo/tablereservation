@@ -13,7 +13,7 @@ public enum ReservationAPIInfo {
             " has been updated successfully with a new number of people of " +
             "%d."
     ),
-
+    TOKEN_CREATED_OK(null),
     TOKEN_VALIDATION_OK(null);
     private final String template;
     ReservationAPIInfo(String template) {

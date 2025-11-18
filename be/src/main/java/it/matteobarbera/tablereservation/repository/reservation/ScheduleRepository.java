@@ -20,8 +20,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
     @Query(
             "SELECT s " +
             "FROM Schedule s " +
-            "WHERE s.id.parsedDate = :parsedDate AND s.id.table.tableDefinition.standaloneCapacity >= :numberOfPeople" +
-            " ORDER BY s.id.table.tableDefinition.standaloneCapacity ASC"
+            "WHERE s.id.parsedDate = :parsedDate AND s.table.tableDefinition.standaloneCapacity >= :numberOfPeople" +
+            " ORDER BY s.table.tableDefinition.standaloneCapacity ASC"
     )
     Set<Schedule> getSchedulesByParsedDateAndAdequateTable(String parsedDate, Integer numberOfPeople);
 

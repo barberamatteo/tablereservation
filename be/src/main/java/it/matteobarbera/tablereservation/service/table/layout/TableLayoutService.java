@@ -39,7 +39,7 @@ public class TableLayoutService {
     public LayoutAPIResult getLayoutById(Long id) {
         var res = tableLayoutRepository.findById(id);
         if (res.isPresent()) {
-            return new LayoutAPIResult.Success(res, LayoutAPIInfo.LAYOUT_FETCHED_OK);
+            return new LayoutAPIResult.Success(res.get(), LayoutAPIInfo.LAYOUT_FETCHED_OK);
         } else {
             return new LayoutAPIResult.Failure(LayoutAPIError.NO_SUCH_LAYOUT_WITH_ID);
         }

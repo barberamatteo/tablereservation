@@ -27,7 +27,7 @@ public class CustomerService {
     public CustomerAPIResult getCustomerById(Long customerId) {
         var result = customerRepository.findById(customerId);
         if (result.isPresent()) {
-            return new CustomerAPIResult.Success(result, CustomerAPIInfo.CUSTOMER_FETCHED_OK);
+            return new CustomerAPIResult.Success(result.get(), CustomerAPIInfo.CUSTOMER_FETCHED_OK);
         } else {
             return new CustomerAPIResult.Failure(CustomerAPIError.NO_SUCH_CUSTOMER_WITH_ID);
         }

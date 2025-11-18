@@ -1,5 +1,8 @@
 package it.matteobarbera.tablereservation.service.reservation;
 
+import it.matteobarbera.tablereservation.http.ReservationAPIError;
+import it.matteobarbera.tablereservation.http.ReservationAPIInfo;
+import it.matteobarbera.tablereservation.http.ReservationAPIResult;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.strategies.multitable.MultiTableReservationStrategy;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
@@ -66,23 +69,15 @@ public class ReservationsService {
 
 
 
-    public Set<AbstractTable> newReservation(ScheduleService scheduleService, Reservation reservation) {
-        Set<AbstractTable> singleTableOutcome = singleTableReservationStrategy.postReservation(scheduleService, reservation);
-        if (!singleTableOutcome.isEmpty())
-            return singleTableOutcome;
-        Set<AbstractTable> multiTableOutcome = multiTableReservationStrategy.postReservation(
-                scheduleService,
-                reservation);
-        if (!multiTableOutcome.isEmpty())
-            return multiTableOutcome;
-        return Set.of();
-    }
 
 
-    public Reservation getReservationById(Long reservationId) {
-        return reservationsRepository
-                .findById(reservationId)
-                .orElse(null);
+    public ReservationAPIResult getReservationById(Long reservationId) {
+        var result = reservationsRepository.findById(reservationId);
+        if (result.isPresent()) {
+            return new ReservationAPIResult.Success(result, ReservationAPIInfo.RESERVATION_FETCHED_OK);
+        } else {
+            return new ReservationAPIResult.Failure(ReservationAPIError.NO_RESERVATION_WITH_ID);
+        }
     }
 
     public Boolean isNumberOfPeopleUpdatableWithoutRescheduling(Reservation reservation, Integer numberOfPeople) {

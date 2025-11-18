@@ -39,7 +39,7 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
     private Set<SimpleJoinableTable> extractJoinableTables(Set<Schedule> schedules) {
         Set<SimpleJoinableTable> toRet = new HashSet<>();
         for (Schedule schedule : schedules) {
-            if (schedule.getId().getTable() instanceof SimpleJoinableTable table) {
+            if (schedule.getTable() instanceof SimpleJoinableTable table) {
                 toRet.add(table);
             }
         }

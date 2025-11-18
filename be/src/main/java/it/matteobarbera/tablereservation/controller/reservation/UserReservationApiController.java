@@ -9,7 +9,7 @@ import it.matteobarbera.tablereservation.http.response.CommonJSONBodies;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.model.preferences.UserPreferences;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
-import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
+import it.matteobarbera.tablereservation.orchestrator.ReservationHandlingOrchestrator;
 import it.matteobarbera.tablereservation.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +33,15 @@ import static it.matteobarbera.tablereservation.logging.ReservationLog.*;
 public class UserReservationApiController {
 
     private static final Logger log = LoggerFactory.getLogger(UserReservationApiController.class);
-    private final ReservationHandlingFacade reservationHandlingFacade;
+    private final ReservationHandlingOrchestrator reservationHandlingOrchestrator;
     private final UserPreferences userPreferences;
 
     @Autowired
     public UserReservationApiController(
-            ReservationHandlingFacade reservationHandlingFacade,
+            ReservationHandlingOrchestrator reservationHandlingOrchestrator,
             UserPreferences userPreferences
     ) {
-        this.reservationHandlingFacade = reservationHandlingFacade;
+        this.reservationHandlingOrchestrator = reservationHandlingOrchestrator;
         this.userPreferences = userPreferences;
     }
 
@@ -94,7 +94,7 @@ public class UserReservationApiController {
                         );
             }
         }
-        ReservationAPIResult result = reservationHandlingFacade.newReservation(reservationDTO, layoutId);
+        ReservationAPIResult result = reservationHandlingOrchestrator.newReservation(reservationDTO, layoutId);
 
 
         if (result.isSuccess()) {
@@ -148,7 +148,7 @@ public class UserReservationApiController {
             @RequestParam(name="reservation_id") Long reservationId
     ){
 
-        ReservationAPIResult result = reservationHandlingFacade.deleteReservation(reservationId);
+        ReservationAPIResult result = reservationHandlingOrchestrator.deleteReservation(reservationId);
 
         if (result.isSuccess()) {
             log.atInfo().log(RESERVATION_DELETED, reservationId);
@@ -203,7 +203,7 @@ public class UserReservationApiController {
     })
     @GetMapping("/get/")
     public ResponseEntity<?> getReservation(@RequestParam Long id){
-        ReservationAPIResult result = reservationHandlingFacade.getReservationById(id);
+        ReservationAPIResult result = reservationHandlingOrchestrator.getReservationById(id);
         if (result.isSuccess()) {
             log.atInfo().log(RESERVATION_FOUND_WITH_ID, ((Reservation) result.getSuccess().getResult()).getId());
             return ResponseEntity
@@ -240,7 +240,7 @@ public class UserReservationApiController {
     @CrossOrigin
     @GetMapping("/getallbyday/")
     public ResponseEntity<?> getAllReservationsByDay(@RequestParam String day){
-        ReservationAPIResult result = reservationHandlingFacade.getAllReservationsByDay(day);
+        ReservationAPIResult result = reservationHandlingOrchestrator.getAllReservationsByDay(day);
         if (result.isSuccess()){
             log.atInfo().log(ALL_RESERVATIONS_FOUND, "", day);
             return ResponseEntity.ok(result.getSuccess().getResult());
@@ -279,7 +279,7 @@ public class UserReservationApiController {
     public ResponseEntity<?> getAllTodayReservations(){
 
 
-        ReservationAPIResult result = reservationHandlingFacade.getAllTodayReservations();
+        ReservationAPIResult result = reservationHandlingOrchestrator.getAllTodayReservations();
         if (result.isSuccess()){
             log.atInfo().log(ALL_RESERVATIONS_FOUND, "to", "");
             return ResponseEntity.ok(result.getSuccess().getResult());
@@ -337,8 +337,9 @@ public class UserReservationApiController {
     ){
 
         ReservationAPIResult result =
-                reservationHandlingFacade.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
-        if (result.isSuccess() && result.getStatus() == RESERVATION_UPDATE_OK) {
+                reservationHandlingOrchestrator.editReservationNumberOfPeople(reservationId, newNumberOfPeople);
+
+        if (result.isSuccess()){
             log.atInfo().log(RESERVATION_UPDATED, reservationId);
             return ResponseEntity
                     .ok()
@@ -349,10 +350,12 @@ public class UserReservationApiController {
                                     RESERVATION_UPDATE_OK.getMessage(reservationId, newNumberOfPeople)
                             )
                     );
-        } else {
-            if (result.getStatus() == NO_RESERVATION_WITH_ID) {
+        }
+
+        return switch (result.getFailure().getError()) {
+            case NO_RESERVATION_WITH_ID -> {
                 log.atError().log(NO_RESERVATION_TO_UPDATE, reservationId);
-                return ResponseEntity
+                yield ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
@@ -362,9 +365,10 @@ public class UserReservationApiController {
                                 )
                         );
             }
-            if (result.getStatus() == NO_RESERVATION_WITH_ID_IN_SCHEDULE){
+
+            case NO_RESERVATION_WITH_ID_IN_SCHEDULE -> {
                 log.atError().log(NO_RESERVATION_TO_UPDATE_IN_SCHEDULE, reservationId);
-                return ResponseEntity
+                yield ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
@@ -374,33 +378,35 @@ public class UserReservationApiController {
                                 )
                         );
             }
-            if (result.getStatus() == NEED_TO_RESCHEDULE){
+            case NEED_TO_RESCHEDULE -> {
                 log.atWarn().log(RESERVATION_TO_RESCHEDULE, reservationId);
 
-                String token = reservationHandlingFacade.triggerUpdateNumberOfPeopleTokenCreation(
-                        reservationId,
-                        newNumberOfPeople
-                );
+                ReservationAPIResult tokenGenerationTrigger =
+                        reservationHandlingOrchestrator.triggerUpdateNumberOfPeopleTokenCreation(
+                                reservationId,
+                                newNumberOfPeople
+                        );
 
 
-                return ResponseEntity
+
+
+                yield ResponseEntity
                         .status(HttpStatus.SEE_OTHER.value())
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(
                                 CommonJSONBodies.fromStatusAndMsgAndX(
                                         HttpStatus.SEE_OTHER.value(),
                                         NEED_TO_RESCHEDULE.getMessage(),
-                                        Map.of(CacheConstants.TOKEN, token)
+                                        Map.of(CacheConstants.TOKEN, tokenGenerationTrigger.getSuccess().get())
                                 )
                         );
             }
 
-        }
+            default -> defaultError();
+        };
 
-
-
-        return defaultError();
     }
+
 
     @Operation(
             summary = "Confirm the reschedule of a reservation",
@@ -424,7 +430,7 @@ public class UserReservationApiController {
     public ResponseEntity<?> performPatchByToken(
             @RequestParam(name = "token") String token
     ){
-        ReservationAPIResult res = reservationHandlingFacade.performActionFromToken(token);
+        ReservationAPIResult res = reservationHandlingOrchestrator.performActionFromToken(token);
         if (res.isSuccess()){
             log.atInfo().log(RESERVATION_UPDATED_AFTER_TOKEN_CONSUMING, token);
             return ResponseEntity.ok(

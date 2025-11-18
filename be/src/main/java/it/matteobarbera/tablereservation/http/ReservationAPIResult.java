@@ -45,6 +45,10 @@ public abstract class ReservationAPIResult {
         public Object getResult() {
             return result;
         }
+
+        public <T> T get(){
+            return (T) result;
+        }
         public ReservationAPIInfo getInfo() {
             return (ReservationAPIInfo) status;
         }

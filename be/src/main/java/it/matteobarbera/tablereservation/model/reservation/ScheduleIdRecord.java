@@ -1,57 +1,43 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
-import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
 public class ScheduleIdRecord implements Serializable{
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "table_id", nullable = false)
-    private AbstractTable table;
+
+    @Column(name = "table_id")
+    private Long tableId;
 
     @Column(name = "date")
     private String parsedDate;
 
+    @Column(name = "layout_id")
+    private Long layoutId;
+
     public ScheduleIdRecord() {
     }
 
-    public ScheduleIdRecord(AbstractTable table, String parsedDate) {
-        this.table = table;
+    public ScheduleIdRecord(Long tableId, String parsedDate, Long layoutId) {
+        this.tableId = tableId;
         this.parsedDate = parsedDate;
-    }
-
-    public AbstractTable getTable() {
-        return table;
-    }
-
-    public void setTable(AbstractTable table) {
-        this.table = table;
-    }
-
-    public String getParsedDate() {
-        return parsedDate;
-    }
-
-    public void setParsedDate(String parsedDate) {
-        this.parsedDate = parsedDate;
+        this.layoutId = layoutId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ScheduleIdRecord that)) return false;
-        return Objects.equals(table, that.table) && Objects.equals(parsedDate, that.parsedDate);
+        return
+                Objects.equals(tableId, that.tableId)
+                        && Objects.equals(parsedDate, that.parsedDate)
+                        && Objects.equals(layoutId, that.layoutId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(table, parsedDate);
+        return Objects.hash(tableId, parsedDate, layoutId);
     }
 }
 

@@ -23,6 +23,7 @@ public class CustomerAPIResult {
     }
 
 
+
     public static class Success extends CustomerAPIResult {
         private final Object result;
         public Success(CustomerAPIInfo info) {
@@ -38,6 +39,7 @@ public class CustomerAPIResult {
         public Object getResult() {
             return result;
         }
+
 
     }
 

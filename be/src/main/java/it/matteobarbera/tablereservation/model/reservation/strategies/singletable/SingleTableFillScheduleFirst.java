@@ -37,7 +37,7 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
 
             }
                 if (!conflictualReservation) {
-                    jointTables.add(schedule.getId().getTable());
+                    jointTables.add(schedule.getTable());
                     reservation.setJointTables(jointTables);
                     schedule.addReservation(reservation);
                     reservation.setSchedule(schedule);

@@ -1,6 +1,7 @@
 package it.matteobarbera.tablereservation.model.reservation;
 
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
+import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -14,6 +15,16 @@ public class Schedule {
     @EmbeddedId
     private ScheduleIdRecord id;
 
+    @MapsId("tableId")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "table_id", nullable = false)
+    private AbstractTable table;
+
+
+    @MapsId("layoutId")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "layout_id", nullable = false)
+    private SimpleMatrixLayout layout;
 
     @OneToMany(
             cascade = CascadeType.ALL,
@@ -26,8 +37,10 @@ public class Schedule {
 
 
 
-    public Schedule(AbstractTable table, String parsedDate) {
-        this.id = new ScheduleIdRecord(table, parsedDate);
+    public Schedule(AbstractTable table, String parsedDate, SimpleMatrixLayout layout) {
+        this.table = table;
+        this.layout = layout;
+        this.id = new ScheduleIdRecord(table.getId(), parsedDate, layout.getId());
     }
 
     public ScheduleIdRecord getId() {
@@ -42,10 +55,21 @@ public class Schedule {
         return reservations;
     }
 
-    public void setReservations(Set<Reservation> reservations) {
-        this.reservations = reservations;
+    public AbstractTable getTable() {
+        return table;
     }
 
+    public void setTable(AbstractTable table) {
+        this.table = table;
+    }
+
+    public SimpleMatrixLayout getLayout() {
+        return layout;
+    }
+
+    public void setLayout(SimpleMatrixLayout layout) {
+        this.layout = layout;
+    }
 
     public void addReservation(Reservation reservation) {
         this.reservations.add(reservation);

@@ -10,7 +10,7 @@ import it.matteobarbera.tablereservation.model.dto.CustomerDTO;
 import it.matteobarbera.tablereservation.model.dto.ReservationDTO;
 import it.matteobarbera.tablereservation.service.table.TablesDefinitionService;
 import it.matteobarbera.tablereservation.service.table.TablesService;
-import it.matteobarbera.tablereservation.facade.ReservationHandlingFacade;
+import it.matteobarbera.tablereservation.orchestrator.ReservationHandlingOrchestrator;
 import it.matteobarbera.tablereservation.service.security.SecurityService;
 import it.matteobarbera.tablereservation.service.table.layout.TableLayoutService;
 import org.modelmapper.ModelMapper;
@@ -35,7 +35,7 @@ public class DebugConfig {
             TablesService tablesService,
             CustomerService customerService,
             SecurityService securityService,
-            ReservationHandlingFacade reservationHandlingFacade,
+            ReservationHandlingOrchestrator reservationHandlingOrchestrator,
             ModelMapper modelMapper, TableLayoutService tableLayoutService) {
         return args -> {
             CustomerDTO customerDTO = new CustomerDTO(
@@ -59,15 +59,16 @@ public class DebugConfig {
             SimpleJoinableTable t5 = new SimpleJoinableTable(5, piccoloDef);
             SimpleJoinableTable t6 = new SimpleJoinableTable(6, piccoloDef);
 
-            tablesService.createSimpleJoinableTable(t1);
-            tablesService.createSimpleJoinableTable(t2);
-            tablesService.createSimpleJoinableTable(t3);
-            tablesService.createSimpleJoinableTable(t4);
-            tablesService.createSimpleJoinableTable(t5);
-            tablesService.createSimpleJoinableTable(t6);
+            tablesService.saveSimpleJoinableTable(t1);
+            tablesService.saveSimpleJoinableTable(t2);
+            tablesService.saveSimpleJoinableTable(t3);
+            tablesService.saveSimpleJoinableTable(t4);
+            tablesService.saveSimpleJoinableTable(t5);
+            tablesService.saveSimpleJoinableTable(t6);
 
             Set<AbstractTable> joinableTables = Set.of(t1, t2, t3, t4, t5, t6);
             SimpleMatrixLayout layout = new SimpleMatrixLayout("Layout1", joinableTables);
+
             layout.connect(t1, t2);
             layout.connect(t1, t3);
             layout.connect(t2, t4);
@@ -76,23 +77,23 @@ public class DebugConfig {
 
             securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
             securityService.createAdmin("admin_pm", "admin"); //Postman admin for debugging/testing
-            reservationHandlingFacade.newReservation(
+            reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
-                            1L,
+                            customer.getId(),
                             "2030-01-01T00:00:00",
                             "2030-01-01T02:00:00",
                             4
                     ),
-                    layout
+                    layout.getId()
             );
-            reservationHandlingFacade.newReservation(
+            reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
-                            1L,
+                            customer.getId(),
                             "2030-01-01T00:00:00",
                             "2030-01-01T02:00:00",
                             6
                     ),
-                    layout
+                    layout.getId()
             );
         };
     }
