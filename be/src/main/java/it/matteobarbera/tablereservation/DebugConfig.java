@@ -77,6 +77,16 @@ public class DebugConfig {
 
             securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
             securityService.createAdmin("admin_pm", "admin"); //Postman admin for debugging/testing
+            var res = reservationHandlingOrchestrator.newReservation(
+                    new ReservationDTO(
+                            customer.getId(),
+                            "2030-01-01T00:00:00",
+                            "2030-01-01T02:00:00",
+                            10
+                    ),
+                    layout.getId()
+            );
+            log.info(res.getSuccess().get());
             reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),

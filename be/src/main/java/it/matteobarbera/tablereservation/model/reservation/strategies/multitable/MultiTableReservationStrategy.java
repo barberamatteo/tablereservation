@@ -6,6 +6,7 @@ import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MultiTableReservationStrategy {

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -30,10 +31,13 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
         );
         var joinableTables = extractJoinableTables(intervalCompliantSchedules);
         var subsetSumSolver = new SubsetSumSolver<>(joinableTables.stream().toList());
-        var subsetsOfCapacities = subsetSumSolver.getSubsetsOfCapacities(reservation.getNumberOfPeople());
+        var subsetOfCapacities = subsetSumSolver.getBestSubsetOfCapacities(reservation.getNumberOfPeople());
 
 
-        return null;
+        return layout.findBestPathWithExclusionsAndCapacities(
+                joinableTables,
+                subsetOfCapacities
+        );
     }
 
     private Set<SimpleJoinableTable> extractJoinableTables(Set<Schedule> schedules) {

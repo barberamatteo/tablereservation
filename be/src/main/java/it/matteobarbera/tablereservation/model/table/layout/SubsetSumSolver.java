@@ -1,22 +1,32 @@
 package it.matteobarbera.tablereservation.model.table.layout;
 
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 public final class SubsetSumSolver<TableType extends SimpleJoinableTable> {
 
+    private static final Logger log = LoggerFactory.getLogger(SubsetSumSolver.class);
     private final List<TableType> pool;
 
 
     public SubsetSumSolver(List<TableType> pool) {
-        this.pool = pool;
-        pool.sort(Comparator.comparingInt(TableType::getStandaloneCapacity));
+        this.pool = new ArrayList<>(pool);
+        this.pool.sort(Comparator.comparingInt(TableType::getStandaloneCapacity));
 
     }
 
-    public List<List<Integer>> getSubsetsOfCapacities(int target){
+    public List<Integer> getBestSubsetOfCapacities(int target){
+        var subsets = getSubsetsOfCapacities(target);
+        var treeSet = new TreeSet<List<Integer>>(Comparator.comparingInt(List::size));
+        treeSet.addAll(subsets);
+        return treeSet.first();
+
+    }
+    private List<List<Integer>> getSubsetsOfCapacities(int target){
         Integer[] capacities = pool.stream().map(TableType::getStandaloneCapacity).toArray(Integer[]::new);
         return subsetSum(capacities, target);
     }

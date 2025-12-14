@@ -78,15 +78,15 @@ public class TableGraph {
         return adjacencyTable.get(t1).remove(t2) && adjacencyTable.get(t2).remove(t1) && sanityCheck;
     }
 
-    public Set<List<SimpleJoinableTable>> getAllPaths(Set<SimpleJoinableTable> tables, List<Integer> capacities){
-        Set<List<SimpleJoinableTable>> paths = new HashSet<>();
+    public Set<Set<AbstractTable>> getAllPaths(Set<SimpleJoinableTable> tables, List<Integer> capacities){
+        Set<Set<AbstractTable>> paths = new HashSet<>();
         for (SimpleJoinableTable table : tables) {
             paths.addAll(getAllPathsByStartingTable(table, capacities));
         }
         return paths;
     }
 
-    public Set<List<SimpleJoinableTable>> getAllPathsByStartingTable(
+    public Set<Set<AbstractTable>> getAllPathsByStartingTable(
             SimpleJoinableTable start,
             List<Integer> capacities
     ){
@@ -97,7 +97,11 @@ public class TableGraph {
         pathCapacity.remove(Integer.valueOf(start.getStandaloneCapacity()));
 
         buildPath(paths, path, start, pathCapacity);
-        return paths;
+        Set<Set<AbstractTable>> toRet = new HashSet<>();
+        for (var calculatedPath : paths){
+            toRet.add(new HashSet<>(calculatedPath));
+        }
+        return toRet;
     }
 
     private void buildPath(

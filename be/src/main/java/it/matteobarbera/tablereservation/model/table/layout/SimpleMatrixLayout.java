@@ -68,18 +68,21 @@ public class SimpleMatrixLayout {
 
 
     // TODO: Align table type (remove List<AbstractTable> ---> List<SimpleJoinableTable> conversion)
-    public List<SimpleJoinableTable> findBestPathWithExclusionsAndCapacities(
-            Set<AbstractTable> whitelistedTables,
+    public Set<AbstractTable> findBestPathWithExclusionsAndCapacities(
+            Set<SimpleJoinableTable> whitelistedTables,
             List<Integer> capacities
     ){
         var allPaths = tableGraph.getAllPaths(
-                whitelistedTables.stream().map(abstractTable -> new SimpleJoinableTable(abstractTable.getNumberInLounge(), abstractTable.getTableDefinition())).collect(Collectors.toSet()),
+                whitelistedTables.stream().map(
+                        table -> new SimpleJoinableTable(
+                                table.getNumberInLounge(),
+                                table.getTableDefinition()
+                        )).collect(Collectors.toSet()),
                 capacities
         );
 
         PathOptimizationPipeline pipeline = new PathOptimizationPipeline(allPaths);
-        var aPath = pipeline.getShortest().getRandom();
-        return aPath;
+        return pipeline.getShortest().getRandom();
 
     }
 
@@ -90,13 +93,13 @@ public class SimpleMatrixLayout {
 
 
     private static final class PathOptimizationPipeline {
-        private Set<List<SimpleJoinableTable>> paths;
-        public PathOptimizationPipeline(Set<List<SimpleJoinableTable>> paths) {
+        private Set<Set<AbstractTable>> paths;
+        public PathOptimizationPipeline(Set<Set<AbstractTable>> paths) {
             this.paths = paths;
         }
 
         public PathOptimizationPipeline getShortest(){
-            TreeSet<List<SimpleJoinableTable>> pathsOrderedBySize = new TreeSet<>(Comparator.comparingInt(List::size));
+            TreeSet<Set<AbstractTable>> pathsOrderedBySize = new TreeSet<>(Comparator.comparingInt(Set::size));
             pathsOrderedBySize.addAll(paths);
             int minLength = pathsOrderedBySize.first().size();
 
@@ -107,7 +110,7 @@ public class SimpleMatrixLayout {
         }
 
 
-        public List<SimpleJoinableTable> getRandom(){
+        public Set<AbstractTable> getRandom(){
             return paths.iterator().next();
         }
 
