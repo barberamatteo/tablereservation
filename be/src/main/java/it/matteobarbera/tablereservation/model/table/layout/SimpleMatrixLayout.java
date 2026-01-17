@@ -73,11 +73,7 @@ public class SimpleMatrixLayout {
             List<Integer> capacities
     ){
         var allPaths = tableGraph.getAllPaths(
-                whitelistedTables.stream().map(
-                        table -> new SimpleJoinableTable(
-                                table.getNumberInLounge(),
-                                table.getTableDefinition()
-                        )).collect(Collectors.toSet()),
+                whitelistedTables,
                 capacities
         );
 

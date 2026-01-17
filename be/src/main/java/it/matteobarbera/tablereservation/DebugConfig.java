@@ -74,19 +74,23 @@ public class DebugConfig {
             layout.connect(t2, t4);
             tableLayoutService.saveLayout(layout);
 
-
             securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
             securityService.createAdmin("admin_pm", "admin"); //Postman admin for debugging/testing
+
+
+            SimpleMatrixLayout fetchedLayout = (SimpleMatrixLayout) tableLayoutService.getLayoutById(1L).getSuccess().getResult();
+
+
             var res = reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),
-                            "2030-01-01T00:00:00",
+                            "2030-01-01T01:00:00",
                             "2030-01-01T02:00:00",
                             10
                     ),
-                    layout.getId()
+                    fetchedLayout.getId()
             );
-            log.info(res.getSuccess().get());
+            log.warn(res.getStatus().toString());
             reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),
@@ -94,7 +98,7 @@ public class DebugConfig {
                             "2030-01-01T02:00:00",
                             4
                     ),
-                    layout.getId()
+                    fetchedLayout.getId()
             );
             reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(

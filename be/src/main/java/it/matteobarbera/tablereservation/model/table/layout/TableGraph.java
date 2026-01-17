@@ -37,28 +37,35 @@ public class TableGraph {
 
     public TableGraph(Collection<AbstractTable> tables) {
         this.tables = new HashSet<>(tables);
-        initAdjacencyMap();
-
+        this.adjacencyTable = new HashMap<>();
+        tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
     }
 
+
     @PostLoad
-    public void loadTables(){
+    private void graphInit(){
         if (tables == null) {
             tables = new HashSet<>();
             tables.addAll(edges.stream().map(TableEdge::getT1).collect(Collectors.toSet()));
             tables.addAll(edges.stream().map(TableEdge::getT2).collect(Collectors.toSet()));
         }
+        if (adjacencyTable == null){
+            adjacencyTable = new HashMap<>();
+            tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
+
+            edges.forEach(edge -> {
+                adjacencyTable.get(edge.getT1()).add(edge.getT2());
+                adjacencyTable.get(edge.getT2()).add(edge.getT1());
+            });
+        }
     }
+
+
 
 
     public TableGraph() {
     }
 
-
-    private void initAdjacencyMap() {
-        this.adjacencyTable = new HashMap<>();
-        tables.forEach(table -> adjacencyTable.put(table, new HashSet<>()));
-    }
 
     public boolean containsTable(AbstractTable table) {
         return adjacencyTable.containsKey(table);
@@ -114,8 +121,7 @@ public class TableGraph {
             paths.add(new ArrayList<>(path));
             return;
         }
-
-        for (AbstractTable currTable : adjacencyTable.get(start)) {
+        for (AbstractTable currTable : adjacencyTable.getOrDefault(start, Set.of())) {
             if (currTable instanceof SimpleJoinableTable currSimpleJoinableTable) {
                 if (path.contains(currSimpleJoinableTable))
                     continue;
