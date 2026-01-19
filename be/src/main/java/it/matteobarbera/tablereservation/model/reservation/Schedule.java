@@ -13,7 +13,7 @@ import java.util.Set;
 public class Schedule {
 
     @EmbeddedId
-    private ScheduleIdRecord id;
+    public ScheduleIdRecord id;
 
     @MapsId("tableId")
     @ManyToOne(optional = false)
@@ -26,11 +26,8 @@ public class Schedule {
     @JoinColumn(name = "layout_id", nullable = false)
     private SimpleMatrixLayout layout;
 
-    @OneToMany(
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
-    )
-    private Set<Reservation> reservations = new HashSet<>();
+    @ManyToMany
+    private Set<Reservation> reservations;
 
     public Schedule() {
     }
@@ -73,7 +70,7 @@ public class Schedule {
 
     public void addReservation(Reservation reservation) {
         this.reservations.add(reservation);
-        reservation.setSchedule(this);
+        reservation.addSchedule(this);
     }
 
     public boolean removeReservation(Reservation reservation) {

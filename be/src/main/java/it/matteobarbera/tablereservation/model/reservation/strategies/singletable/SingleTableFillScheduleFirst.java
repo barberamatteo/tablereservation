@@ -2,6 +2,7 @@ package it.matteobarbera.tablereservation.model.reservation.strategies.singletab
 
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
+import it.matteobarbera.tablereservation.service.SingleTableReservationPersister;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import org.springframework.context.annotation.Primary;
@@ -15,7 +16,10 @@ import java.util.Set;
 public class SingleTableFillScheduleFirst implements SingleTableReservationStrategy {
 
 
-    public SingleTableFillScheduleFirst() {
+    private final SingleTableReservationPersister singleTableReservationPersister;
+
+    public SingleTableFillScheduleFirst(SingleTableReservationPersister singleTableReservationPersister) {
+        this.singleTableReservationPersister = singleTableReservationPersister;
     }
 
 
@@ -37,11 +41,11 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
 
             }
                 if (!conflictualReservation) {
-                    jointTables.add(schedule.getTable());
-                    reservation.setJointTables(jointTables);
-                    schedule.addReservation(reservation);
-                    reservation.setSchedule(schedule);
-                    scheduleService.addReservationToSchedule(schedule);
+                    singleTableReservationPersister.persist(
+                            reservation,
+                            jointTables,
+                            Set.of(schedule)
+                    );
                     return jointTables;
                 }
             }

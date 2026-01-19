@@ -96,4 +96,8 @@ public class ReservationsService {
     public Set<Reservation> getAllReservationsByDay(String day) {
         return Set.copyOf(reservationsRepository.getAllByDate(day));
     }
+
+    public void saveReservation(Reservation reservation) {
+        reservationsRepository.save(reservation);
+    }
 }

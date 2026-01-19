@@ -2,6 +2,7 @@ package it.matteobarbera.tablereservation.model.reservation;
 
 import jakarta.persistence.Embeddable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Embeddable
@@ -38,6 +39,13 @@ public class Interval {
         this.startDateTime = start;
     }
 
+    public LocalDate getStartDate(){
+        return this.startDateTime.toLocalDate();
+    }
+
+    public LocalDate getEndDate(){
+        return this.endDateTime.toLocalDate();
+    }
     public boolean clashes(Interval other){
         return
                 !this.endDateTime.isEqual(other.startDateTime)

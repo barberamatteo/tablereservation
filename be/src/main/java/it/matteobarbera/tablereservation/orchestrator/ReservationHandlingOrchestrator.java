@@ -220,7 +220,7 @@ public class ReservationHandlingOrchestrator {
             // TODO: FIX
             ReservationAPIResult recreateResult = newReservation(
                     ReservationDTO.from(reservation),
-                    reservation.getSchedule().getLayout().getId()
+                    null/*reservation.getSchedule().getLayout().getId()*/
             );
             if (recreateResult.getStatus() == ReservationAPIError.NO_AVAILABLE_TABLES) {
                 TransactionInterceptor.currentTransactionStatus().setRollbackOnly();

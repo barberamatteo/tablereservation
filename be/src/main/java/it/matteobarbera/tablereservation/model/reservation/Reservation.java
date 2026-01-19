@@ -4,14 +4,13 @@ package it.matteobarbera.tablereservation.model.reservation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.matteobarbera.tablereservation.model.customer.Customer;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table
@@ -45,27 +44,27 @@ public class Reservation {
 
     private Integer numberOfPeople;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({
+    @ManyToMany(fetch = FetchType.EAGER)
+    /*@JoinColumns({
             @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
             @JoinColumn(name = "date", referencedColumnName = "date"),
             @JoinColumn(name = "layout_id", referencedColumnName = "layout_id")
-    })
+    })*/
     @JsonIgnore
-    private Schedule schedule;
+    private Set<Schedule> schedules;
 
     public Reservation(
             Set<AbstractTable> jointTables,
             Interval interval,
             Customer customer,
             Integer numberOfPeople,
-            Schedule schedule
+            Set<Schedule> schedules
     ) {
         this.jointTables = jointTables;
         this.interval = interval;
         this.customer = customer;
         this.numberOfPeople = numberOfPeople;
-        this.schedule = schedule;
+        this.schedules = schedules;
     }
 
     public Reservation(
@@ -88,13 +87,13 @@ public class Reservation {
         this(startDateTime, endDateTime, null, numberOfPeople);
     }
 
-    public Reservation(Reservation reservation, Schedule schedule) {
+    public Reservation(Reservation reservation, Set<Schedule> schedules) {
         this(
                 reservation.jointTables,
                 reservation.interval,
                 reservation.customer,
                 reservation.numberOfPeople,
-                schedule
+                schedules
         );
     }
     public Reservation() {
@@ -141,12 +140,28 @@ public class Reservation {
         this.numberOfPeople = numberOfPeople;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
+    public Set<Schedule> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public void setSchedules(Set<Schedule> schedule) {
+        this.schedules = schedule;
+    }
+
+    public void addSchedule(Schedule schedule){
+        if (this.schedules == null) {
+            this.schedules = new HashSet<>();
+            this.schedules.add(schedule);
+        } else {
+            this.schedules.add(schedule);
+        }
+    }
+    public LocalDate getStartDate(){
+        return this.interval.getStartDate();
+    }
+
+    public LocalDate getEndDate(){
+        return this.interval.getEndDate();
     }
 
     @Override

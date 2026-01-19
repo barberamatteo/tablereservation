@@ -91,7 +91,7 @@ public class DebugConfig {
                     fetchedLayout.getId()
             );
             log.warn(res.getStatus().toString());
-            reservationHandlingOrchestrator.newReservation(
+            /*reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),
                             "2030-01-01T00:00:00",
@@ -107,8 +107,8 @@ public class DebugConfig {
                             "2030-01-01T02:00:00",
                             6
                     ),
-                    layout.getId()
-            );
+                    fetchedLayout.getId()
+            );*/
         };
     }
 }

@@ -4,7 +4,7 @@ import it.matteobarbera.tablereservation.model.reservation.Interval;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleTable;
+import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.repository.reservation.ScheduleRepository;
@@ -28,6 +28,12 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
 
+    public Schedule getScheduleById(LocalDate day, Long tableId){
+        return scheduleRepository
+                .getScheduleByRecordId(day, tableId)
+                .orElse(null);
+    }
+
     @Transactional
     public Set<Schedule> getSchedulesByDayAndAdequateTable(LocalDate localDate, Integer numberOfPeople) {
         return scheduleRepository.getSchedulesByParsedDateAndAdequateTable(
@@ -38,8 +44,12 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void addReservationToSchedule(Schedule schedule) {
+    public void updateScheduleTransactional(Schedule schedule) {
         scheduleRepository.saveAndFlush(schedule);
+    }
+
+    public void updateSchedules(Set<Schedule> schedules){
+        scheduleRepository.saveAll(schedules);
     }
 
     public void initScheduleIfAbsent(
@@ -71,6 +81,8 @@ public class ScheduleService {
                         null
                 );
     }
+
+
 
     private void updateSchedule(Schedule scheduleOfReservation) {
         scheduleRepository.save(scheduleOfReservation);
@@ -135,4 +147,15 @@ public class ScheduleService {
     }
 
 
+    public Set<Schedule> getSchedulesOfTables(
+            Set<AbstractTable> joinableTables,
+            LocalDate startDate,
+            SimpleMatrixLayout layout
+    ) {
+        return scheduleRepository.getSchedulesOfTables(
+                joinableTables,
+                DateUtils.estrapolateDate(startDate),
+                layout
+        );
+    }
 }
