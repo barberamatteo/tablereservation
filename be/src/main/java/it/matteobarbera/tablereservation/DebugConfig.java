@@ -72,6 +72,9 @@ public class DebugConfig {
             layout.connect(t1, t2);
             layout.connect(t1, t3);
             layout.connect(t2, t4);
+
+            layout.connect(t4, t5);
+            layout.connect(t6, t5);
             tableLayoutService.saveLayout(layout);
 
             securityService.createAdmin("admin", "admin"); //FE admin for debugging/testing
@@ -81,7 +84,7 @@ public class DebugConfig {
             SimpleMatrixLayout fetchedLayout = (SimpleMatrixLayout) tableLayoutService.getLayoutById(1L).getSuccess().getResult();
 
 
-            var res = reservationHandlingOrchestrator.newReservation(
+            /*var res = reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),
                             "2030-01-01T01:00:00",
@@ -89,8 +92,8 @@ public class DebugConfig {
                             10
                     ),
                     fetchedLayout.getId()
-            );
-            log.warn(res.getStatus().toString());
+            );*/
+            //log.warn(res.getStatus().toString());
             /*reservationHandlingOrchestrator.newReservation(
                     new ReservationDTO(
                             customer.getId(),

@@ -52,6 +52,7 @@ public class ScheduleService {
         scheduleRepository.saveAll(schedules);
     }
 
+
     public void initScheduleIfAbsent(
             TablesService tablesService,
             String arrivalDateTime,
@@ -64,12 +65,12 @@ public class ScheduleService {
         Set<AbstractTable> allTables = tablesService.getAllTables();
         if (scheduleRepository.getSchedulesByParsedDate(arrivalDate).isEmpty()) {
             scheduleRepository.saveAll(
-                    allTables.stream().map(table -> (new Schedule(table, arrivalDate, layout))).toList()
+                    allTables.stream().map(table -> (new Schedule(table, arrivalDate, layout))).collect(Collectors.toSet())
             );
         }
         if (scheduleRepository.getSchedulesByParsedDate(leaveDate).isEmpty()) {
             scheduleRepository.saveAll(
-                    allTables.stream().map(table -> (new Schedule(table, leaveDate, layout))).toList()
+                    allTables.stream().map(table -> (new Schedule(table, leaveDate, layout))).collect(Collectors.toSet())
             );
         }
     }
@@ -122,6 +123,7 @@ public class ScheduleService {
 
         return toRet;
     }
+
 
 
 

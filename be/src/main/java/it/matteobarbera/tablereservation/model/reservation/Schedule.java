@@ -38,6 +38,7 @@ public class Schedule {
         this.table = table;
         this.layout = layout;
         this.id = new ScheduleIdRecord(table.getId(), parsedDate, layout.getId());
+        this.reservations = new HashSet<>();
     }
 
     public ScheduleIdRecord getId() {
@@ -93,12 +94,13 @@ public class Schedule {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Schedule schedule)) return false;
-        return Objects.equals(id, schedule.id) && Objects.equals(reservations, schedule.reservations);
+        if (o == null || getClass() != o.getClass()) return false;
+        Schedule schedule = (Schedule) o;
+        return Objects.equals(id, schedule.id) && Objects.equals(table, schedule.table) && Objects.equals(layout, schedule.layout) && Objects.equals(reservations, schedule.reservations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reservations);
+        return Objects.hash(id, table, layout);
     }
 }
