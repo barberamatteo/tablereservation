@@ -97,7 +97,7 @@ public class SimpleMatrixLayout {
         public PathOptimizationPipeline getShortest(){
             TreeSet<Set<AbstractTable>> pathsOrderedBySize = new TreeSet<>(Comparator.comparingInt(Set::size));
             pathsOrderedBySize.addAll(paths);
-            int minLength = pathsOrderedBySize.first().size();
+            int minLength = (pathsOrderedBySize.isEmpty() ? 0: pathsOrderedBySize.first().size());
 
             paths = pathsOrderedBySize.stream().takeWhile(simpleJoinableTables ->
                     simpleJoinableTables.size() == minLength
@@ -107,7 +107,7 @@ public class SimpleMatrixLayout {
 
 
         public Set<AbstractTable> getRandom(){
-            return paths.iterator().next();
+            return (paths.iterator().hasNext() ? paths.iterator().next() : Set.of());
         }
 
     }

@@ -37,31 +37,29 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
         );
         var joinableTables = extractJoinableTables(intervalCompliantSchedules);
         var subsetSumSolver = new SubsetSumSolver<>(joinableTables.stream().toList());
-        var subsetOfCapacities = subsetSumSolver.getBestSubsetOfCapacities(reservation.getNumberOfPeople());
-        var joinedTables = layout.findBestPathWithExclusionsAndCapacities(
-                joinableTables,
-                subsetOfCapacities
-        );
+//        var subsetOfCapacities = subsetSumSolver.getBestSubsetOfCapacities(reservation.getNumberOfPeople());
+        var subsetsOfCapacities = subsetSumSolver.getSubsetsOfCapacities(reservation.getNumberOfPeople());
+        for (var subset : subsetsOfCapacities){
+            var joinedTables = layout.findBestPathWithExclusionsAndCapacities(
+                    joinableTables,
+                    subset
+            );
+            if (!joinedTables.isEmpty()) {
+                var involvedSchedules = scheduleService.getSchedulesOfTables(
+                        joinedTables,
+                        reservation.getStartDate(),
+                        layout
+                );
+                multiTableReservationPersister.persist(
+                        reservation,
+                        joinedTables,
+                        involvedSchedules
+                );
+                return joinedTables;
+            }
+        }
+        return Set.of();
 
-        var involvedSchedules = scheduleService.getSchedulesOfTables(
-                joinedTables,
-                reservation.getStartDate(),
-                layout
-        );
-
-        multiTableReservationPersister.persist(
-                reservation,
-                joinedTables,
-                involvedSchedules
-        );
-        /*
-        reservation.setJointTables(joinedTables);
-        involvedSchedules.forEach(schedule -> schedule.addReservation(reservation));
-        reservation.setSchedules(involvedSchedules);
-        scheduleService.updateSchedules(involvedSchedules);
-
-         */
-        return joinedTables;
     }
 
     private Set<SimpleJoinableTable> extractJoinableTables(Set<Schedule> schedules) {

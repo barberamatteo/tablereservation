@@ -85,17 +85,42 @@ public class TableGraph {
         return adjacencyTable.get(t1).remove(t2) && adjacencyTable.get(t2).remove(t1) && sanityCheck;
     }
 
-    public Set<Set<AbstractTable>> getAllPaths(Set<SimpleJoinableTable> tables, List<Integer> capacities){
+    public Set<Set<AbstractTable>> getAllPaths(
+            Set<SimpleJoinableTable> tables,
+            List<Integer> capacities
+    ){
+        HashMap<AbstractTable, Set<AbstractTable>> shrankAdjacencyMap = shrinkAdjacencyMapByFeasibleSchedules(tables);
         Set<Set<AbstractTable>> paths = new HashSet<>();
         for (SimpleJoinableTable table : tables) {
-            paths.addAll(getAllPathsByStartingTable(table, capacities));
+            paths.addAll(
+                    getAllPathsByStartingTable(table, capacities, shrankAdjacencyMap)
+            );
         }
         return paths;
     }
 
+    private HashMap<AbstractTable, Set<AbstractTable>> shrinkAdjacencyMapByFeasibleSchedules(
+            Set<SimpleJoinableTable> tables
+    ) {
+        return new HashMap<>(){
+            {
+                tables.forEach(table -> {
+                    var adjacencyList = adjacencyTable.get((table));
+                    var filteredAdjacencyList =
+                            adjacencyList
+                                    .stream()
+                                    .filter(tables::contains)
+                                    .collect(Collectors.toSet());
+                    put(table, filteredAdjacencyList);
+                });
+            }
+        };
+    }
+
     public Set<Set<AbstractTable>> getAllPathsByStartingTable(
             SimpleJoinableTable start,
-            List<Integer> capacities
+            List<Integer> capacities,
+            HashMap<AbstractTable, Set<AbstractTable>> shrankAdjacencyMap
     ){
         Set<List<SimpleJoinableTable>> paths = new HashSet<>();
         List<SimpleJoinableTable> path = new ArrayList<>();
@@ -103,7 +128,7 @@ public class TableGraph {
         List<Integer> pathCapacity = new ArrayList<>(capacities);
         pathCapacity.remove(Integer.valueOf(start.getStandaloneCapacity()));
 
-        buildPath(paths, path, start, pathCapacity);
+        buildPath(paths, path, start, pathCapacity, shrankAdjacencyMap);
         Set<Set<AbstractTable>> toRet = new HashSet<>();
         for (var calculatedPath : paths){
             toRet.add(new HashSet<>(calculatedPath));
@@ -115,20 +140,21 @@ public class TableGraph {
             Set<List<SimpleJoinableTable>> paths,
             List<SimpleJoinableTable> path,
             AbstractTable start,
-            List<Integer> pathCapacity
+            List<Integer> pathCapacity,
+            HashMap<AbstractTable, Set<AbstractTable>> shrankAdjacencyMap
     ) {
         if (pathCapacity.isEmpty()) {
             paths.add(new ArrayList<>(path));
             return;
         }
-        for (AbstractTable currTable : adjacencyTable.getOrDefault(start, Set.of())) {
+        for (AbstractTable currTable : shrankAdjacencyMap.getOrDefault(start, Set.of())) {
             if (currTable instanceof SimpleJoinableTable currSimpleJoinableTable) {
                 if (path.contains(currSimpleJoinableTable))
                     continue;
                 if (!pathCapacity.remove(Integer.valueOf(currSimpleJoinableTable.getStandaloneCapacity())))
                     continue;
                 path.add(currSimpleJoinableTable);
-                buildPath(paths, path, currTable, pathCapacity);
+                buildPath(paths, path, currTable, pathCapacity, shrankAdjacencyMap);
                 pathCapacity.add(currSimpleJoinableTable.getStandaloneCapacity());
                 path.removeLast();
             }

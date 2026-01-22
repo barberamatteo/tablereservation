@@ -19,16 +19,12 @@ public final class SubsetSumSolver<TableType extends SimpleJoinableTable> {
 
     }
 
-    public List<Integer> getBestSubsetOfCapacities(int target){
-        var subsets = getSubsetsOfCapacities(target);
-        var treeSet = new TreeSet<List<Integer>>(Comparator.comparingInt(List::size));
-        treeSet.addAll(subsets);
-        return treeSet.first();
-
-    }
-    private List<List<Integer>> getSubsetsOfCapacities(int target){
+    public List<List<Integer>> getSubsetsOfCapacities(int target){
         Integer[] capacities = pool.stream().map(TableType::getStandaloneCapacity).toArray(Integer[]::new);
-        return subsetSum(capacities, target);
+        var subsets = subsetSum(capacities, target);
+        subsets.sort(Comparator.comparingInt(List::size));
+        return subsets;
+
     }
 
     public static List<List<Integer>> subsetSum(Integer[] capacities, int target) {

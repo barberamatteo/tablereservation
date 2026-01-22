@@ -85,7 +85,7 @@ public class ScheduleService {
 
 
 
-    private void updateSchedule(Schedule scheduleOfReservation) {
+    public void updateSchedule(Schedule scheduleOfReservation) {
         scheduleRepository.save(scheduleOfReservation);
     }
 
