@@ -45,11 +45,15 @@ public class Reservation {
     private Integer numberOfPeople;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    /*@JoinColumns({
-            @JoinColumn(name = "table_id", referencedColumnName = "table_id"),
-            @JoinColumn(name = "date", referencedColumnName = "date"),
-            @JoinColumn(name = "layout_id", referencedColumnName = "layout_id")
-    })*/
+    @JoinTable(
+            name = "reservation_schedules",
+            joinColumns = @JoinColumn(name = "reservation_id"),
+            inverseJoinColumns = {
+                    @JoinColumn(name = "table_id"),
+                    @JoinColumn(name = "date"),
+                    @JoinColumn(name = "layout_id")
+            }
+    )
     @JsonIgnore
     private Set<Schedule> schedules;
 

@@ -1,13 +1,13 @@
 package it.matteobarbera.tablereservation.model.reservation.strategies.multitable;
 
 
+import it.matteobarbera.tablereservation.PersistenceService;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.model.table.layout.SubsetSumSolver;
-import it.matteobarbera.tablereservation.service.MultiTableReservationPersister;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -20,10 +20,10 @@ import java.util.Set;
 public class MultiTableFillScheduleFirst implements MultiTableReservationStrategy {
 
 
-    private final MultiTableReservationPersister multiTableReservationPersister;
+    private final PersistenceService persistenceService;
 
-    public MultiTableFillScheduleFirst(MultiTableReservationPersister multiTableReservationPersister) {
-        this.multiTableReservationPersister = multiTableReservationPersister;
+    public MultiTableFillScheduleFirst(PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
     }
 
     @Override
@@ -37,7 +37,6 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
         );
         var joinableTables = extractJoinableTables(intervalCompliantSchedules);
         var subsetSumSolver = new SubsetSumSolver<>(joinableTables.stream().toList());
-//        var subsetOfCapacities = subsetSumSolver.getBestSubsetOfCapacities(reservation.getNumberOfPeople());
         var subsetsOfCapacities = subsetSumSolver.getSubsetsOfCapacities(reservation.getNumberOfPeople());
         for (var subset : subsetsOfCapacities){
             var joinedTables = layout.findBestPathWithExclusionsAndCapacities(
@@ -50,7 +49,7 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
                         reservation.getStartDate(),
                         layout
                 );
-                multiTableReservationPersister.persist(
+                persistenceService.persistMulti(
                         reservation,
                         joinedTables,
                         involvedSchedules

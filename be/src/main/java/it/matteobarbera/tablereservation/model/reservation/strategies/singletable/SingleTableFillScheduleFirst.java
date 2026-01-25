@@ -1,5 +1,6 @@
 package it.matteobarbera.tablereservation.model.reservation.strategies.singletable;
 
+import it.matteobarbera.tablereservation.PersistenceService;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.service.SingleTableReservationPersister;
@@ -15,13 +16,11 @@ import java.util.Set;
 @Primary
 public class SingleTableFillScheduleFirst implements SingleTableReservationStrategy {
 
+    private final PersistenceService persistenceService;
 
-    private final SingleTableReservationPersister singleTableReservationPersister;
-
-    public SingleTableFillScheduleFirst(SingleTableReservationPersister singleTableReservationPersister) {
-        this.singleTableReservationPersister = singleTableReservationPersister;
+    public SingleTableFillScheduleFirst(PersistenceService persistenceService) {
+        this.persistenceService = persistenceService;
     }
-
 
     @Override
     public Set<AbstractTable> postReservation(ScheduleService scheduleService, Reservation reservation) {
@@ -41,7 +40,7 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
 
             }
                 if (!conflictualReservation) {
-                    singleTableReservationPersister.persist(
+                    persistenceService.persistSingle(
                             reservation,
                             jointTables,
                             Set.of(schedule)

@@ -26,7 +26,7 @@ public class Schedule {
     @JoinColumn(name = "layout_id", nullable = false)
     private SimpleMatrixLayout layout;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "schedules")
     private Set<Reservation> reservations;
 
     public Schedule() {
