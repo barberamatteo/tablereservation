@@ -5,6 +5,7 @@ import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
 import it.matteobarbera.tablereservation.service.MultiTableReservationPersister;
 import it.matteobarbera.tablereservation.service.SingleTableReservationPersister;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -31,7 +32,7 @@ public class PersistenceService {
     public void persistSingleWithinTwoSchedules(
             Reservation reservation,
             Set<AbstractTable> tables,
-            Set<Schedule> schedules
+            Set<Pair<Schedule, Schedule>> schedules
     ){
         singleTableReservationPersister.persistTwoSchedules(reservation, tables, schedules);
     }

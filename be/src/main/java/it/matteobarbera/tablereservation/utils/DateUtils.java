@@ -1,12 +1,7 @@
 package it.matteobarbera.tablereservation.utils;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
 
 public class DateUtils {
 
@@ -38,11 +33,4 @@ public class DateUtils {
         return localDate.plusDays(1);
     }
 
-    public static LocalDateTime atMidnight(LocalDate date) {
-        return LocalDateTime.of(date, LocalTime.MIDNIGHT);
-    }
-
-    public static LocalDateTime atMidnightMinusOne(LocalDate endDate) {
-        return atMidnight(endDate).minusMinutes(1);
-    }
 }

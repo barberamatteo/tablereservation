@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,9 +25,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
             "SELECT s " +
             "FROM Schedule s " +
             "WHERE s.id.parsedDate = :parsedDate AND s.table.tableDefinition.standaloneCapacity >= :numberOfPeople" +
-            " ORDER BY s.table.tableDefinition.standaloneCapacity ASC"
+            " ORDER BY s.table.tableDefinition.standaloneCapacity, s.table.numberInLounge ASC"
     )
-    Set<Schedule> getSchedulesByDateAndAdequateTable(String parsedDate, Integer numberOfPeople);
+    List<Schedule> getSchedulesByDateAndAdequateTable(String parsedDate, Integer numberOfPeople);
 
     @Query(
             "SELECT s " +

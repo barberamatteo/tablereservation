@@ -10,6 +10,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -26,7 +27,7 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
     public Set<AbstractTable> postReservation(ScheduleService scheduleService, Reservation reservation) {
         if (reservation.getInterval().spansMoreDays())
             return postReservationMultiSchedule(scheduleService, reservation);
-        Set<Schedule> adequateSchedules = scheduleService.getSchedulesByDayAndAdequateTable(
+        List<Schedule> adequateSchedules = scheduleService.getSchedulesByDayAndAdequateTable(
                 reservation.getStartDate(),
                 reservation.getNumberOfPeople()
         );
@@ -56,7 +57,7 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
     }
 
     private Set<AbstractTable> postReservationMultiSchedule(ScheduleService scheduleService, Reservation reservation) {
-        Set<Pair<Schedule, Schedule>> adequateSchedulesPairs = scheduleService.getSchedulesByCoupleDayAndAdequateTable(
+        List<Pair<Schedule, Schedule>> adequateSchedulesPairs = scheduleService.getSchedulesByCoupleDayAndAdequateTable(
                 reservation.getStartDate(),
                 reservation.getNumberOfPeople()
         );
@@ -84,7 +85,7 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
                 persistenceService.persistSingleWithinTwoSchedules(
                         reservation,
                         jointTables,
-                        Set.of(schedulesPair.getFirst(), schedulesPair.getSecond())
+                        Set.of(Pair.of(schedulesPair.getFirst(), schedulesPair.getSecond()))
                 );
                 return jointTables;
             }

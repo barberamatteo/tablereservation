@@ -7,6 +7,7 @@ import it.matteobarbera.tablereservation.repository.reservation.ReservationsRepo
 import it.matteobarbera.tablereservation.service.reservation.ReservationsService;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -35,7 +36,10 @@ public class MultiTableReservationPersister implements Persister {
     }
 
     @Override
-    public void persistTwoSchedules(Reservation reservation, Set<AbstractTable> tables, Set<Schedule> schedules) {
+    public void persistTwoSchedules(
+            Reservation reservation,
+            Set<AbstractTable> tables,
+            Set<Pair<Schedule, Schedule>> schedules) {
 
 
     }

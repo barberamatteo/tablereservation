@@ -39,5 +39,15 @@ public class ScheduleIdRecord implements Serializable{
     public int hashCode() {
         return Objects.hash(tableId, parsedDate, layoutId);
     }
+
+    @Override
+    public String toString() {
+        String toString = "{"
+                + "        \"tableId\":\"" + tableId + "\""
+                + ",         \"parsedDate\":\"" + parsedDate + "\""
+                + ",         \"layoutId\":\"" + layoutId + "\""
+                + "}";
+        return toString.replaceAll("[\n\r]", "   ");
+    }
 }
 

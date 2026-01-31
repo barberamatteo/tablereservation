@@ -40,10 +40,14 @@ public class SingleTableReservationPersister implements Persister{
     }
 
     @Override
-    public void persistTwoSchedules(Reservation reservation, Set<AbstractTable> tables, Set<Schedule> schedules) {
-        List<Schedule> schedulePair = schedules.stream().toList();
+    public void persistTwoSchedules(
+            Reservation reservation,
+            Set<AbstractTable> tables,
+            Set<Pair<Schedule, Schedule>> schedules
+    ) {
+        Pair<Schedule, Schedule> schedulePair = schedules.stream().findFirst().orElseThrow(RuntimeException::new);
         Schedule schedule1 = schedulePair.getFirst();
-        Schedule schedule2 = schedulePair.get(1);
+        Schedule schedule2 = schedulePair.getSecond();
 
         tables.add(schedule1.getTable());
 
@@ -53,29 +57,13 @@ public class SingleTableReservationPersister implements Persister{
 
         reservationsRepository.save(reservation);
 
-        var splitReservation = splitReservation(reservation, Pair.of(schedule1, schedule2));
-
-        schedule1.addReservation(splitReservation.getFirst());
-        schedule2.addReservation(splitReservation.getSecond());
+        schedule1.addReservation(reservation);
+        schedule2.addReservation(reservation);
 
         scheduleService.updateSchedules(Set.of(schedule1, schedule2));
     }
 
-    private static Pair<Reservation, Reservation> splitReservation(
-            Reservation reservation,
-            Pair<Schedule, Schedule> schedulePair
-    ){
-        Reservation firstHalf = new Reservation(reservation, new HashSet<>(){{add(schedulePair.getFirst());}});
-        firstHalf.setEndDateTime(
-                DateUtils.atMidnightMinusOne(firstHalf.getEndDate())
-        );
-        Reservation secondHalf = new Reservation(reservation, new HashSet<>(){{add(schedulePair.getSecond());}});
-        secondHalf.setStartDateTime(
-                DateUtils.atMidnight(secondHalf.getEndDate())
-        );
 
-        return Pair.of(firstHalf, secondHalf);
-    }
 
 
 }
