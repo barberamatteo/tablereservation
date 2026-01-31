@@ -33,4 +33,10 @@ public class MultiTableReservationPersister implements Persister {
         //schedules.forEach(schedule -> schedule.addReservation(reservation));
         scheduleService.updateSchedules(schedules);
     }
+
+    @Override
+    public void persistTwoSchedules(Reservation reservation, Set<AbstractTable> tables, Set<Schedule> schedules) {
+
+
+    }
 }

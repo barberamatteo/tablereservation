@@ -4,7 +4,6 @@ import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.reservation.ScheduleIdRecord;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +26,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
             "WHERE s.id.parsedDate = :parsedDate AND s.table.tableDefinition.standaloneCapacity >= :numberOfPeople" +
             " ORDER BY s.table.tableDefinition.standaloneCapacity ASC"
     )
-    Set<Schedule> getSchedulesByParsedDateAndAdequateTable(String parsedDate, Integer numberOfPeople);
+    Set<Schedule> getSchedulesByDateAndAdequateTable(String parsedDate, Integer numberOfPeople);
 
     @Query(
             "SELECT s " +

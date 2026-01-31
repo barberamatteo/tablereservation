@@ -12,4 +12,10 @@ public interface Persister {
             Set<AbstractTable> tables,
             Set<Schedule> schedules
     );
+
+    void persistTwoSchedules(
+            Reservation reservation,
+            Set<AbstractTable> tables,
+            Set<Schedule> schedules
+    );
 }

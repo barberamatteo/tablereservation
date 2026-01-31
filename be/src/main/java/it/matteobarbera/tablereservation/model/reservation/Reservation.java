@@ -168,6 +168,17 @@ public class Reservation {
         return this.interval.getEndDate();
     }
 
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.interval.setStartDateTime(startDateTime);
+    }
+
+    public void setEndDateTime(LocalDateTime endDateTime){
+        this.interval.setEndDateTime(endDateTime);
+    }
+
+    public boolean involvesMultipleSchedules(){
+        return interval.spansMoreDays();
+    }
     @Override
     public String toString() {
         return "Reservation{" +

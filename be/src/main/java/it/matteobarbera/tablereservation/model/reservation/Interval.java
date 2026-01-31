@@ -57,6 +57,9 @@ public class Interval {
                 !other.endDateTime.isBefore(this.startDateTime);
     }
 
+    public boolean spansMoreDays(){
+        return endDateTime.toLocalDate().isAfter(startDateTime.toLocalDate());
+    }
     @Override
     public String toString() {
         String sdd = String.valueOf(this.startDateTime.getDayOfMonth());

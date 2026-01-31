@@ -28,6 +28,14 @@ public class PersistenceService {
         singleTableReservationPersister.persist(reservation, tables, schedules);
     }
 
+    public void persistSingleWithinTwoSchedules(
+            Reservation reservation,
+            Set<AbstractTable> tables,
+            Set<Schedule> schedules
+    ){
+        singleTableReservationPersister.persistTwoSchedules(reservation, tables, schedules);
+    }
+
     public void persistMulti(
             Reservation reservation,
             Set<AbstractTable> tables,

@@ -4,18 +4,20 @@ import it.matteobarbera.tablereservation.model.reservation.Interval;
 import it.matteobarbera.tablereservation.model.reservation.Reservation;
 import it.matteobarbera.tablereservation.model.reservation.Schedule;
 import it.matteobarbera.tablereservation.model.table.AbstractTable;
-import it.matteobarbera.tablereservation.model.table.SimpleJoinableTable;
 import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.service.table.TablesService;
 import it.matteobarbera.tablereservation.repository.reservation.ScheduleRepository;
 import it.matteobarbera.tablereservation.utils.DateUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,14 +36,51 @@ public class ScheduleService {
                 .orElse(null);
     }
 
-    @Transactional
+
     public Set<Schedule> getSchedulesByDayAndAdequateTable(LocalDate localDate, Integer numberOfPeople) {
-        return scheduleRepository.getSchedulesByParsedDateAndAdequateTable(
+        return scheduleRepository.getSchedulesByDateAndAdequateTable(
                 localDate.toString(),
                 numberOfPeople
         );
+    }
+
+    public Set<Pair<Schedule, Schedule>> getSchedulesByCoupleDayAndAdequateTable(
+            LocalDate localDate,
+            Integer numberOfPeople
+    ){
+        Set<Schedule> firstDaySchedules = new TreeSet<>(Comparator.comparingLong(
+                schedule -> schedule.getTable().getNumberInLounge())
+        );
+        firstDaySchedules.addAll(
+                getSchedulesByDayAndAdequateTable(
+                        localDate,
+                        numberOfPeople
+                )
+        );
+        Set<Schedule> secondDaySchedules = new TreeSet<>(Comparator.comparingLong(
+                schedule -> schedule.getTable().getNumberInLounge())
+        );
+
+        secondDaySchedules.addAll(
+                getSchedulesByDayAndAdequateTable(
+                        DateUtils.tomorrow(localDate),
+                        numberOfPeople
+                )
+        );
+        Set<Pair<Schedule, Schedule>> toRet = new HashSet<>();
+        if (firstDaySchedules.size() != secondDaySchedules.size())
+            throw new RuntimeException("The two schedules sets are not the same size");
+
+        var iterator1 = firstDaySchedules.iterator();
+        var iterator2 = secondDaySchedules.iterator();
+
+        while (iterator1.hasNext() && iterator2.hasNext()){
+            toRet.add(Pair.of(iterator1.next(), iterator2.next()));
+        }
+        return toRet;
 
     }
+
 
     @Transactional
     public void updateScheduleTransactional(Schedule schedule) {
