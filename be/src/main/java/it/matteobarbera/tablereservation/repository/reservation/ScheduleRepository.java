@@ -31,9 +31,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, ScheduleIdRe
 
     @Query(
             "SELECT s " +
-            "FROM Schedule s WHERE s.id.parsedDate = :arrivalDate"
+            "FROM Schedule s " +
+            "WHERE s.id.parsedDate = :arrivalDate " +
+            "ORDER BY s.id.tableId ASC"
     )
-    Set<Schedule> getSchedulesByParsedDate(String arrivalDate);
+    List<Schedule> getSchedulesByParsedDate(String arrivalDate);
 
     @Query("SELECT s FROM Schedule s WHERE s.id.parsedDate = :day AND s.id.tableId = :table")
     Optional<Schedule> getScheduleByRecordId(LocalDate day, Long table);

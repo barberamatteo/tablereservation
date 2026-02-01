@@ -49,9 +49,9 @@ public class Reservation {
             name = "reservation_schedules",
             joinColumns = @JoinColumn(name = "reservation_id"),
             inverseJoinColumns = {
-                    @JoinColumn(name = "table_id"),
+                    @JoinColumn(name = "layout_id"),
                     @JoinColumn(name = "date"),
-                    @JoinColumn(name = "layout_id")
+                    @JoinColumn(name = "table_id")
             }
     )
     @JsonIgnore

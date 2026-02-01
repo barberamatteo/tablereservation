@@ -16,4 +16,6 @@ public interface MultiTableReservationStrategy {
             Reservation reservation,
             SimpleMatrixLayout layout
     );
+
+
 }

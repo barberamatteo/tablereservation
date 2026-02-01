@@ -67,12 +67,6 @@ public class ScheduleService {
 
     }
 
-
-    @Transactional
-    public void updateScheduleTransactional(Schedule schedule) {
-        scheduleRepository.saveAndFlush(schedule);
-    }
-
     public void updateSchedules(Set<Schedule> schedules){
         scheduleRepository.saveAll(schedules);
     }
@@ -135,7 +129,7 @@ public class ScheduleService {
     }
 
 
-    public Set<Schedule> getSchedulesByInterval(Interval interval) {
+    private Set<Schedule> getSchedulesByInterval(Interval interval) {
         String parsedStartDate = DateUtils.estrapolateDate(interval.getStartDateTime().toLocalDate());
         String parsedEndDate = DateUtils.estrapolateDate(interval.getEndDateTime().toLocalDate());
 
@@ -149,6 +143,30 @@ public class ScheduleService {
         return toRet;
     }
 
+
+    private List<Pair<Schedule, Schedule>> getSchedulesPairByInterval(Interval interval) {
+        String parsedStartDate = DateUtils.estrapolateDate(interval.getStartDateTime().toLocalDate());
+        String parsedEndDate = DateUtils.estrapolateDate(interval.getEndDateTime().toLocalDate());
+
+        final List<Schedule> schedulesOfStartDate = new ArrayList<>(
+                scheduleRepository.getSchedulesByParsedDate(parsedStartDate)
+        );
+
+        final List<Schedule> schedulesOfEndDate = new ArrayList<>(
+                scheduleRepository.getSchedulesByParsedDate(parsedEndDate)
+        );
+
+        if (schedulesOfStartDate.size() != schedulesOfEndDate.size()){
+            throw new RuntimeException("The two schedules sets are not the same size");
+        }
+
+        List<Pair<Schedule, Schedule>> toRet = new ArrayList<>();
+        for (int i = 0; i < schedulesOfStartDate.size(); i++){
+            toRet.add(Pair.of(schedulesOfStartDate.get(i), schedulesOfEndDate.get(i)));
+        }
+
+        return toRet;
+    }
 
 
 
@@ -166,12 +184,36 @@ public class ScheduleService {
         }).collect(Collectors.toSet());
     }
 
+    private List<Pair<Schedule, Schedule>> filterIntervalCompliantSchedulesPair(
+            Interval interval,
+            List<Pair<Schedule, Schedule>> schedulePairs
+    ) {
+        return schedulePairs.stream().filter(schedulePair -> {
+            for (Reservation reservation : schedulePair.getFirst().getReservations()){
+                if (interval.clashes(reservation.getInterval())){
+                    return false;
+                }
+            }
+            for (Reservation reservation : schedulePair.getSecond().getReservations()){
+                if (interval.clashes(reservation.getInterval())){
+                    return false;
+                }
+            }
+            return true;
+        }).toList();
+    }
 
 
     public Set<Schedule> getIntervalCompliantSchedules(Interval interval) {
         Set<Schedule> schedules = getSchedulesByInterval(interval);
         return filterIntervalCompliantSchedules(interval, schedules);
     }
+
+    public List<Pair<Schedule, Schedule>> getIntervalCompliantSchedulePairs(Interval interval) {
+        List<Pair<Schedule, Schedule>> schedulePairs = getSchedulesPairByInterval(interval);
+        return filterIntervalCompliantSchedulesPair(interval, schedulePairs);
+    }
+
 
 
     public Set<Schedule> getSchedulesOfTables(

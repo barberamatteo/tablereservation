@@ -10,5 +10,5 @@ public interface SingleTableReservationStrategy {
 
 
     Set<AbstractTable> postReservation(ScheduleService scheduleService, Reservation reservation);
-
+    Set<AbstractTable> postReservationMultiSchedule(ScheduleService scheduleService, Reservation reservation);
 }

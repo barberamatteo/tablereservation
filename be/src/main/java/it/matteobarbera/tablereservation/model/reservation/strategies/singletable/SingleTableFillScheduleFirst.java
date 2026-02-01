@@ -56,7 +56,8 @@ public class SingleTableFillScheduleFirst implements SingleTableReservationStrat
 
     }
 
-    private Set<AbstractTable> postReservationMultiSchedule(ScheduleService scheduleService, Reservation reservation) {
+    @Override
+    public Set<AbstractTable> postReservationMultiSchedule(ScheduleService scheduleService, Reservation reservation) {
         List<Pair<Schedule, Schedule>> adequateSchedulesPairs = scheduleService.getSchedulesByCoupleDayAndAdequateTable(
                 reservation.getStartDate(),
                 reservation.getNumberOfPeople()

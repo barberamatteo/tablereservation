@@ -10,9 +10,11 @@ import it.matteobarbera.tablereservation.model.table.layout.SimpleMatrixLayout;
 import it.matteobarbera.tablereservation.model.table.layout.SubsetSumSolver;
 import it.matteobarbera.tablereservation.service.reservation.ScheduleService;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -32,6 +34,11 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
             Reservation reservation,
             SimpleMatrixLayout layout
     ) {
+        if (reservation.getInterval().spansMoreDays())
+            return postReservationMultiSchedule(scheduleService, reservation, layout);
+        
+        
+        
         Set<Schedule> intervalCompliantSchedules = scheduleService.getIntervalCompliantSchedules(
                 reservation.getInterval()
         );
@@ -61,6 +68,55 @@ public class MultiTableFillScheduleFirst implements MultiTableReservationStrateg
 
     }
 
+    
+    public Set<AbstractTable> postReservationMultiSchedule(
+            ScheduleService scheduleService,
+            Reservation reservation,
+            SimpleMatrixLayout layout
+    ){
+        List<Pair<Schedule, Schedule>> adequateSchedulePairs = 
+                scheduleService.getIntervalCompliantSchedulePairs(reservation.getInterval());
+        Set<Schedule> intervalCompliantSchedules = new HashSet<>(){
+            {
+                for (var pair : adequateSchedulePairs){
+                    add(pair.getFirst());
+                }
+            }
+        };
+        var joinableTables = extractJoinableTables(intervalCompliantSchedules);
+        var subsetSumSolver = new SubsetSumSolver<>(joinableTables.stream().toList());
+        var subsetsOfCapacities = subsetSumSolver.getSubsetsOfCapacities(reservation.getNumberOfPeople());
+        for (var subset : subsetsOfCapacities){
+            var joinedTables = layout.findBestPathWithExclusionsAndCapacities(
+                    joinableTables,
+                    subset
+            );
+            if (!joinedTables.isEmpty()) {
+                var involvedSchedulesOfFirstDay = scheduleService.getSchedulesOfTables(
+                        joinedTables,
+                        reservation.getStartDate(),
+                        layout
+                );
+                
+                var involvedSchedulesOfSecondDay = scheduleService.getSchedulesOfTables(
+                        joinedTables,
+                        reservation.getEndDate(),
+                        layout
+                );
+                Set<Schedule> involvedSchedules = new HashSet<>();
+                involvedSchedules.addAll(involvedSchedulesOfFirstDay);
+                involvedSchedules.addAll(involvedSchedulesOfSecondDay);
+
+                persistenceService.persistMulti(
+                        reservation,
+                        joinedTables,
+                        involvedSchedules
+                );
+                return joinedTables;
+            }
+        }
+        return Set.of();
+    }
     private Set<SimpleJoinableTable> extractJoinableTables(Set<Schedule> schedules) {
         Set<SimpleJoinableTable> toRet = new HashSet<>();
         for (Schedule schedule : schedules) {
